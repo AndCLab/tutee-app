@@ -11,8 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
-    })
-    ->withExceptions(function (Exceptions $exceptions) {
+        $middleware->alias([
+            'check.is_stepper' => \App\Http\Middleware\CheckStepper::class,
+        ]);
+    })->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

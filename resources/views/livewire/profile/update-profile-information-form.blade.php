@@ -16,7 +16,8 @@ new class extends Component
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
+        $this->name = Auth::user()->fname;
+        $this->name = Auth::user()->lname;
         $this->email = Auth::user()->email;
     }
 
@@ -28,7 +29,8 @@ new class extends Component
         $user = Auth::user();
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'fname' => ['required', 'string', 'max:255'],
+            'lname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
         ]);
 
@@ -75,8 +77,14 @@ new class extends Component
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />
+            <x-input-label for="fname" :value="__('First Name')" />
+            <x-text-input wire:model="fname" id="fname" name="fname" type="text" class="mt-1 block w-full" required autofocus autocomplete="fname" />
+            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        </div>
+
+        <div>
+            <x-input-label for="lname" :value="__('Name')" />
+            <x-text-input wire:model="lname" id="lname" name="lname" type="text" class="mt-1 block w-full" required autofocus autocomplete="lname" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 

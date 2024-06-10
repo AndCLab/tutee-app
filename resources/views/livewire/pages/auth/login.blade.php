@@ -27,15 +27,16 @@ new #[Layout('layouts.guest')] class extends Component
 <div>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
-    
-    <div class="my-6">
+
+    {{-- <div class="my-6">
         <x-wui-datetime-picker
+            without-time="false"
             label="Testing WireUI Component"
             placeholder="Appointment Date"
             wire:model.defer="normalPicker"
         />
-    </div>
-    
+    </div> --}}
+
     <form wire:submit="login">
         <!-- Email Address -->
         <div>

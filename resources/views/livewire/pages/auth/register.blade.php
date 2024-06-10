@@ -10,7 +10,8 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
-    public string $name = '';
+    public string $fname = '';
+    public string $lname = '';
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
@@ -21,7 +22,8 @@ new #[Layout('layouts.guest')] class extends Component
     public function register(): void
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'fname' => ['required', 'string', 'max:255'],
+            'lname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -38,11 +40,19 @@ new #[Layout('layouts.guest')] class extends Component
 
 <div>
     <form wire:submit="register">
-        <!-- Name -->
+        <!-- First Name -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <x-input-label for="fname" :value="__('Name')" />
+            <x-text-input wire:model="fname" id="fname" class="block mt-1 w-full" type="text" name="fname" required autofocus autocomplete="fname" />
+            <x-input-error :messages="$errors->get('fname')" class="mt-2" />
+        </div>
+
+
+        <!-- Last Name -->
+        <div class="mt-4">
+            <x-input-label for="lname" :value="__('Name')" />
+            <x-text-input wire:model="lname" id="lname" class="block mt-1 w-full" type="text" name="lname" required autofocus autocomplete="lname" />
+            <x-input-error :messages="$errors->get('lname')" class="mt-2" />
         </div>
 
         <!-- Email Address -->
