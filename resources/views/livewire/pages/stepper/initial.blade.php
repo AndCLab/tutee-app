@@ -57,8 +57,6 @@ new #[Layout('layouts.app')] class extends Component {
         $this->institute = array_values($this->institute);
     }
 
-
-
     public function next_step()
     {
         $this->validate_status();
@@ -67,7 +65,11 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function prev_step()
     {
-        $this->count--;
+        if ($this->count === 1) {
+            session()->flash('error', 'You\'re at step 1 dipshyet');
+        } else{
+            $this->count--;
+        }
     }
 
     public function validate_status()
@@ -146,8 +148,10 @@ new #[Layout('layouts.app')] class extends Component {
 
 <div>
 
+    @if (session('error'))
+        {{ session('error') }}
+    @endif
     <div>
-
         Step {{ $count }}
     </div>
     {{ $user_type }}
@@ -181,12 +185,10 @@ new #[Layout('layouts.app')] class extends Component {
 
     @switch($count)
         @case($count < 4)
-
-            <x-wui-button wire:click='prev_step' wire:loading.attr='@disabled(true)'
-            wire:target='prev_step' neutral label="Back" />
+            <x-wui-button wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step' neutral
+                label="Back" />
             <x-wui-button wire:click='next_step' emerald label="Next" />
-
-            @break
+        @break
 
         @case($count === 4)
             <x-wui-button wire:click='submit' emerald label="Submit" />
