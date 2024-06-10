@@ -30,3 +30,7 @@
     <x-wui-button wire:click='add_institute' wire:loading.attr='@disabled(true)'
         wire:target='add_institute' emerald label="Add Insitute" />
 </div>
+
+@if (session('error-institute'))
+    {{ session('error-institute') }}
+@endif

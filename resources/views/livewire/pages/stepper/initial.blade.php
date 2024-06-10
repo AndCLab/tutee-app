@@ -36,11 +36,13 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function add_institute()
     {
-        if (count($this->inputs) <= 3) {
+        if (count($this->inputs) < 3) {
             $this->inputs[] = count($this->inputs);
             $this->from[] = ''; // Ensure from, to, and institute arrays are synchronized
             $this->to[] = '';
             $this->institute[] = '';
+        } else{
+            session()->flash('error-institute', 'You cannot add more than 3');
         }
     }
 
@@ -65,11 +67,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function prev_step()
     {
-        if ($this->count === 1) {
-            session()->flash('error', 'You\'re at step 1 dipshyet');
-        } else{
-            $this->count--;
-        }
+        $this->count--;
     }
 
     public function validate_status()
@@ -185,8 +183,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     @switch($count)
         @case($count < 4)
-            <x-wui-button wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step' neutral
-                label="Back" />
+            @if ($count == 2)
+                <x-wui-button wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step' neutral label="Back" />
+            @endif
             <x-wui-button wire:click='next_step' emerald label="Next" />
         @break
 
