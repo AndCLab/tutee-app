@@ -146,7 +146,10 @@ new #[Layout('layouts.app')] class extends Component {
 
 <div>
 
-    {{ $count }}
+    <div>
+
+        Step {{ $count }}
+    </div>
     {{ $user_type }}
 
     @if ($count === 1)
@@ -178,13 +181,15 @@ new #[Layout('layouts.app')] class extends Component {
 
     @switch($count)
         @case($count < 4)
-            <button wire:click='prev_step' @if ($count === 1) @disabled(true) @endif>Back</button>
 
-            <button wire:click='next_step'>Next</button>
-        @break
+            <x-wui-button wire:click='prev_step' wire:loading.attr='@disabled(true)'
+            wire:target='prev_step' neutral label="Back" />
+            <x-wui-button wire:click='next_step' emerald label="Next" />
+
+            @break
 
         @case($count === 4)
-            <button wire:click='submit'>Submit</button>
+            <x-wui-button wire:click='submit' emerald label="Submit" />
         @break
 
         @default
