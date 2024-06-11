@@ -9,10 +9,10 @@ use App\Models\Institute;
 use App\Models\Tutor;
 
 new #[Layout('layouts.app')] class extends Component {
-    public $count = 1;
+    public $count = 2;
 
     // General
-    public $user_type = '';
+    public $user_type = 'tutee';
     public $dates = [''];
     public $inputs = [];
 
@@ -149,51 +149,58 @@ new #[Layout('layouts.app')] class extends Component {
     @if (session('error'))
         {{ session('error') }}
     @endif
-    <div>
-        Step {{ $count }}
+
+    <div class="flex justify-center items-center h-screen">
+
+        <div class="grid grid-cols-4 grid-flow-col gap-10">
+            <div class="">
+                @include('livewire.pages.stepper.header')
+            </div>
+            <div class="col-span-4">
+                @if ($count === 1)
+                    @include('livewire.pages.stepper.role')
+                @endif
+
+                @switch($user_type)
+                    @case('tutee')
+                        @if ($count === 2)
+                            @include('livewire.pages.stepper.tutee.form')
+                        @endif
+
+                        @if ($count === 3)
+                            Fields for tutee
+                        @endif
+                    @break
+
+                    @case('tutor')
+                        @if ($count === 2)
+                            @include('livewire.pages.stepper.tutor.form')
+                        @endif
+
+                        @if ($count === 3)
+                            Fields for tutor
+                        @endif
+                    @break
+
+                @endswitch
+
+                @switch($count)
+                    @case($count < 4)
+                        @if ($count == 2)
+                            <x-wui-button wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step' neutral label="Back" />
+                        @endif
+                        <x-wui-button wire:click='next_step' emerald label="Next" />
+                    @break
+
+                    @case($count === 4)
+                        <x-wui-button wire:click='submit' emerald label="Submit" />
+                    @break
+
+                    @default
+                @endswitch
+            </div>
+        </div>
     </div>
-    {{ $user_type }}
 
-    @if ($count === 1)
-        @include('livewire.pages.stepper.role')
-    @endif
-
-    @switch($user_type)
-        @case('tutee')
-            @if ($count === 2)
-                @include('livewire.pages.stepper.tutee.form')
-            @endif
-
-            @if ($count === 3)
-                Fields for tutee
-            @endif
-        @break
-
-        @case('tutor')
-            @if ($count === 2)
-                @include('livewire.pages.stepper.tutor.form')
-            @endif
-
-            @if ($count === 3)
-                Fields for tutor
-            @endif
-        @break
-
-    @endswitch
-
-    @switch($count)
-        @case($count < 4)
-            @if ($count == 2)
-                <x-wui-button wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step' neutral label="Back" />
-            @endif
-            <x-wui-button wire:click='next_step' emerald label="Next" />
-        @break
-
-        @case($count === 4)
-            <x-wui-button wire:click='submit' emerald label="Submit" />
-        @break
-
-        @default
-    @endswitch
 
 </div>
