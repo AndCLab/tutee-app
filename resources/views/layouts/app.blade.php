@@ -19,7 +19,7 @@
 </head>
 
 <body class="font-inter antialiased">
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen">
 
         <!-- Page Heading -->
         @if (isset($header))

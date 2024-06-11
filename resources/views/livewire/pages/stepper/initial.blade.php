@@ -9,10 +9,10 @@ use App\Models\Institute;
 use App\Models\Tutor;
 
 new #[Layout('layouts.app')] class extends Component {
-    public $count = 2;
+    public $count = 1;
 
     // General
-    public $user_type = 'tutee';
+    public $user_type = '';
     public $dates = [''];
     public $inputs = [];
 
@@ -41,7 +41,7 @@ new #[Layout('layouts.app')] class extends Component {
             $this->from[] = ''; // Ensure from, to, and institute arrays are synchronized
             $this->to[] = '';
             $this->institute[] = '';
-        } else{
+        } else {
             session()->flash('error-institute', 'You cannot add more than 3');
         }
     }
@@ -52,11 +52,6 @@ new #[Layout('layouts.app')] class extends Component {
         unset($this->from[$index]);
         unset($this->to[$index]);
         unset($this->institute[$index]);
-
-        $this->inputs = array_values($this->inputs);
-        $this->from = array_values($this->from);
-        $this->to = array_values($this->to);
-        $this->institute = array_values($this->institute);
     }
 
     public function next_step()
@@ -150,13 +145,12 @@ new #[Layout('layouts.app')] class extends Component {
         {{ session('error') }}
     @endif
 
-    <div class="flex justify-center items-center h-screen">
-
-        <div class="grid grid-cols-4 grid-flow-col gap-10">
+    <div class="flex justify-center items-center h-screen mx-10">
+        <div class="grid grid-rows-4 grid-flow-row sm:grid-rows-1 sm:grid-cols-4 sm:grid-flow-col">
             <div class="">
                 @include('livewire.pages.stepper.header')
             </div>
-            <div class="col-span-4">
+            <div class="sm:col-span-4 row-span-4">
                 @if ($count === 1)
                     @include('livewire.pages.stepper.role')
                 @endif
@@ -184,20 +178,21 @@ new #[Layout('layouts.app')] class extends Component {
 
                 @endswitch
 
-                @switch($count)
-                    @case($count < 4)
-                        @if ($count == 2)
-                            <x-wui-button wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step' neutral label="Back" />
-                        @endif
-                        <x-wui-button wire:click='next_step' emerald label="Next" />
-                    @break
+                <div class="flex justify-between w-2/3 mx-auto gap-3">
+                    <x-wui-button class="w-full" wire:click='prev_step' wire:loading.attr='disabled' wire:target='prev_step'
+                        neutral label="Back" />
+                    @switch($count)
+                        @case($count < 4)
+                            <x-wui-button class="w-full" wire:click='next_step' emerald label="Next" />
+                        @break
 
-                    @case($count === 4)
-                        <x-wui-button wire:click='submit' emerald label="Submit" />
-                    @break
+                        @case($count === 4)
+                            <x-wui-button class="w-full" wire:click='submit' emerald label="Submit" />
+                        @break
 
-                    @default
-                @endswitch
+                        @default
+                    @endswitch
+                </div>
             </div>
         </div>
     </div>
