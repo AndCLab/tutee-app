@@ -1,5 +1,11 @@
-<x-wui-input
-    label="Test"
-    placeholder="Test"
-    wire:model='test'
-/>
+<?php
+
+use Livewire\Volt\Component;
+use Livewire\Attributes\Layout;
+
+new #[Layout('layouts.app')] class extends Component {
+
+}; ?>
+
+<div>
+</div>

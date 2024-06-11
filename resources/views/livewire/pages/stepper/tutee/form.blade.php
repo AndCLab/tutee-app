@@ -1,3 +1,12 @@
+<?php
+
+use Livewire\Volt\Component;
+use Livewire\Attributes\Layout;
+
+new #[Layout('layouts.app')] class extends Component {
+
+}; ?>
+
 <div class="flex flex-col justify-center items-center">
     <div class="w-fit">
         <x-wui-select label="School Level" placeholder="Select school level" wire:model.defer="grade_level">
