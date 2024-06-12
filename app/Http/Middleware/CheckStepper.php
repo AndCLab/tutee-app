@@ -18,14 +18,15 @@ class CheckStepper
     {
         if (Auth::check()) {
             $user = Auth::user();
+            $isStepperRoute = $request->route()->named('stepper')
+                || $request->route()->named('stepper.tutee')
+                || $request->route()->named('stepper.tutor');
 
-            // Redirect to the stepper route if the user is a stepper and not already on the stepper route
-            if ($user->is_stepper == 1 && !$request->route()->named('stepper')) {
+            if ($user->is_stepper == 1 && !$isStepperRoute) {
                 return redirect()->route('stepper');
             }
 
-            // If the user is not a stepper and tries to access the stepper route, redirect to the dashboard
-            if ($user->is_stepper == 0 && $request->route()->named('stepper')) {
+            if ($user->is_stepper == 0 && $isStepperRoute) {
                 return redirect()->route('dashboard');
             }
         }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('fname');
             $table->string('lname');
             $table->boolean('is_stepper')->default(1);
-            $table->enum('user_type', ['tutee', 'tutor', 'both'])->default('tutee');
+            $table->enum('user_type', ['tutee', 'tutor', 'both'])->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
