@@ -6,7 +6,6 @@ use Livewire\Attributes\Validate;
 use App\Models\User;
 use App\Models\Tutee;
 use App\Models\Institute;
-use App\Models\Tutor;
 
 new #[Layout('layouts.app')] class extends Component {
     public $count = 2;
