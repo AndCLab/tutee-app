@@ -46,6 +46,11 @@ new #[Layout('layouts.app')] class extends Component {
         unset($this->from[$index]);
         unset($this->to[$index]);
         unset($this->work[$index]);
+
+        $this->inputs = array_values($this->inputs);
+        $this->from = array_values($this->from);
+        $this->to = array_values($this->to);
+        $this->institute = array_values($this->work);
     }
 
     public function next_step()

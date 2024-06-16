@@ -6,6 +6,7 @@ use Livewire\Attributes\Validate;
 use App\Models\User;
 use App\Models\Tutee;
 use App\Models\Institute;
+use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
     public $count = 2;
@@ -14,12 +15,26 @@ new #[Layout('layouts.app')] class extends Component {
     public $user_type = 'tutee';
     public $dates = [''];
     public $inputs = [];
+    public $i = 0;
+
+    public $fields = [
+        'English' => ['Grammar', 'Literature', 'Poetry', 'Writing'],
+        'Mathematics' => ['Algebra', 'Geometry', 'Calculus', 'Statistics', 'Trigonometry'],
+        'Science' => ['Biology', 'Chemistry', 'Physics', 'Astronomy', 'Geology'],
+        'History' => ['Ancient', 'Medieval', 'Modern', 'World Wars', 'American'],
+        'Geography' => ['Maps', 'Climate', 'Continents', 'Oceans', 'Countries'],
+        'Computer Science' => ['Programming', 'Algorithms', 'Data Structures', 'Databases', 'Networks'],
+        'Art' => ['Painting', 'Sculpture', 'Drawing', 'Photography', 'Film'],
+        'Music' => ['Theory', 'Composition', 'Performance', 'Genres', 'History'],
+        'Physical Education' => ['Sports', 'Exercise', 'Health', 'Fitness', 'Nutrition'],
+    ];
 
     // Tutee
     public $grade_level = '';
     public $from = [];
     public $to = [];
     public $institute = [];
+    public $selected = [];
 
     public function mount()
     {
@@ -48,12 +63,40 @@ new #[Layout('layouts.app')] class extends Component {
         unset($this->from[$index]);
         unset($this->to[$index]);
         unset($this->institute[$index]);
+
+        $this->inputs = array_values($this->inputs);
+        $this->from = array_values($this->from);
+        $this->to = array_values($this->to);
+        $this->institute = array_values($this->institute);
+    }
+
+    // Fields
+
+    public function get_field($name)
+    {
+        if (!in_array($name, $this->selected)) {
+            $this->selected[$this->i++] = $name;
+        }
+    }
+
+    public function remove_field($index)
+    {
+        unset($this->selected[$index]);
+        $this->selected = array_values($this->selected);
     }
 
     public function next_step()
     {
-        $this->validate_status();
-        $this->count++;
+        if ($this->count === 3) {
+            if (count($this->selected) < 3) {
+                session()->flash('error-field', 'Choose at least 3 fields');
+            } else {
+                $this->count++;
+            }
+        } else{
+            $this->validate_status();
+            $this->count++;
+        }
     }
 
     public function prev_step()
@@ -79,10 +122,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                 ],
             );
-        } elseif ($this->count === 3) {
-            # code...
         }
-
     }
 
     public function submit()
@@ -105,6 +145,13 @@ new #[Layout('layouts.app')] class extends Component {
                     'from' => $this->from[$item],
                     'to' => $this->to[$item],
                     'institute' => $this->institute[$item],
+                ]);
+            }
+
+            foreach ($this->selected as $item) {
+                Fields::create([
+                    'user_id' => $user->id,
+                    'field_name' => $item,
                 ]);
             }
 

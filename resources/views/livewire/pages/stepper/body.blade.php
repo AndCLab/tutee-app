@@ -1,9 +1,9 @@
-<div class="flex justify-center items-center h-screen mx-10">
-    <div class="grid grid-rows-4 grid-flow-row sm:grid-rows-1 sm:grid-cols-4 sm:grid-flow-col">
-        <div>
+<div class="mx-10">
+    <div class="grid grid-rows-4 grid-flow-row md:grid-rows-1 md:grid-cols-8 md:grid-flow-col justify-center items-center h-screen max-w-5xl mx-auto">
+        <div class="md:col-span-3">
             @include('livewire.pages.stepper.header')
         </div>
-        <div class="sm:col-span-4 row-span-4">
+        <div class="md:col-span-5 row-span-4">
             @if ($count === 1)
                 @include('livewire.pages.stepper.role')
 
@@ -22,7 +22,7 @@
                         @endif
 
                         @if ($count === 3)
-                            Fields for tutee
+                            @include('livewire.pages.stepper.tutee.steps.fields')
                         @endif
 
                         <div class="flex justify-between w-2/3 mx-auto gap-3">
