@@ -8,7 +8,9 @@
                 @include('livewire.pages.stepper.role')
 
                 <div class="flex justify-between w-2/3 mx-auto gap-3">
-                    <x-wui-button class="w-full" wire:click='next_step()' emerald label="Next" />
+                    <x-primary-button wire:click='next_step' class="w-full">
+                        Next
+                    </x-primary-button>
                 </div>
             @else
                 @switch($user_type)
@@ -26,14 +28,20 @@
                         @endif
 
                         <div class="flex justify-between w-2/3 mx-auto gap-3">
-                            <x-wui-button class="w-full" wire:click='prev_step' neutral label="Back" />
+                            <x-secondary-button wire:click='prev_step' class="w-full">
+                                Back
+                            </x-secondary-button>
                             @switch($count)
                                 @case($count < 4)
-                                    <x-wui-button class="w-full" wire:click='next_step' emerald label="Next" />
+                                    <x-primary-button wire:click='next_step' class="w-full">
+                                        Next
+                                    </x-primary-button>
                                 @break
 
                                 @case($count === 4)
-                                    <x-wui-button class="w-full" wire:click='submit' emerald label="Submit" />
+                                    <x-primary-button wire:click='submit' class="w-full">
+                                        Submit
+                                    </x-primary-button>
                                 @break
 
                                 @default
@@ -58,11 +66,15 @@
                             <x-wui-button class="w-full" wire:click='prev_step' neutral label="Back" />
                             @switch($count)
                                 @case($count < 4)
-                                    <x-wui-button class="w-full" wire:click='next_step' emerald label="Next" />
+                                    <x-primary-button wire:click='next_step' class="w-full">
+                                        Next
+                                    </x-primary-button>
                                 @break
 
                                 @case($count === 4)
-                                    <x-wui-button class="w-full" wire:click='submit' emerald label="Submit" />
+                                    <x-primary-button wire:click='submit' class="w-full">
+                                        Submit
+                                    </x-primary-button>
                                 @break
 
                                 @default

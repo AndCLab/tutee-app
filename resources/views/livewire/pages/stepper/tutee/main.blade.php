@@ -9,7 +9,7 @@ use App\Models\Institute;
 use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
-    public $count = 2;
+    public $count = 3;
 
     // General
     public $user_type = 'tutee';

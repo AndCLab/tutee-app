@@ -31,8 +31,8 @@ new #[Layout('layouts.guest')] class extends Component {
         <div class="flex flex-col gap-4">
             <!-- Email Address -->
             <div>
-                <x-wui-input label="Email" placeholder="Email" description="Enter your email address"
-                    wire:model="form.email" autocomplete/>
+                <x-wui-input label="Email" placeholder="Enter your email"
+                    wire:model="form.email" autocomplete='username'/>
             </div>
 
             <!-- Password -->
