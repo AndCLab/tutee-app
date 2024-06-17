@@ -22,19 +22,20 @@
     <div class="min-h-screen">
 
         <!-- Page Heading -->
-        @if (isset($header))
-            <livewire:layout.navigation />
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
+        {{-- @if (isset($header))
+        @endif --}}
 
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
+        <div class="flex flex-row">
+            <livewire:layout.sidenav />
+            <div class="w-full">
+                <livewire:layout.navigation />
+                <!-- Page Content -->
+                <main>
+                    {{ $slot }}
+                </main>
+            </div>
+        </div>
+
     </div>
 </body>
 
