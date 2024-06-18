@@ -8,7 +8,7 @@
                 @include('livewire.pages.stepper.role')
 
                 <div class="flex justify-between w-2/3 mx-auto gap-3">
-                    <x-primary-button wire:click='next_step' class="w-full">
+                    <x-primary-button wire:click.prevent='next_step' class="w-full">
                         Next
                     </x-primary-button>
                 </div>
@@ -30,11 +30,11 @@
                 @includeWhen($count === 4, 'livewire.pages.stepper.confirm')
 
                 <div class="flex justify-between w-3/4 mx-auto gap-3">
-                    <x-secondary-button wire:click='prev_step' class="w-full">
+                    <x-secondary-button wire:click.prevent='prev_step' class="w-full">
                         Back
                     </x-secondary-button>
                     @if ($count < 4)
-                        <x-primary-button wire:click='next_step' class="w-full">
+                        <x-primary-button wire:click.prevent='next_step' class="w-full">
                             Next
                         </x-primary-button>
                     @endif

@@ -20,8 +20,6 @@
                             </x-wui-select>
                         </div>
 
-                        <x-wui-errors />
-
                         <x-wui-input class="w-full" id="institute.{{ $index }}"
                             name="institute.{{ $index }}" placeholder="Institute"
                             wire:model='institute.{{ $index }}' />
@@ -41,6 +39,7 @@
                     </div>
                 </div>
             @endforeach
+            <x-wui-errors />
 
             {{-- Add Insitute --}}
             <x-white-button class="w-full mt-3" wire:click='add_institute' emerald label="Add Insitute">Add

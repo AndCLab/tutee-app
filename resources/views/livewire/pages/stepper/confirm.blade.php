@@ -68,19 +68,29 @@
 
             </div>
 
-            <div class="mt-6">
-                Checkbox ni
+            <div x-data="{ open: false }">
+                <div class="mt-6">
+                    <div class="block">
+                        <label for="confirm" class="inline-flex items-center">
+                            <input id="confirm" type="checkbox" x-model="open"
+                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
+                            <span class="ms-2 text-sm text-gray-600">I agree to the terms and condition</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <x-secondary-button x-on:click="$dispatch('close')">
+                        {{ __('Cancel') }}
+                    </x-secondary-button>
+
+                    <x-primary-button class="ms-3" x-bind:disabled="!open">
+                        {{ __('Submit') }}
+                    </x-primary-button>
+                </div>
             </div>
 
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
 
-                <x-primary-button class="ms-3">
-                    Submit
-                </x-primary-button>
-            </div>
         </form>
     </x-modal>
 </div>
