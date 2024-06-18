@@ -10,6 +10,9 @@ class CreateCertificatesTable extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tutor_id')->constrained('tutor')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->string('file_path');
             $table->timestamps();
         });
@@ -20,4 +23,3 @@ class CreateCertificatesTable extends Migration
         Schema::dropIfExists('certificates');
     }
 }
-
