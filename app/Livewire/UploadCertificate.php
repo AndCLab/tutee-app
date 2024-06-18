@@ -15,7 +15,7 @@ class UploadCertificate extends Component
     public function store()
     {
         $this->validate([
-            'certificate' => 'required|file|max:10240',
+            'certificate' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
         ]);
 
         $filePath = $this->certificate->store('certificates', 'public');
