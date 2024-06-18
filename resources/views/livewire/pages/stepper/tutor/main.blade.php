@@ -5,6 +5,8 @@ use Livewire\Attributes\Layout;
 use App\Models\User;
 use App\Models\Tutor;
 use App\Models\Work;
+use Livewire\WithFileUploads;
+use App\Models\Certificate;
 
 new #[Layout('layouts.app')] class extends Component {
     public $count = 2;
@@ -18,6 +20,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $from = [];
     public $to = [];
     public $work = [];
+    public $certificate;
 
     public function mount()
     {
@@ -50,7 +53,26 @@ new #[Layout('layouts.app')] class extends Component {
         $this->inputs = array_values($this->inputs);
         $this->from = array_values($this->from);
         $this->to = array_values($this->to);
-        $this->institute = array_values($this->work);
+        $this->work = array_values($this->work);
+    }
+
+    use WithFileUploads;
+    public function upload_certificate()
+    {
+        $validated = $this->validate();
+
+        if ($this->certificate){
+            $filePath = $this->certificate->store('certificates', 'public');
+            $validated['file_path'] = $filePath;
+        }
+
+        Certificate::create([
+            'file_path' => $filePath,
+        ]);
+
+        session()->flash('message', 'Certificate uploaded successfully!');
+
+        $this->reset('certificate');
     }
 
     public function next_step()
@@ -76,6 +98,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'from.*' => 'required|date',
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
+                    'certificate.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
                 ],
                 [
                     'to.*.after' => 'The "to" date must be after the "from" date.',
