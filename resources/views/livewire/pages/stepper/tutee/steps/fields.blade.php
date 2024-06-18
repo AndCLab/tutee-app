@@ -1,4 +1,4 @@
-<div class="my-5 w-2/3 mx-auto">
+<div class="my-5 w-3/4 mx-auto">
     @if (session('error-field'))
         <div class="w-full border border-blue-200 text-center py-3 rounded-lg antialiased bg-blue-100 text-blue-900 mb-2">
             {{ session('error-field') }}
