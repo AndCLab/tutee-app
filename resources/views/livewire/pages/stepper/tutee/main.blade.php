@@ -9,13 +9,14 @@ use App\Models\Institute;
 use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
-    public $count = 2;
+    public $count;
 
     // General
     public $user_type = 'tutee';
     public $dates = [''];
     public $inputs = [];
     public $i = 0;
+    public $specific = '';
 
     public $fields = [
         'English' => ['Grammar', 'Literature', 'Poetry', 'Writing'],
@@ -51,6 +52,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
+        $this->count = 3;
         $this->inputs = [0];
         $this->from = [''];
         $this->to = [''];

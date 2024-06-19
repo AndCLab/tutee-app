@@ -5,7 +5,12 @@ use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Component {
     public $user_type = '';
-    public $count = 1;
+    public $count;
+
+    public function mount()
+    {
+        $this->count = 1;
+    }
 
     public function next_step()
     {
