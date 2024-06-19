@@ -52,7 +52,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
-        $this->count = 3;
+        $this->count = 2;
         $this->i = 0;
         $this->inputs = [0];
         $this->from = [''];

@@ -8,7 +8,7 @@
                 @include('livewire.pages.stepper.role')
 
                 <div class="flex justify-between w-2/3 mx-auto gap-3">
-                    <x-primary-button wire:click.prevent='next_step' class="w-full">
+                    <x-primary-button wire:click='next_step' class="w-full">
                         Next
                     </x-primary-button>
                 </div>
