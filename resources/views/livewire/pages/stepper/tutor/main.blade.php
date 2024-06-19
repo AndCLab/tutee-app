@@ -35,7 +35,7 @@ new #[Layout('layouts.app')] class extends Component {
     {
         if (count($this->inputs) < 3) {
             $this->inputs[] = count($this->inputs);
-            $this->from[] = ''; // Ensure from, to, and work arrays are synchronized
+            $this->from[] = '';
             $this->to[] = '';
             $this->work[] = '';
         } else {
@@ -57,22 +57,25 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     use WithFileUploads;
-    public function upload_certificate()
+    public function upload_certificate($tutorId)
     {
-        $validated = $this->validate();
-
-        if ($this->certificate){
-            $filePath = $this->certificate->store('certificates', 'public');
-            $validated['file_path'] = $filePath;
-        }
-
-        Certificate::create([
-            'file_path' => $filePath,
+        $validated = $this->validate([
+            'certificate' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
         ]);
 
-        session()->flash('message', 'Certificate uploaded successfully!');
+        if ($this->certificate) {
+            $filePath = $this->certificate->store('certificates', 'public');
+            
+            Certificate::create([
+                'tutor_id' => $tutorId,
+                'file_path' => $filePath,
+            ]);
 
-        $this->reset('certificate');
+            session()->flash('message', 'Certificate uploaded successfully!');
+            $this->reset('certificate');
+        } else {
+            session()->flash('error', 'No file selected.');
+        }
     }
 
     public function next_step()
@@ -128,6 +131,8 @@ new #[Layout('layouts.app')] class extends Component {
                     'work' => $this->work[$item],
                 ]);
             }
+            
+            $this->upload_certificate($tutor->id);
 
             return redirect()->route('dashboard');
         }

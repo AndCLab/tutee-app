@@ -9,5 +9,5 @@ class Certificate extends Model
 {
     use HasFactory;
     protected $table = 'certificates';
-    protected $fillable = ['file_path'];
+    protected $fillable = ['tutor_id', 'file_path'];
 }
