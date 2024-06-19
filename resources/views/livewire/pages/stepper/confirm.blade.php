@@ -39,7 +39,7 @@
                 TUTEE Platform - Terms and Conditions
             </h2>
 
-            <div class="mt-1 text-sm text-gray-600 overflow-auto soft-scrollbar h-[400px] space-y-5">
+            <div class="mt-1 text-sm text-gray-600 overflow-auto soft-scrollbar h-[390px] space-y-5">
                 <p>
                     Welcome to TUTEE, the revolutionary platform designed to enhance the tutoring experience for both
                     tutees

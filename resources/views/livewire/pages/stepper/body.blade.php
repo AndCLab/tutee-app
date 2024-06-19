@@ -38,9 +38,6 @@
                             Next
                         </x-primary-button>
                     @endif
-                    {{-- <x-primary-button wire:click='submit' class="w-full">
-                        Submit
-                    </x-primary-button> --}}
                 </div>
             @endif
         </div>

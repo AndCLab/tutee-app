@@ -26,6 +26,6 @@ new #[Layout('layouts.app')] class extends Component {
     }
 }; ?>
 
-<div>
+<div wire:ignore>
     @include('livewire.pages.stepper.body')
 </div>
