@@ -15,7 +15,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $user_type = 'tutee';
     public $dates = [''];
     public $inputs = [];
-    public $i = 0;
+    public $i;
     public $specific = '';
 
     public $fields = [
@@ -53,6 +53,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function mount()
     {
         $this->count = 3;
+        $this->i = 0;
         $this->inputs = [0];
         $this->from = [''];
         $this->to = [''];
@@ -91,6 +92,19 @@ new #[Layout('layouts.app')] class extends Component {
         if (!in_array($name, $this->selected)) {
             $this->selected[$this->i++] = $name;
         }
+    }
+
+    public function get_specific_field()
+    {
+        $this->validate([
+            'specific' => 'required'
+        ]);
+
+        if (!in_array($this->specific, $this->selected)) {
+            $this->selected[$this->i++] = $this->specific;
+        }
+
+        $this->reset('specific');
     }
 
     public function remove_field($index)

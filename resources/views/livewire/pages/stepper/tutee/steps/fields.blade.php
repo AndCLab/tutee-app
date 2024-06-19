@@ -44,16 +44,14 @@
             @endforeach
         </div>
     </div>
-    <hr class="my-4">
-    <form wire:submit='get_field("{{ $specific }}")'>
-        <div class="flex items-end gap-3">
-            <div class="w-full">
-                <x-wui-input class="py-1.5" label="Specific Field" placeholder="Enter specific field"
-                    wire:model.defer="specific" wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition' autofocus autocomplete='off' />
-            </div>
-            <div class="min-w-fit">
-                <x-white-button type='submit'>Add Field</x-white-button>
-            </div>
+    <form wire:submit.prevent='get_specific_field()' class="space-y-2 mt-2">
+        <div class="w-full">
+            <x-wui-input class="py-1.5" label="Specific Field" placeholder="Enter specific field"
+                wire:model.defer="specific" wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition'
+                autofocus autocomplete='off' />
+        </div>
+        <div class="grid">
+            <x-white-button type='submit'>Add Field</x-white-button>
         </div>
     </form>
 
