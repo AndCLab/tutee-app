@@ -67,26 +67,42 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## Initial Pull:
 
-`git remote add origin https://github.com/Mark-Ameka/tutee-app.git`
-`git branch -M main`
-`git pull origin main`
+1. `git remote add origin https://github.com/Mark-Ameka/tutee-app.git`
+2. `git branch -M main`
+3. `git pull origin main`
 
 ## Pull:
 
-`git pull origin main`
+2. `git pull origin main`
 
 ## Push:
 
-`git add .`
-`git commit -m 'your-message'`
-`git push -u origin your-branch`
+1. `git add .`
+2. `git commit -m 'your-message'`
+3. `git push -u origin your-branch`
+
+## Merge:
+
+###### Make sure your changes are already committed
+
+> If not, do commit before merging
+
+1. `git add .`
+2. `git commit`
+
+> If branch is already up to date, make sure you pull before merging
+
+1. `git pull origin branch`
+
+> After, just run this command
+
+1. `git merge branch-you-wanna-merge`
 
 ## Switch Branch:
 
 > `mark` is a branch name
 
-`git checkout mark`
-`git pull origin mark`
+1. `git checkout mark`
 
 ## Things you need
 
@@ -98,9 +114,10 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 1. `composer install`
 2. `npm install`
-3. `php artisan key:generate`
-4. Copy `.env.example` and rename it to `.env`
+3. Copy `.env.example` and rename it to `.env`
+4. `php artisan key:generate`
 5. `php artisan migrate`
+6. `npm run build`
 
 ## Run the project: separate terminal
 
@@ -166,7 +183,7 @@ new #[Layout('layouts.app')] class extends Component {
 | [Laravel Livewire]()                                         | [Tailwind](https://tailwindcss.com/docs/installation) |
 | [Laravel Reverb](https://reverb.laravel.com/)                | [WireUI](https://wireui.dev/components/alert)         |
 | [Laravel Socialite](https://laravel.com/docs/11.x/socialite) | [Php Flasher](https://php-flasher.io/livewire/)       |
-| [Laravel Evoyer](https://envoyer.io/)                        |
+| [Laravel Evoyer](https://envoyer.io/)                        | [DaisyUI](https://daisyui.com/)                       |
 | [Laravel Breeze](https://laravel.com/docs/11.x/starter-kits) |
 
 [Back to top](#top)
