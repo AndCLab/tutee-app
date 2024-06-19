@@ -7,20 +7,14 @@
                     <div class="space-y-3">
                         <div class="sm:flex w-full gap-2">
                             {{-- From --}}
-                            <x-wui-select class="w-full" placeholder="From" wire:model.defer="from.{{ $index }}"
-                                id="from.{{ $index }}" name="from.{{ $index }}" autocomplete="off">
-                                @foreach ($dates as $year)
-                                    <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" />
-                                @endforeach
-                            </x-wui-select>
+                            <x-wui-select wire:model.defer="from.{{ $index }}"
+                                placeholder="From" :async-data="route('dates')"
+                                option-label="year" option-value="id" autocomplete="off"/>
 
                             {{-- To --}}
-                            <x-wui-select class="w-full" placeholder="To" wire:model.defer="to.{{ $index }}"
-                                id="to.{{ $index }}" name="to.{{ $index }}" autocomplete="off">
-                                @foreach ($dates as $year)
-                                    <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" />
-                                @endforeach
-                            </x-wui-select>
+                            <x-wui-select wire:model.defer="to.{{ $index }}"
+                                placeholder="To" :async-data="route('dates')"
+                                option-label="year" option-value="id" autocomplete="off"/>
                         </div>
 
 
@@ -53,7 +47,8 @@
     <div class="grid sm:grid-cols-4 sm:w-3/4 w-full">
         <p class="font-semibold">School Grade</p>
         <div class="sm:col-span-3">
-            <x-wui-select class="w-full" placeholder="Select school level" wire:model.defer="grade_level" autocomplete="off">
+            <x-wui-select class="w-full" placeholder="Select school level" wire:model.defer="grade_level"
+                autocomplete="off">
                 <x-wui-select.option label="High School" value="highschool" />
                 <x-wui-select.option label="College" value="college" />
             </x-wui-select>

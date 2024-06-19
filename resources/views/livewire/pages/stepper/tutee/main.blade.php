@@ -51,7 +51,6 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
-        $this->dates = range(1990, 2024);
         $this->inputs = [0];
         $this->from = [''];
         $this->to = [''];
