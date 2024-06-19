@@ -14,11 +14,10 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         if ($this->user_type == 'tutee') {
-            $route = redirect()->route('stepper.tutee');
+            return redirect()->route('stepper.tutee');
         } elseif ($this->user_type == 'tutor') {
-            $route = redirect()->route('stepper.tutor');
+            return redirect()->route('stepper.tutor');
         }
-        return $route;
     }
 }; ?>
 
