@@ -1,4 +1,4 @@
-<div class="w-2/3 mx-auto">
+<div class="w-3/4 mx-auto">
     <div class="mb-5">
         <input type="radio" id="tutee" name="tutee" value="tutee" class="hidden peer/tutee" wire:model.defer="user_type"/>
         <label for="tutee"

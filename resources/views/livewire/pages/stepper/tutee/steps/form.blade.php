@@ -5,7 +5,7 @@
             @foreach ($inputs as $index => $input)
                 <div class="flex gap-3">
                     <div class="space-y-3">
-                        <div class="sm:flex w-full gap-2">
+                        <div class="sm:inline-flex w-full gap-2">
                             {{-- From --}}
                             <x-wui-select wire:model.defer="from.{{ $index }}"
                                 placeholder="From" :async-data="route('dates')"
