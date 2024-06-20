@@ -5,14 +5,14 @@
             @foreach ($inputs as $index => $input)
                 <div class="flex gap-3">
                     <div class="space-y-3">
-                        <div class="sm:flex w-full gap-2">
+                        <div class="sm:inline-flex w-full gap-2">
                             {{-- From --}}
-                            <x-wui-select wire:model.defer="from.{{ $index }}"
+                            <x-wui-select wire:model.live="from.{{ $index }}"
                                 placeholder="From" :async-data="route('dates')"
                                 option-label="year" option-value="id" autocomplete="off"/>
 
                             {{-- To --}}
-                            <x-wui-select wire:model.defer="to.{{ $index }}"
+                            <x-wui-select wire:model.live="to.{{ $index }}"
                                 placeholder="To" :async-data="route('dates')"
                                 option-label="year" option-value="id" autocomplete="off"/>
                         </div>
@@ -47,7 +47,7 @@
     <div class="grid sm:grid-cols-4 sm:w-3/4 w-full">
         <p class="font-semibold">School Grade</p>
         <div class="sm:col-span-3">
-            <x-wui-select class="w-full" placeholder="Select school level" wire:model.defer="grade_level"
+            <x-wui-select class="w-full" placeholder="Select school level" wire:model.live="grade_level"
                 autocomplete="off">
                 <x-wui-select.option label="High School" value="highschool" />
                 <x-wui-select.option label="College" value="college" />

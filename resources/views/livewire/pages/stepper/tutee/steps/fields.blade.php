@@ -14,7 +14,7 @@
                     <p>
                         {{ $select }}
                     </p>
-                    <svg wire:click.prevent='remove_field({{ $index }})' xmlns="http://www.w3.org/2000/svg" fill="none"
+                    <svg wire:click='remove_field({{ $index }})' xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4 cursor-pointer">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
@@ -36,7 +36,7 @@
                             'text-[#0F172A] px-3 py-2 text-sm rounded-3xl hover:bg-[#CBD5E1] transition',
                             'bg-[#CBD5E1] cursor-default' => in_array($name, $selected),
                             'bg-[#F1F5F9] cursor-pointer' => !in_array($name, $selected),
-                        ]) wire:click.prevent='get_field("{{ $name }}")'>
+                        ]) wire:click='get_field("{{ $name }}")'>
                             {{ $name }}
                         </div>
                     @endforeach
@@ -44,10 +44,10 @@
             @endforeach
         </div>
     </div>
-    <form wire:submit.prevent='get_specific_field()' class="space-y-2 mt-2">
+    <form wire:submit='get_specific_field()' class="space-y-2 mt-2">
         <div class="w-full">
             <x-wui-input class="py-1.5" label="Specific Field" placeholder="Enter specific field"
-                wire:model.defer="specific" wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition'
+                wire:model.live="specific" wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition'
                 autofocus autocomplete='off' />
         </div>
         <div class="grid">
