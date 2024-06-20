@@ -7,6 +7,7 @@ use App\Models\Tutor;
 use App\Models\Work;
 use Livewire\WithFileUploads;
 use App\Models\Certificate;
+use App\Models\Resume;
 
 new #[Layout('layouts.app')] class extends Component {
     public $count = 2;
@@ -21,6 +22,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $to = [];
     public $work = [];
     public $certificate;
+    public $resume;
 
     public function mount()
     {
@@ -78,6 +80,27 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
+    public function upload_resume($tutorId)
+    {
+        $validated = $this->validate([
+            'resume' => 'required|file|mimes:pdf|max:2048',
+        ]);
+
+        if ($this->resume) {
+            $filePath = $this->resume->store('resume', 'public');
+            
+            Resume::create([
+                'tutor_id' => $tutorId,
+                'file_path' => $filePath,
+            ]);
+
+            session()->flash('message', 'Resume uploaded successfully!');
+            $this->reset('resume');
+        } else {
+            session()->flash('error', 'No file selected.');
+        }
+    }
+
     public function next_step()
     {
         $this->validate_status();
@@ -102,6 +125,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
                     'certificate.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
+                    'resume.*' => 'required|file|mimes:pdf|max:2048'
                 ],
                 [
                     'to.*.after' => 'The "to" date must be after the "from" date.',
@@ -133,6 +157,7 @@ new #[Layout('layouts.app')] class extends Component {
             }
             
             $this->upload_certificate($tutor->id);
+            $this->upload_resume($tutor->id);
 
             return redirect()->route('dashboard');
         }

@@ -41,15 +41,28 @@
                 hover:outline-dashed
                 hover:outline-neutral-300
                 hover:brightness-50
+                @if($certificate) border-4 border-emerald-500 @else border-4 border-transparent @endif
                 ">
                 <div class="flex flex-col justify-center items-center w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="text-neutral-400 w-10 h-10">
-                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 14a1 1 0 011-1v-8a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1zm4-2a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-neutral-400 text-sm pt-2" style="line-height: 30px">Upload Certificates</span>
+                    @if($certificate)
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="green" class="w-10 h-10">
+                            <circle cx="12" cy="12" r="10" fill="green"/>
+                            <path d="M10 15l-3-3 1.414-1.414L10 12.172l5.586-5.586L17 8l-7 7z" fill="white"/>
+                        </svg>
+                        <span class="text-green-500 text-sm pt-2" style="line-height: 30px">
+                            Uploaded Certificate
+                        </span>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="text-neutral-400 w-10 h-10">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 14a1 1 0 011-1v-8a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1zm4-2a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-neutral-400 text-sm pt-2" style="line-height: 30px">
+                            Upload Certificate
+                        </span>
+                    @endif
                 </div>
             </label>
-            <input wire:model="certificate" type="file" accept=".pdf,.png,.jpg,.jpeg" id="upload-certificate">
+            <input wire:model="certificate" class="hidden" type="file" accept=".pdf,.png,.jpg,.jpeg" id="upload-certificate">
         
             @error('certificate')
                 <span class="error">{{ $message }}</span>
@@ -59,27 +72,43 @@
         {{-- Upload Resume--}}
         <p class="font-semibold sm:py-3">Resume</p>
         <div class="col-span-3">
-            <label for="upload-certificate" class="
-              rounded-lg
-              cursor-pointer
-              h-40
-              w-100  shadow-xl
-              flex
-              hover:outline-2
-              hover:outline-collapse
-              hover:outline-dashed
-              hover:outline-neutral-300
-              hover:brightness-50
-            ">
+            <label for="upload-resume" class="
+                rounded-lg
+                cursor-pointer
+                h-40
+                w-100  shadow-xl
+                flex
+                hover:outline-2
+                hover:outline-collapse
+                hover:outline-dashed
+                hover:outline-neutral-300
+                hover:brightness-50
+                @if($resume) border-4 border-emerald-500 @else border-4 border-transparent @endif
+                ">
                 <div class="flex flex-col justify-center items-center w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="text-neutral-400 w-10 h-10">
-                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 14a1 1 0 011-1v-8a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1zm4-2a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-neutral-400 text-sm pt-2" style="line-height: 30px">Upload Resume</span>
+                    @if($resume)
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="green" class="w-10 h-10">
+                            <circle cx="12" cy="12" r="10" fill="green"/>
+                            <path d="M10 15l-3-3 1.414-1.414L10 12.172l5.586-5.586L17 8l-7 7z" fill="white"/>
+                        </svg>
+                        <span class="text-green-500 text-sm pt-2" style="line-height: 30px">
+                            Uploaded Resume
+                        </span>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="text-neutral-400 w-10 h-10">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 14a1 1 0 011-1v-8a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1zm4-2a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-neutral-400 text-sm pt-2" style="line-height: 30px">
+                            Upload Resume
+                        </span>
+                    @endif
                 </div>
             </label>
-            <input class="hidden" type="file" accept=".pdf" name="resume" id="upload-resume">
+            
+            <input wire:model="resume" class="hidden" type="file" accept=".pdf" name="resume" id="upload-resume">
+            @error('resume')
+                <span class="error">{{ $message }}</span>
+            @enderror
         </div>
     </div>
-
 </div>
