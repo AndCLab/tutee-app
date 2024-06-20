@@ -29,5 +29,7 @@ Route::middleware('auth', 'check.is_stepper')->group(function () {
     Volt::route('confirm-password', 'pages.auth.confirm-password')
         ->name('password.confirm');
 
-    Volt::route('stepper', 'pages.stepper.body')->name('stepper');
+    Volt::route('stepper', 'pages.stepper.initial')->name('stepper');
+    Volt::route('stepper/tutee', 'pages.stepper.tutee.main')->name('stepper.tutee');
+    Volt::route('stepper/tutor', 'pages.stepper.tutor.main')->name('stepper.tutor');
 });

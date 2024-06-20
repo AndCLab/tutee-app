@@ -18,7 +18,9 @@ class CheckStepper
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $isStepperRoute = $request->route()->named('stepper');
+            $isStepperRoute = $request->route()->named('stepper')
+                || $request->route()->named('stepper.tutee')
+                || $request->route()->named('stepper.tutor');
 
             if ($user->is_stepper == 1 && !$isStepperRoute) {
                 return redirect()->route('stepper');

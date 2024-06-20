@@ -1,22 +1,3 @@
-<?php
-
-use Livewire\Volt\Component;
-use Livewire\Attributes\Layout;
-
-new #[Layout('layouts.app')] class extends Component {
-    public $count = 1;
-
-    public function next_step()
-    {
-        $this->count++;
-    }
-
-    public function return_step()
-    {
-        $this->count--;
-    }
-}; ?>
-
 <div class="mx-10">
     <div class="grid grid-rows-4 grid-flow-row md:grid-rows-1 md:grid-cols-8 md:grid-flow-col justify-center items-center h-screen max-w-5xl mx-auto">
         <div class="md:col-span-3">
@@ -25,8 +6,14 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="md:col-span-5 row-span-4">
             @if ($count === 1)
                 @include('livewire.pages.stepper.role')
+
+                <div class="flex justify-between w-2/3 mx-auto gap-3">
+                    <x-primary-button wire:click.prevent='next_step' class="w-full">
+                        Next
+                    </x-primary-button>
+                </div>
             @else
-                {{-- @if (session('error'))
+                @if (session('error'))
                     <div class="text-red-500">
                         {{ session('error') }}
                     </div>
@@ -41,19 +28,18 @@ new #[Layout('layouts.app')] class extends Component {
                 @endif
 
                 @includeWhen($count === 4, 'livewire.pages.stepper.confirm')
-                --}}
 
+                <div class="flex justify-between w-3/4 mx-auto gap-3">
+                    <x-secondary-button wire:click.prevent='prev_step' class="w-full">
+                        Back
+                    </x-secondary-button>
+                    @if ($count < 4)
+                        <x-primary-button wire:click.prevent='next_step' class="w-full">
+                            Next
+                        </x-primary-button>
+                    @endif
+                </div>
             @endif
-            <div class="flex justify-between w-3/4 mx-auto gap-3">
-                <x-secondary-button wire:click.prevent='return_step' class="w-full">
-                    Back
-                </x-secondary-button>
-                @if ($count < 4)
-                    <x-primary-button wire:click.prevent='next_step' class="w-full">
-                        Next
-                    </x-primary-button>
-                @endif
-            </div>
         </div>
     </div>
 </div>
