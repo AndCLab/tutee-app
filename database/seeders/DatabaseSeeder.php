@@ -20,5 +20,21 @@ class DatabaseSeeder extends Seeder
             'lname' => 'User',
             'email' => 'test@example.com',
         ]);
+
+        User::factory()->create([
+            'fname' => 'tutee',
+            'lname' => 'tutee',
+            'is_stepper' => 0,
+            'user_type' => 'tutee',
+            'email' => 'tutee@example.com',
+        ]);
+
+        User::factory()->create([
+            'fname' => 'tutor',
+            'lname' => 'tutor',
+            'is_stepper' => 0,
+            'user_type' => 'tutor',
+            'email' => 'tutor@example.com',
+        ]);
     }
 }
