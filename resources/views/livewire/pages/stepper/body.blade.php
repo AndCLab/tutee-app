@@ -22,11 +22,11 @@
             @includeWhen($count === 4, 'livewire.pages.stepper.confirm')
 
             <div class="flex justify-between w-3/4 mx-auto gap-3">
-                <x-secondary-button wire:click.debounce='prev_step' @class(['w-full', 'hidden' => $count === 1])>
+                <x-secondary-button wire:click='prev_step' @class(['w-full', 'hidden' => $count === 1])>
                     Back
                 </x-secondary-button>
                 @if ($count < 4)
-                    <x-primary-button wire:click.debounce='next_step' class="w-full">
+                    <x-primary-button wire:click='next_step' class="w-full">
                         Next
                     </x-primary-button>
                 @endif
