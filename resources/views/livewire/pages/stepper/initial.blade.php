@@ -5,7 +5,12 @@ use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.app')] class extends Component {
     public $user_type = '';
-    public $count = 1;
+    public $count;
+
+    public function mount()
+    {
+        $this->count = 1;
+    }
 
     public function next_step()
     {
@@ -14,14 +19,13 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         if ($this->user_type == 'tutee') {
-            $route = redirect()->route('stepper.tutee');
+            return redirect()->route('stepper.tutee');
         } elseif ($this->user_type == 'tutor') {
-            $route = redirect()->route('stepper.tutor');
+            return redirect()->route('stepper.tutor');
         }
-        return $route;
     }
 }; ?>
 
-<div>
+<div wire:ignore>
     @include('livewire.pages.stepper.body')
 </div>

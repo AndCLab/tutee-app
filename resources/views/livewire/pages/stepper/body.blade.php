@@ -8,84 +8,38 @@
                 @include('livewire.pages.stepper.role')
 
                 <div class="flex justify-between w-2/3 mx-auto gap-3">
-                    <x-primary-button wire:click='next_step' class="w-full">
+                    <x-primary-button wire:click.prevent='next_step' class="w-full">
                         Next
                     </x-primary-button>
                 </div>
             @else
-                @switch($user_type)
-                    @case('tutee')
-                        @if (session('error'))
-                            {{ session('error') }}
-                        @endif
+                @if (session('error'))
+                    <div class="text-red-500">
+                        {{ session('error') }}
+                    </div>
+                @endif
 
-                        @if ($count === 2)
-                            @include('livewire.pages.stepper.tutee.steps.form')
-                        @endif
+                @if ($user_type === 'tutee')
+                    @includeWhen($count === 2, 'livewire.pages.stepper.tutee.steps.form')
+                    @includeWhen($count === 3, 'livewire.pages.stepper.tutee.steps.fields')
+                @elseif ($user_type === 'tutor')
+                    @includeWhen($count === 2, 'livewire.pages.stepper.tutor.steps.form')
+                    @includeWhen($count === 3, 'livewire.pages.stepper.tutor.steps.fields')
+                @endif
 
-                        @if ($count === 3)
-                            @include('livewire.pages.stepper.tutee.steps.fields')
-                        @endif
+                @includeWhen($count === 4, 'livewire.pages.stepper.confirm')
 
-                        <div class="flex justify-between w-2/3 mx-auto gap-3">
-                            <x-secondary-button wire:click='prev_step' class="w-full">
-                                Back
-                            </x-secondary-button>
-                            @switch($count)
-                                @case($count < 4)
-                                    <x-primary-button wire:click='next_step' class="w-full">
-                                        Next
-                                    </x-primary-button>
-                                @break
-
-                                @case($count === 4)
-                                    <x-primary-button wire:click='submit' class="w-full">
-                                        Submit
-                                    </x-primary-button>
-                                @break
-
-                                @default
-                            @endswitch
-                        </div>
-                    @break
-
-                    @case('tutor')
-                        @if (session('error'))
-                            {{ session('error') }}
-                        @endif
-
-                        @if ($count === 2)
-                            @include('livewire.pages.stepper.tutor.steps.form')
-                        @endif
-
-                        @if ($count === 3)
-                            Fields for tutor
-                        @endif
-
-                        <div class="flex justify-between w-2/3 mx-auto gap-3">
-                            <x-wui-button class="w-full" wire:click='prev_step' neutral label="Back" />
-                            @switch($count)
-                                @case($count < 4)
-                                    <x-primary-button wire:click='next_step' class="w-full">
-                                        Next
-                                    </x-primary-button>
-                                @break
-
-                                @case($count === 4)
-                                    <x-primary-button wire:click='submit' class="w-full">
-                                        Submit
-                                    </x-primary-button>
-                                @break
-
-                                @default
-                            @endswitch
-                        </div>
-                    @break
-
-                    @default
-                @endswitch
+                <div class="flex justify-between w-3/4 mx-auto gap-3">
+                    <x-secondary-button wire:click.prevent='prev_step' class="w-full">
+                        Back
+                    </x-secondary-button>
+                    @if ($count < 4)
+                        <x-primary-button wire:click.prevent='next_step' class="w-full">
+                            Next
+                        </x-primary-button>
+                    @endif
+                </div>
             @endif
         </div>
-
     </div>
 </div>
