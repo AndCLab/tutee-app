@@ -41,7 +41,7 @@
                 hover:outline-dashed
                 hover:outline-neutral-300
                 hover:brightness-50
-                @if($certificate) border-4 border-emerald-500 @else border-4 border-transparent @endif
+                @if($certificate) border-4 border-emerald-500 @else border-transparent @endif
                 ">
                 <div class="flex flex-col justify-center items-center w-full">
                     @if($certificate)
@@ -83,7 +83,7 @@
                 hover:outline-dashed
                 hover:outline-neutral-300
                 hover:brightness-50
-                @if($resume) border-4 border-emerald-500 @else border-4 border-transparent @endif
+                @if($resume) border-4 border-emerald-500 @else border-transparent @endif
                 ">
                 <div class="flex flex-col justify-center items-center w-full">
                     @if($resume)

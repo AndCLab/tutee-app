@@ -1,5 +1,5 @@
 <div class="my-5 w-3/4 mx-auto">
-    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold">User Profile Overview</h1>
+    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">User Profile Overview</h1>
     <div class="grid grid-cols-3 text-[#0F172A]">
         <div class="space-y-2">
             <div class="flex flex-col">
