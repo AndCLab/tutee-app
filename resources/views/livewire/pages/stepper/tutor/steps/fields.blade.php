@@ -8,7 +8,7 @@
 
     <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">User Profile Overview</h1>
     <div class="grid grid-cols-3 text-[#0F172A] gap-4">
-        <div class="space-y-2 border-r border-gray-200">
+        <div class="space-y-2 border-r border-gray-200 text-sm">
             <div class="flex flex-col">
                 <p class="font-bold">Work Experience</p>
                 <p>Attached File</p>

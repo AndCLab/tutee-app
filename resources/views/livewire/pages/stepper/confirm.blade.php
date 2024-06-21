@@ -1,7 +1,7 @@
 <div class="my-5 w-3/4 mx-auto">
     <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">User Profile Overview</h1>
     <div class="grid grid-cols-3 text-[#0F172A]">
-        <div class="space-y-2">
+        <div class="space-y-2 text-sm">
             <div class="flex flex-col">
                 <p class="font-bold">Full Name</p>
                 <p>{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</p>
@@ -12,9 +12,9 @@
             </div>
         </div>
         <div class="col-span-2">
-            <div class="flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center space-y-2">
                 <p class="font-bold">Your Chosen Fields</p>
-                <div class="flex w-full flex-wrap justify-center gap-2 pb-4">
+                <div class="flex w-full flex-wrap justify-center text-sm gap-2 pb-4">
                     @foreach ($selected as $index => $select)
                         <div class="bg-[#F1F5F9] text-[#0F172A] px-3 py-2 text-sm rounded-3xl flex items-center gap-2">
                             <p>
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <div class="mt-2.5 text-pretty text-sm text-center">
+    <div class="my-2 text-pretty text-sm text-center">
         <p>By using this website, you agree to our <span class="underline cursor-pointer" x-data=""
                 x-on:click.prevent="$dispatch('open-modal', 'terms-and-conditions')">Terms and Condition</span></p>
     </div>

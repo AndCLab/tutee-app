@@ -107,10 +107,7 @@ new #[Layout('layouts.app')] class extends Component {
                 'file_path' => $filePath,
             ]);
 
-            session()->flash('message', 'Certificate uploaded successfully!');
             $this->reset('certificate');
-        } else {
-            session()->flash('error', 'No file selected.');
         }
     }
 
@@ -125,10 +122,7 @@ new #[Layout('layouts.app')] class extends Component {
                 'file_path' => $filePath,
             ]);
 
-            session()->flash('message', 'Resume uploaded successfully!');
             $this->reset('resume');
-        } else {
-            session()->flash('error', 'No file selected.');
         }
     }
 
