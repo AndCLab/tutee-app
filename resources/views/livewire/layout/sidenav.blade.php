@@ -20,7 +20,7 @@ new class extends Component {
     {
         $logout();
 
-        $this->redirect('/', navigate: true);
+        $this->redirect('/login', navigate: true);
     }
 }; ?>
 
@@ -65,11 +65,11 @@ new class extends Component {
                 class="size-10 rounded-full object-cover" />
             <div>
                 <p @class([
-                    'text-xs',
+                    'text-xs max-w-28 truncate',
                     'text-[#0C3B2E]' => $role == 'tutee',
                     'text-[#D9D9D9]' => $role == 'tutor',
                 ])>
-                    <strong class="block font-medium">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
+                    <strong class="block font-medium max-w-28 truncate">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
 
                     <span>{{ Auth::user()->email }}</span>
                 </p>
