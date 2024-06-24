@@ -6,7 +6,7 @@
         </div>
     @endif
 
-    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">User Profile Overview</h1>
+    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select Your Fields</h1>
     <div class="grid grid-cols-3 text-[#0F172A] gap-4">
         <div class="space-y-2 border-r border-gray-200 text-sm">
             <div class="flex flex-col">
@@ -15,11 +15,17 @@
             </div>
             <div class="flex flex-col">
                 <p class="font-bold">Certificates</p>
-                <p>Attached File</p>
+                @if ($certificate)
+                    <a href="{{ $certificate->temporaryUrl() }}" target="_blank" class="text-blue-600 hover:underline">
+                    Attached File </a>
+                @endif
             </div>
             <div class="flex flex-col">
                 <p class="font-bold">Resume</p>
-                <p>Attached File</p>
+                @if ($resume)
+                    <a href="{{ $resume->temporaryUrl() }}" target="_blank" class="text-blue-600 hover:underline">
+                    Attached File </a>
+                @endif
             </div>
         </div>
         <div class="col-span-2 space-y-5">
