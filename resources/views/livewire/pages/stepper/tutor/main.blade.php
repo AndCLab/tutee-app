@@ -79,7 +79,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function get_specific_field()
     {
         $this->validate([
-            'specific' => 'required'
+            'specific' => 'required',
         ]);
 
         if (!in_array($this->specific, $this->selected)) {
@@ -98,10 +98,12 @@ new #[Layout('layouts.app')] class extends Component {
     use WithFileUploads;
     public function upload_certificate($tutorId)
     {
-
         if ($this->certificate) {
-            $filePath = $this->certificate->store('certificates', 'public');
-            
+            $extension = $this->certificate->getClientOriginalExtension();
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+
+            $filePath = $this->certificate->storeAs('certificates', $filename);
+
             Certificate::create([
                 'tutor_id' => $tutorId,
                 'file_path' => $filePath,
@@ -113,10 +115,12 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function upload_resume($tutorId)
     {
-
         if ($this->resume) {
-            $filePath = $this->resume->store('resume', 'public');
-            
+            $extension = $this->resume->getClientOriginalExtension();
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+
+            $filePath = $this->resume->storeAs('resumes', $filename);
+
             Resume::create([
                 'tutor_id' => $tutorId,
                 'file_path' => $filePath,
@@ -134,7 +138,7 @@ new #[Layout('layouts.app')] class extends Component {
             } else {
                 $this->count++;
             }
-        } else{
+        } else {
             $this->validate_status();
             $this->count++;
         }
@@ -158,7 +162,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
                     'certificate' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
-                    'resume' => 'required|file|mimes:pdf|max:2048'
+                    'resume' => 'required|file|mimes:pdf|max:2048',
                 ],
                 [
                     'to.*.after' => 'The "to" date must be after the "from" date.',
@@ -177,7 +181,7 @@ new #[Layout('layouts.app')] class extends Component {
         if ($user && $this->user_type === 'tutor') {
             $tutor = Tutor::create([
                 'user_id' => $user->id,
-                'work' =>json_encode($this->work),
+                'work' => json_encode($this->work),
             ]);
 
             foreach ($this->inputs as $item) {
@@ -195,7 +199,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'field_name' => $item,
                 ]);
             }
-            
+
             $this->upload_certificate($tutor->id);
             $this->upload_resume($tutor->id);
 
