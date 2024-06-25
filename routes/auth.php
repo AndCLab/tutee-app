@@ -32,4 +32,14 @@ Route::middleware('auth', 'check.is_stepper')->group(function () {
     Volt::route('stepper', 'pages.stepper.initial')->name('stepper');
     Volt::route('stepper/tutee', 'pages.stepper.tutee.main')->name('stepper.tutee');
     Volt::route('stepper/tutor', 'pages.stepper.tutor.main')->name('stepper.tutor');
+
+    Route::middleware('checkUserType:tutee')->group(function () {
+        // Add tutee routes here
+    });
+
+    Route::middleware('checkUserType:tutor')->group(function () {
+        // Add tutor routes here
+    });
+
+    Route::view('/forbidden-access', 'forbidden-page');
 });
