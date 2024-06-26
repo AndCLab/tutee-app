@@ -10,6 +10,7 @@
                 </h2>
                 <div class="p-6 text-gray-900">
                     {{ __("you are forbidden to access this route") }}
+                    {{ url()->previous() }}
                 </div>
             </div>
         </div>

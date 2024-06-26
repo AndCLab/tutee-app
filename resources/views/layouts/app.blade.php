@@ -18,7 +18,7 @@
     <wireui:scripts />
 </head>
 
-<body class="font-inter antialiased">
+<body class="font-inter antialiased bg-[#FAFAFA]">
     <div class="min-h-screen">
 
         <!-- Page Heading -->

@@ -33,13 +33,19 @@ Route::middleware('auth', 'check.is_stepper')->group(function () {
     Volt::route('stepper/tutee', 'pages.stepper.tutee.main')->name('stepper.tutee');
     Volt::route('stepper/tutor', 'pages.stepper.tutor.main')->name('stepper.tutor');
 
+    // Add tutee routes here
     Route::middleware('checkUserType:tutee')->group(function () {
-        // Add tutee routes here
+        Volt::route('tutee/discover', 'pages.tutee.discover')->name('tutee.discover');
         Volt::route('tutors', 'pages.tutee.tutors')->name('tutors');
+        Volt::route('tutee/schedule', 'pages.tutee.schedule')->name('tutee.schedule');
     });
 
+    // Add tutor routes here
     Route::middleware('checkUserType:tutor')->group(function () {
-        // Add tutor routes here
+        Volt::route('tutor/discover', 'pages.tutor.discover')->name('tutor.discover');
+        Volt::route('classes', 'pages.tutor.classes')->name('classes');
+        Volt::route('tutor/schedule', 'pages.tutor.schedule.schedule')->name('tutor.schedule');
+        Volt::route('view-students', 'pages.tutor.schedule.view-students')->name('view-students');
     });
 
     Route::view('/forbidden-access', 'forbidden-page');
