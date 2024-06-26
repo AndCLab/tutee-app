@@ -17,7 +17,7 @@ class CheckUserType
     public function handle(Request $request, Closure $next, $role): Response
     {
 
-        if (Auth::user()->type !== $role) {
+        if (Auth::user()->user_type !== $role) {
             return redirect('/forbidden-access'); // Redirect to home or any other page
         }
 

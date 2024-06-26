@@ -1,6 +1,6 @@
 {{-- Discover --}}
 <li>
-    <a href="{{ route('dashboard') }}" wire:navigate class="inline-flex items-center gap-3 text-sm font-medium">
+    <a href="{{ route('dashboard') }}" wire:navigate class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2] py-2 px-2 rounded-md w-full">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-layout-dashboard">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -13,7 +13,7 @@
 
 {{-- Tutor --}}
 <li>
-    <a href="#" class="inline-flex items-center gap-3 text-sm font-medium">
+    <a href="{{ route('tutors') }}" class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2] py-2 px-2 rounded-md w-full">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-ballpen">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />

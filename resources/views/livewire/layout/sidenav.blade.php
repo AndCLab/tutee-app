@@ -39,13 +39,13 @@ new class extends Component {
 ])>
     <div class="px-4 py-6">
         <h1 @class([
-            'uppercase font-bold text-4xl font-anton mb-4',
+            'uppercase font-bold text-4xl px-2 font-anton mb-4',
             'text-[#0C3B2E]' => $role == 'tutee',
             'text-[#6D9773]' => $role == 'tutor',
         ])>tutee</h1>
 
         <ul @class([
-            'mt-6 space-y-3',
+            'mt-6 space-y-1',
             'text-[#0C3B2E]' => $role == 'tutee',
             'text-[#D9D9D9]' => $role == 'tutor',
         ])>
@@ -58,8 +58,12 @@ new class extends Component {
         </ul>
     </div>
 
-    <div class="sticky inset-x-0 bottom-0">
-        <a href="{{ route('profile') }}" wire:navigate class="flex items-center gap-2 px-4">
+    <div class="sticky inset-x-0 bottom-0 px-4">
+        <a href="{{ route('profile') }}" wire:navigate @class([
+            'flex items-center gap-2 px-2  py-2 rounded-md w-full',
+            'hover:bg-[#F2F2F2]' => $role == 'tutee',
+            'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
+        ])>
             <img alt=""
                 src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
                 class="size-10 rounded-full object-cover" />
@@ -69,7 +73,8 @@ new class extends Component {
                     'text-[#0C3B2E]' => $role == 'tutee',
                     'text-[#D9D9D9]' => $role == 'tutor',
                 ])>
-                    <strong class="block font-medium max-w-28 truncate">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
+                    <strong
+                        class="block font-medium max-w-28 truncate">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
 
                     <span>{{ Auth::user()->email }}</span>
                 </p>
@@ -78,9 +83,9 @@ new class extends Component {
 
         <!-- Logout -->
         <button wire:click='logout' @class([
-            'inline-flex items-center gap-3 text-sm font-medium p-4 pb-6',
-            'text-[#0C3B2E]' => $role == 'tutee',
-            'text-[#D9D9D9]' => $role == 'tutor',
+            'inline-flex items-center gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md w-full',
+            'text-[#0C3B2E] hover:bg-[#F2F2F2]' => $role == 'tutee',
+            'text-[#D9D9D9] hover:bg-[#F2F2F2]/10' => $role == 'tutor',
         ])>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

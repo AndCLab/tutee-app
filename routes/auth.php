@@ -35,6 +35,7 @@ Route::middleware('auth', 'check.is_stepper')->group(function () {
 
     Route::middleware('checkUserType:tutee')->group(function () {
         // Add tutee routes here
+        Volt::route('tutors', 'pages.tutee.tutors')->name('tutors');
     });
 
     Route::middleware('checkUserType:tutor')->group(function () {
