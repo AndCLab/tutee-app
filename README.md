@@ -67,9 +67,11 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## Initial Pull:
 
-1. `git remote add origin https://github.com/Mark-Ameka/tutee-app.git`
-2. `git branch -M main`
-3. `git pull origin main`
+1. `git init`
+2. `git remote add origin https://github.com/Mark-Ameka/tutee-app.git`
+3. `git branch -M main`
+4. `git pull origin main`
+5. `git fetch`
 
 ## Pull:
 
