@@ -1,12 +1,12 @@
-<div class="my-5 w-3/4 mx-auto">
+<div class="my-5 md:w-3/4 md:mx-auto">
     @if (session('error-field'))
         <div
             class="w-full border border-blue-200 text-center py-3 rounded-lg antialiased bg-blue-100 text-blue-900 mb-2">
             {{ session('error-field') }}
         </div>
     @endif
+    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select your Fields</h1>
     <div class="flex gap-2 pb-4 flex-wrap w-full">
-
         {{-- Selected fields --}}
         @if (!empty($selected))
             @foreach ($selected as $index => $select)
@@ -44,7 +44,7 @@
             @endforeach
         </div>
     </div>
-    <form wire:submit='get_specific_field()' class="space-y-2 mt-2">
+    <form wire:submit='get_specific_field' class="space-y-2 mt-2">
         <div class="w-full">
             <x-wui-input class="py-1.5" label="Specific Field" placeholder="Enter specific field"
                 wire:model="specific" wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition'

@@ -1,29 +1,26 @@
-<div class="flex flex-col justify-center items-center w-full sm:py-5 gap-2">
-    <div class="grid sm:grid-cols-4 sm:w-3/4 w-full">
-        <p class="font-semibold">Institute</p>
-        <div class="col-span-3 space-y-3">
+<div class="md:w-3/4 w-full">
+    <div class="md:grid md:grid-cols-4 pb-5">
+        <p class="font-semibold pb-3 md:pb-0">Institute</p>
+        <div class="md:col-span-3 space-y-3">
             @foreach ($inputs as $index => $input)
-                <div class="flex gap-3">
+                <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0">
                     <div class="space-y-3">
-                        <div class="sm:inline-flex w-full gap-2">
+                        <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">
                             {{-- From --}}
-                            <x-wui-select wire:model.live="from.{{ $index }}"
-                                placeholder="From" :async-data="route('dates')"
-                                option-label="year" option-value="id" autocomplete="off"/>
+                            <x-wui-select wire:model.live="from.{{ $index }}" placeholder="From" :async-data="route('dates')"
+                                option-label="year" option-value="id" autocomplete="off" />
 
                             {{-- To --}}
-                            <x-wui-select wire:model.live="to.{{ $index }}"
-                                placeholder="To" :async-data="route('dates')"
-                                option-label="year" option-value="id" autocomplete="off"/>
+                            <x-wui-select wire:model.live="to.{{ $index }}" placeholder="To" :async-data="route('dates')"
+                                option-label="year" option-value="id" autocomplete="off" />
                         </div>
-
 
                         <x-wui-input class="w-full" id="institute.{{ $index }}"
                             name="institute.{{ $index }}" placeholder="Institute"
                             wire:model='institute.{{ $index }}' />
                     </div>
-                    <div>
-                        {{-- Remove Institute --}}
+                    {{-- Remove Institute --}}
+                    <div class="hidden md:block">
                         <x-delete-icon wire:click='remove_institute({{ $index }})'>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-trash">
@@ -35,25 +32,26 @@
                             </svg>
                         </x-delete-icon>
                     </div>
+                    <x-danger-button wire:click='remove_institute({{ $index }})'
+                        class="md:hidden block w-full">Remove Institute</x-danger-button>
                 </div>
             @endforeach
-            <x-wui-errors />
+            {{-- <x-wui-errors /> --}}
 
             {{-- Add Insitute --}}
-            <x-white-button class="w-full mt-3" wire:click='add_institute' emerald label="Add Insitute">Add
+            <x-white-button class="w-full" wire:click='add_institute' emerald label="Add Insitute">Add
                 Insitute</x-white-button>
         </div>
     </div>
-    <div class="grid sm:grid-cols-4 sm:w-3/4 w-full">
-        <p class="font-semibold">School Grade</p>
-        <div class="sm:col-span-3">
+    <div class="grid md:grid-cols-4 pb-4">
+        <p class="font-semibold pb-3 md:pb">School Grade</p>
+        <div class="md:col-span-3">
             <x-wui-select class="w-full" placeholder="Select school level" wire:model.live="grade_level"
                 autocomplete="off">
                 <x-wui-select.option label="High School" value="highschool" />
                 <x-wui-select.option label="College" value="college" />
             </x-wui-select>
         </div>
-
     </div>
 
     @if (session('error-institute'))

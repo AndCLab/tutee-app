@@ -1,4 +1,4 @@
-<div class="my-5 w-3/4 mx-auto">
+<div class="my-5 md:w-3/4 mx-auto">
     <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">User Profile Overview</h1>
     <div class="grid grid-cols-3 text-[#0F172A]">
         <div class="space-y-2 text-sm">
