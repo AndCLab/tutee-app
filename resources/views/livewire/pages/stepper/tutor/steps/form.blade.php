@@ -91,7 +91,7 @@
                 </div>
             </label>
             <input wire:model="certificate" class="hidden" type="file" accept=".pdf,.png,.jpg,.jpeg"
-                id="upload-certificate">
+                id="upload-certificate" multiple>
 
             @error('certificate')
                 <p class="text-[#dc2626] pt-2 text-sm">{{ $message }}</p>

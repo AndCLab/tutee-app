@@ -23,7 +23,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $from = [];
     public $to = [];
     public $work = [];
-    public $certificate;
+    public $certificate = [];
     public $resume;
     public $specific = '';
     public $selected = [];
@@ -99,16 +99,17 @@ new #[Layout('layouts.app')] class extends Component {
     public function upload_certificate($tutorId)
     {
         if ($this->certificate) {
-            $extension = $this->certificate->getClientOriginalExtension();
-            $filename = uniqid() . '_' . time() . '.' . $extension;
+            foreach ($this->certificates as $certificate) {
+                $extension = $this->certificate->getClientOriginalExtension();
+                $filename = uniqid() . '_' . time() . '.' . $extension;
 
-            $filePath = $this->certificate->storeAs('certificates', $filename);
+                $filePath = $this->certificate->storeAs('certificates', $filename);
 
-            Certificate::create([
-                'tutor_id' => $tutorId,
-                'file_path' => $filePath,
-            ]);
-
+                Certificate::create([
+                    'tutor_id' => $tutorId,
+                    'file_path' => $filePath,
+                ]);
+            }
             $this->reset('certificate');
         }
     }
@@ -161,7 +162,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'from.*' => 'required|date',
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
-                    'certificate' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
+                    'certificate.*' => 'required|file|mimes:png,jpg,jpeg|max:2048',
                     'resume' => 'required|file|mimes:pdf|max:2048',
                 ],
                 [
