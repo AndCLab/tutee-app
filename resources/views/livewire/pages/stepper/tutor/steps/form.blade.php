@@ -78,14 +78,11 @@
                                 <path d="M12 12l0 9" />
                             </svg>
                         @endif
-<<<<<<< HEAD
                     </span>
                 </div>
             </label>
             <input wire:model="certificate" class="hidden" type="file" accept=".pdf,.png,.jpg,.jpeg"
                 id="upload-certificate" multiple>
-=======
->>>>>>> mark
 
                         <span class="font-medium text-sm" style="line-height: 30px">
                             @if (!$certificate)
