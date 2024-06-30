@@ -7,6 +7,12 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
-<div>
-    tutor schedule
-</div>
+<x-app-layout>
+    <x-slot name="header">
+    </x-slot>
+
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 p-6">
+        <p>Schedule page</p>
+        <a href="{{ route('view-students') }}" wire:navigate>View Students</a>
+    </div>
+</x-app-layout>

@@ -1,4 +1,4 @@
-<div class="my-5 w-3/4 mx-auto">
+<div class="my-5 md:w-3/4 mx-auto">
     @if (session('error-field'))
         <div
             class="w-full border border-blue-200 text-center py-3 rounded-lg antialiased bg-blue-100 text-blue-900 mb-2">
@@ -6,13 +6,10 @@
         </div>
     @endif
 
-    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select Your Fields</h1>
-    <div class="grid grid-cols-3 text-[#0F172A] gap-4">
-        <div class="space-y-2 border-r border-gray-200 text-sm">
-            <div class="flex flex-col">
-                <p class="font-bold">Work Experience</p>
-                <p>Attached File</p>
-            </div>
+    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select your Fields</h1>
+    {{-- <div class="grid grid-cols-3 text-[#0F172A] gap-4"> --}}
+    <div class="text-[#0F172A] gap-4">
+        {{-- <div class="space-y-2 border-r border-gray-200 text-sm">
             <div class="flex flex-col">
                 <p class="font-bold">Certificates</p>
                 @if ($certificate)
@@ -27,8 +24,9 @@
                     Attached File </a>
                 @endif
             </div>
-        </div>
-        <div class="col-span-2 space-y-5">
+        </div> --}}
+        {{-- <div class="col-span-2 space-y-5"> --}}
+        <div class="space-y-5">
             <p class="text-sm text-gray-500 leading-relaxed text-center">
                 Please specify your field tags based on the certificates and proof of education you submitted. These
                 tags
@@ -64,8 +62,4 @@
             </form>
         </div>
     </div>
-
-
-
-
 </div>

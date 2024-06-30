@@ -12,4 +12,9 @@ class Tutee extends Model
     protected $table = 'tutee';
 
     protected $fillable = ['user_id', 'grade_level'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

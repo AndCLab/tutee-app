@@ -9,7 +9,7 @@ use App\Models\Institute;
 use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
-    public $count;
+    public $count = 2;
 
     // General
     public $user_type = 'tutee';
@@ -52,7 +52,6 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
-        $this->count = 2;
         $this->i = 0;
         $this->inputs = [0];
         $this->from = [''];
