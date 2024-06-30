@@ -10,7 +10,7 @@
         {{-- Selected fields --}}
         @if (!empty($selected))
             @foreach ($selected as $index => $select)
-                <div wire:key='{{ $select }}' class="bg-[#CBD5E1] text-[#0F172A] px-3 py-2 text-sm rounded-3xl flex items-center gap-2">
+                <div wire:key='{{ $select }}' class="bg-[#CBD5E1] text-[#0F172A] px-2 py-1 text-sm rounded-3xl flex items-center gap-1">
                     <p>
                         {{ $select }}
                     </p>
@@ -30,10 +30,10 @@
             @foreach ($fields as $index => $field)
                 <h1 class="text-xl font-semibold pb-2">{{ $index }}</h1>
                 {{-- Looped the child array --}}
-                <div class="flex gap-2 pb-4 flex-wrap">
+                <div class="flex gap-1 pb-4 flex-wrap">
                     @foreach ($field as $name)
                         <div wire:key='{{ $name }}' @class([
-                            'text-[#0F172A] px-3 py-2 text-sm rounded-3xl hover:bg-[#CBD5E1] transition',
+                            'text-[#0F172A] px-2 py-1 text-sm rounded-3xl hover:bg-[#CBD5E1] transition',
                             'bg-[#CBD5E1] cursor-default' => in_array($name, $selected),
                             'bg-[#F1F5F9] cursor-pointer' => !in_array($name, $selected),
                         ]) wire:click='get_field("{{ $name }}")'>
@@ -54,5 +54,5 @@
             <x-white-button type='submit'>Add Field</x-white-button>
         </div>
     </form>
-
+    <x-wui-notifications />
 </div>

@@ -1,11 +1,4 @@
 <div class="my-5 md:w-3/4 mx-auto">
-    @if (session('error-field'))
-        <div
-            class="w-full border border-blue-200 text-center py-3 rounded-lg antialiased bg-blue-100 text-blue-900 mb-2">
-            {{ session('error-field') }}
-        </div>
-    @endif
-
     <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select your Fields</h1>
     {{-- <div class="grid grid-cols-3 text-[#0F172A] gap-4"> --}}
     <div class="text-[#0F172A] gap-4">
@@ -32,12 +25,12 @@
                 tags
                 will be used when creating classes, so include as many relevant subjects as possible. Thank you!
             </p>
-            <div class="flex flex-wrap gap-2 w-full">
+            <div class="flex flex-wrap gap-1 w-full">
                 {{-- Selected fields --}}
                 @if (!empty($selected))
                     @foreach ($selected as $index => $select)
                         <div wire:key='{{ $select }}'
-                            class="bg-[#CBD5E1] text-[#0F172A] px-3 py-2 text-sm rounded-3xl flex items-center">
+                            class="bg-[#CBD5E1] text-[#0F172A] px-2 py-1 gap-2 text-sm rounded-3xl flex items-center">
                             <p>
                                 {{ $select }}
                             </p>
@@ -62,4 +55,5 @@
             </form>
         </div>
     </div>
+    <x-wui-notifications />
 </div>

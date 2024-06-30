@@ -9,14 +9,18 @@ use Livewire\WithFileUploads;
 use App\Models\Certificate;
 use App\Models\Resume;
 use App\Models\Fields;
+use WireUi\Traits\Actions;
 
 new #[Layout('layouts.app')] class extends Component {
+    use Actions;
+
     public $count = 2;
 
     // General
     public $user_type = 'tutor';
     public $dates = [''];
-    public $inputs = [];
+    public $input_work = [];
+    public $input_cert = [];
     public $i;
 
     // Tutor
@@ -24,58 +28,61 @@ new #[Layout('layouts.app')] class extends Component {
     public $to = [];
     public $work = [];
     public $certificate = [];
+    public $selected = [];
     public $resume;
     public $specific = '';
-    public $selected = [];
 
-    public $confirmation = [
-        'Platform Usage' => ['By accessing or using the TUTEE platform, you agree to comply with these terms and conditions and all applicable laws and regulations.', 'TUTEE reserves the right to modify or update these terms at any time without prior notice. It is your responsibility to review these terms periodically for any changes.'],
-        'Account Registration' => ['To access certain features of the TUTEE platform, you may be required to create an account.', 'You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete.', 'You are solely responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.'],
-        'Tutors and Tutees' => ['TUTEE provides a platform where individuals can connect for tutoring services. Tutors are independent contractors and are not employees or agents of TUTEE.', 'Tutees have access to a curated database of tutors and can select tutors based on their preferences and requirements.'],
-        'Verification Process' => ['TUTEE offers a verification process for tutors to enhance their credibility. However, even tutors who are not verified can build trust through a rating system based on reviews from previous interactions with students.'],
-        'Scheduling and Communication' => ['Tutees can schedule appointments with tutors directly through the TUTEE platform.', 'TUTEE facilitates seamless communication between tutors and tutees through integrated messaging features for ongoing support and clarification of doubts.'],
-        'User Conduct' => ['You agree not to use the TUTEE platform for any unlawful or unauthorized purpose.', 'You agree not to interfere with or disrupt the integrity or performance of the TUTEE platform or its services.'],
-        'Intellectual Property' => ['All content on the TUTEE platform, including but not limited to text, graphics, logos, images, and software, is the property of TUTEE or its licensors and is protected by intellectual property laws.'],
-        'Limitation of Liability' => ['TUTEE shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or in connection with the use or inability to use the TUTEE platform.'],
-        'Governing Law' => ['These terms and conditions shall be governed by and construed in accordance with the laws of the Republic of the Philippines, without regard to its conflict of law provisions.'],
-        'Contact Information' => ['If you have any questions or concerns about these terms and conditions, please contact us at [tutee@email.com].'],
-    ];
-
+    // Mount everything
     public function mount()
     {
         $this->i = 0;
-        $this->dates = range(1990, 2024);
-        $this->inputs = [0];
+        $this->input_work = [0];
+        $this->input_cert = [0];
         $this->from = [''];
         $this->to = [''];
         $this->work = [''];
+        $this->certificate = [''];
     }
 
+    // Work experience
     public function add_work()
     {
-        if (count($this->inputs) < 3) {
-            $this->inputs[] = count($this->inputs);
-            $this->from[] = '';
-            $this->to[] = '';
-            $this->work[] = '';
-        } else {
-            session()->flash('error-work', 'You cannot add more than 3');
-        }
+        $this->input_work[] = count($this->input_work);
+        $this->from[] = '';
+        $this->to[] = '';
+        $this->work[] = '';
     }
 
     public function remove_work($index)
     {
-        unset($this->inputs[$index]);
+        unset($this->input_work[$index]);
         unset($this->from[$index]);
         unset($this->to[$index]);
         unset($this->work[$index]);
 
-        $this->inputs = array_values($this->inputs);
+        $this->input_work = array_values($this->input_work);
         $this->from = array_values($this->from);
         $this->to = array_values($this->to);
         $this->work = array_values($this->work);
     }
 
+    // Certificate
+    public function add_cert()
+    {
+        $this->input_cert[] = count($this->input_cert);
+        $this->certificate[] = '';
+    }
+
+    public function remove_cert($index)
+    {
+        unset($this->input_cert[$index]);
+        unset($this->certificate[$index]);
+
+        $this->input_cert = array_values($this->input_cert);
+        $this->certificate = array_values($this->certificate);
+    }
+
+    // Fields
     public function get_specific_field()
     {
         $this->validate([
@@ -99,11 +106,11 @@ new #[Layout('layouts.app')] class extends Component {
     public function upload_certificate($tutorId)
     {
         if ($this->certificate) {
-            foreach ($this->certificates as $certificate) {
-                $extension = $this->certificate->getClientOriginalExtension();
+            foreach ($this->certificate as $certificate) {
+                $extension = $certificate->getClientOriginalExtension();
                 $filename = uniqid() . '_' . time() . '.' . $extension;
 
-                $filePath = $this->certificate->storeAs('certificates', $filename);
+                $filePath = $certificate->storeAs('certificate', $filename);
 
                 Certificate::create([
                     'tutor_id' => $tutorId,
@@ -135,7 +142,12 @@ new #[Layout('layouts.app')] class extends Component {
     {
         if ($this->count === 3) {
             if (count($this->selected) < 3) {
-                session()->flash('error-field', 'List at least 3 fields');
+                $this->notification([
+                    'title'       => 'Error',
+                    'description' => 'Must have at least 3 fields',
+                    'icon'        => 'error',
+                    'timeout'     => 2500,
+                ]);
             } else {
                 $this->count++;
             }
@@ -166,6 +178,10 @@ new #[Layout('layouts.app')] class extends Component {
                     'resume' => 'required|file|mimes:pdf|max:2048',
                 ],
                 [
+                    'from.*.required' => 'The field is required',
+                    'to.*.required' => 'The field is required',
+                    'work.*.required' => 'The field is required',
+                    'certificate.*.required' => 'The field is required',
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                 ],
             );
@@ -185,7 +201,7 @@ new #[Layout('layouts.app')] class extends Component {
                 'work' => json_encode($this->work),
             ]);
 
-            foreach ($this->inputs as $item) {
+            foreach ($this->input_work as $item) {
                 Work::create([
                     'tutor_id' => $tutor->id,
                     'from' => $this->from[$item],
