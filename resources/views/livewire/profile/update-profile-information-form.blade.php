@@ -5,9 +5,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use WireUi\Traits\Actions;
+
 
 new class extends Component
 {
+    use Actions;
+
     public string $fname = '';
     public string $lname = '';
     public string $email = '';
@@ -43,6 +47,13 @@ new class extends Component
 
         $user->save();
 
+        $this->notification([
+            'title'       => 'Profile saved!',
+            'description' => 'Your profile has successfully updated',
+            'icon'        => 'success',
+            'timeout'     => 3000
+        ]);
+
         $this->dispatch('profile-updated', name: $user->name);
     }
 
@@ -76,23 +87,26 @@ new class extends Component
         </p>
     </header>
 
-    <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
-        <div>
-            <x-input-label for="fname" :value="__('First Name')" />
-            <x-text-input wire:model="fname" id="fname" name="fname" type="text" class="mt-1 block w-full" required autofocus autocomplete="fname" />
-            <x-input-error class="mt-2" :messages="$errors->get('fname')" />
+    <form wire:submit="updateProfileInformation" class="mt-6 space-y-3">
+        <div class="inline-flex items-center gap-4">
+            <!-- First Name -->
+            <div>
+                <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus
+                    autocomplete="fname" hint='Update your first name'/>
+            </div>
+
+            {{-- Last Name --}}
+            <div>
+                <x-wui-input label="Last Name" placeholder="Enter your last name" wire:model="lname" autofocus
+                    autocomplete="lname" hint='Update your last name'/>
+            </div>
         </div>
 
         <div>
-            <x-input-label for="lname" :value="__('Last Name')" />
-            <x-text-input wire:model="lname" id="lname" name="lname" type="text" class="mt-1 block w-full" required autofocus autocomplete="lname" />
-            <x-input-error class="mt-2" :messages="$errors->get('lname')" />
-        </div>
-
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <!-- Email Address -->
+            <div>
+                <x-wui-input label="Email" placeholder="Email" wire:model="email" autocomplete='username' hint='Update your email'/>
+            </div>
 
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
                 <div>
@@ -113,12 +127,14 @@ new class extends Component
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            <x-action-message class="me-3" on="profile-updated">
+        <div class="grid grid-cols-2 items-center gap-4">
+            <x-secondary-button type='submit' class="w-full">{{ __('Save') }}</x-secondary-button>
+            {{-- <x-action-message class="me-3" on="profile-updated">
                 {{ __('Saved.') }}
-            </x-action-message>
-        </div>
+            </x-action-message> --}}
     </form>
+            {{-- Should be outside the form --}}
+            <livewire:profile.delete-user-form/>
+        </div>
+    <x-wui-notifications position="bottom-right" />
 </section>

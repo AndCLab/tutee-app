@@ -43,7 +43,7 @@
                     @endforeach
                 @endif
             </div>
-            <form wire:submit='get_specific_field()' class="space-y-2 mt-2">
+            <form wire:submit='get_specific_field' class="space-y-2 mt-2">
                 <div class="w-full">
                     <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="specific"
                         wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition' autofocus

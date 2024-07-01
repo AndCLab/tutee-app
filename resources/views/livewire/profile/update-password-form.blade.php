@@ -5,9 +5,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Component;
+use WireUi\Traits\Actions;
 
 new class extends Component
 {
+    use Actions;
+
     public string $current_password = '';
     public string $password = '';
     public string $password_confirmation = '';
@@ -34,6 +37,15 @@ new class extends Component
 
         $this->reset('current_password', 'password', 'password_confirmation');
 
+
+        $this->notification([
+            'title'       => 'Password saved!',
+            'description' => 'Your password has successfully updated',
+            'icon'        => 'success',
+            'timeout'     => 3000
+        ]);
+
+
         $this->dispatch('password-updated');
     }
 }; ?>
@@ -49,31 +61,32 @@ new class extends Component
         </p>
     </header>
 
-    <form wire:submit="updatePassword" class="mt-6 space-y-6">
+    <form wire:submit="updatePassword" class="mt-6 space-y-3">
+        <!-- Old Password -->
         <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input wire:model="current_password" id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
+            <x-wui-inputs.password placeholder='Enter your current password' wire:model="current_password" label="Password"
+                autocomplete="current_password"/>
         </div>
 
+        <!-- New Password -->
         <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input wire:model="password" id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <x-wui-inputs.password placeholder='Enter your new password' wire:model="password" label="New Password"
+                autocomplete="new-password" />
         </div>
 
+        <!-- Confirm Password -->
         <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input wire:model="password_confirmation" id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            <x-wui-inputs.password placeholder='Confirm password' wire:model="password_confirmation"
+                label="Password" autocomplete="new-password" />
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-secondary-button type='submit' class="w-full">{{ __('Save') }}</x-secondary-button>
 
             <x-action-message class="me-3" on="password-updated">
                 {{ __('Saved.') }}
             </x-action-message>
         </div>
     </form>
+    <x-wui-notifications position="bottom-right" />
 </section>
