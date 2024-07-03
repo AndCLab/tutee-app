@@ -2,6 +2,7 @@
 
 use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Fields;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -17,6 +18,8 @@ new class extends Component
             'password' => ['required', 'string', 'current_password'],
         ]);
 
+        Fields::where('user_id', Auth::id())->delete();
+
         tap(Auth::user(), $logout(...))->delete();
 
         $this->redirect('/', navigate: true);
@@ -30,7 +33,7 @@ new class extends Component
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
     >{{ __('Delete Account') }}</x-danger-button>
 
-    <x-modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable>
+    <x-modal name="confirm-user-deletion" maxWidth='sm' :show="$errors->isNotEmpty()" focusable>
         <div class="">
             <form wire:submit="deleteUser" class="p-6">
                 <h2 class="text-lg font-medium text-gray-900">

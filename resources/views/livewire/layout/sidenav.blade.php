@@ -64,11 +64,11 @@ new class extends Component {
             'hover:bg-[#F2F2F2]' => $role == 'tutee',
             'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
         ])>
-            @if (Auth::user()->avatar == 'default.png')
-                <img alt="default.png" src="{{ asset('images/' . Auth::user()->avatar) }}"
+            @if (Auth::user()->avatar == null)
+                <img alt="default.png" src="{{ asset('images/default.jpg') }}"
                     class="size-10 rounded-full object-cover" />
             @else
-                <img alt="current avatar" src="{{ asset('storage/' . Auth::user()->avatar) }}"
+                <img alt="current avatar" src="{{ Storage::url(Auth::user()->avatar) }}"
                     class="size-10 rounded-full object-cover" />
             @endif
             <div>

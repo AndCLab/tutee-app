@@ -18,7 +18,7 @@ new class extends Component
     public string $email = '';
     public $avatar;
     public $cropped_image;
-    public $uploadInput;
+    public $showModal;
 
     /**
      * Mount the component.
@@ -67,31 +67,34 @@ new class extends Component
     public function saveCroppedImage()
     {
         $image = $this->cropped_image;
-        $image = str_replace('data:image/png;base64,', '', $image);
-        $image = str_replace(' ', '+', $image);
-        $imageName = 'avatars/cropped_image_' . time() . '.png';
 
-        Storage::disk('public')->put($imageName, base64_decode($image));
+        if ($image) {
+            $image = str_replace('data:image/png;base64,', '', $image);
+            $image = str_replace(' ', '+', $image);
+            $imageName = 'avatars/cropped_image_' . time() . '.png';
 
-        $user = Auth::user();
-        if ($user->avatar && $user->avatar != 'default.png') {
-            $old_path = public_path('storage/' . $user->avatar);
-            if (File::exists($old_path)) {
-                File::delete($old_path);
+            Storage::disk('public')->put($imageName, base64_decode($image));
+
+            $user = Auth::user();
+            if ($user->avatar && $user->avatar != null) {
+                $old_path = $user->avatar;
+                if (Storage::disk('public')->exists($old_path)) {
+                    Storage::disk('public')->delete($old_path);
+                }
             }
+
+            $user->avatar = $imageName;
+            $user->save();
+
+            $this->notification([
+                'title'       => 'Profile picture saved!',
+                'description' => 'Your profile picture has been successfully updated',
+                'icon'        => 'success',
+                'timeout'     => 3000
+            ]);
+
+            $this->showModal = false;
         }
-
-        $user->avatar = $imageName;
-        $user->save();
-
-        $this->reset('uploadInput');
-
-        $this->notification([
-            'title'       => 'Profile picture saved!',
-            'description' => 'Your profile picture has been successfully updated',
-            'icon'        => 'success',
-            'timeout'     => 3000
-        ]);
 
     }
 
@@ -101,14 +104,14 @@ new class extends Component
 
         // dd($user);
 
-        if ($user->avatar && $user->avatar != 'default.png') {
-            $old_path = public_path('storage/' . $user->avatar);
-            if (File::exists($old_path)) {
-                File::delete($old_path);
+        if ($user->avatar && $user->avatar != null) {
+            $old_path = $user->avatar;
+            if (Storage::disk('public')->exists($old_path)) {
+                Storage::disk('public')->delete($old_path);
             }
         }
 
-        $user->avatar = 'default.png';
+        $user->avatar = null;
         $user->save();
 
         $this->reset('uploadInput');
@@ -155,39 +158,39 @@ new class extends Component
     {{-- border-[#F1F5F9] --}}
     <div class="flex justify-between items-end gap-2">
         <div class="size-20">
-            @if (Auth::user()->avatar !== 'default.png')
-                <img class="rounded-lg" src="{{ asset('storage/' . Auth::user()->avatar) }}">
+            @if (Auth::user()->avatar !== null)
+                <img class="rounded-lg" src="{{ Storage::url(Auth::user()->avatar) }}">
             @else
-                <img class="rounded-lg" src="{{ asset('images/' . Auth::user()->avatar) }}">
+                <img class="rounded-lg" src="{{ asset('images/default.jpg') }}">
             @endif
         </div>
 
         <div>
             <div @class([
-                    'grid-cols-1' => Auth::user()->avatar === 'default.png',
-                    'grid-cols-2' => Auth::user()->avatar !== 'default.png'
+                    'grid-cols-1' => Auth::user()->avatar === null,
+                    'grid-cols-2' => Auth::user()->avatar !== null
                 ])>
 
-                @if (Auth::user()->avatar !== 'default.png')
+                @if (Auth::user()->avatar !== null)
                     <x-wui-button negative xs flat type='submit' label='Remove' wire:click.prevent='removeAvatar' spinner='removeAvatar'/>
                 @endif
-                <x-wui-button flat xs type='button' onclick="$openModal('simpleModal')" label='Change Profile' />
+                <x-wui-button flat xs type='button' wire:click="$set('showModal', true)" label='Change Profile' spinner='saveCroppedImage' />
             </div>
         </div>
     </div>
 
-    <x-wui-modal name="simpleModal" align='center' max-width='sm' persistent>
+    <x-wui-modal wire:model.defer="showModal" align='center' max-width='sm' persistent>
         <x-wui-card title="Profile Picture">
             <p class="text-gray-600">
 
                 <div class="flex items-center justify-center w-full" id="uploadContainer">
                     <label for="uploadInput" id="uploadLabel" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                            <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                             </svg>
-                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                            <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
                         </div>
                         {{-- image input --}}
                         <input type="file" name="uploadInput" class="hidden" id="uploadInput" accept="image/png, image/jpeg">
@@ -203,11 +206,13 @@ new class extends Component
             <form wire:submit.prevent="saveCroppedImage">
                 <input type="hidden" wire:model="cropped_image" id="croppedImage">
             </form>
+
             <span class="mt-2 text-sm text-negative-600 hidden" id="uploadError">You have not uploaded any image yet.</span>
+
             <x-slot name="footer">
                 <div class="flex justify-end gap-x-4">
                     <x-wui-button flat label="Cancel" x-on:click="close" id="uploadClose"/>
-                    <x-wui-button primary label="Save Cropped Image" spinner id="saveAndCrop"/>
+                    <x-wui-button primary label="Save Cropped Image" spinner='saveCroppedImage' id="saveAndCrop"/>
                 </div>
             </x-slot>
         </x-wui-card>
@@ -215,18 +220,14 @@ new class extends Component
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-3">
 
-        <div class="inline-flex items-center gap-4">
+        <div class="flex items-center gap-4">
             <!-- First Name -->
-            <div>
-                <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus
-                    autocomplete="fname" hint='Update your first name'/>
-            </div>
+            <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus
+                autocomplete="fname" hint='Update your first name'/>
 
             {{-- Last Name --}}
-            <div>
-                <x-wui-input label="Last Name" placeholder="Enter your last name" wire:model="lname" autofocus
-                    autocomplete="lname" hint='Update your last name'/>
-            </div>
+            <x-wui-input label="Last Name" placeholder="Enter your last name" wire:model="lname" autofocus
+                autocomplete="lname" hint='Update your last name'/>
         </div>
 
         <div>
@@ -321,6 +322,7 @@ new class extends Component
                             document.getElementById("cropped_image").src = '';
                             document.getElementById("uploadInput").value = '';
                         });
+
                         console.log('save and crop if');
                     } else{
                         console.log('save and crop else');

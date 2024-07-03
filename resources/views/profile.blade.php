@@ -52,27 +52,25 @@
                 </ul>
 
                 {{-- Divider --}}
-                <div class="max-h-full w-0.5 rounded-md bg-[#D9D9D9]"></div>
+                <div class="h-96 w-0.5 rounded-md bg-[#D9D9D9]"></div>
 
                 {{-- Right panel --}}
                 <div>
-                    <div>
-                        <div x-show="tab == '#account'" x-cloak>
-                            <div class="max-w-xl">
-                                <livewire:profile.update-profile-information-form />
-                            </div>
+                    <div x-show="tab == '#account'" x-cloak>
+                        <div class="max-w-xl">
+                            <livewire:profile.update-profile-information-form />
                         </div>
+                    </div>
 
-                        <div x-show="tab == '#password'" x-cloak>
-                            <div class="max-w-xl">
-                                <livewire:profile.update-password-form />
-                            </div>
+                    <div x-show="tab == '#password'" x-cloak>
+                        <div class="max-w-xl">
+                            <livewire:profile.update-password-form />
                         </div>
+                    </div>
 
-                        <div x-show="tab == '#interests'" x-cloak>
-                            <div class="max-w-xl">
-                                <livewire:profile.interest-user-form />
-                            </div>
+                    <div x-show="tab == '#interests'" x-cloak>
+                        <div class="max-w-xl">
+                            <livewire:profile.interest-user-form />
                         </div>
                     </div>
                 </div>
