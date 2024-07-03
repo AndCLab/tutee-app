@@ -93,7 +93,6 @@ new class extends Component
             'timeout'     => 3000
         ]);
 
-        $this->dispatch('close-modal');
     }
 
     public function removeAvatar()
@@ -177,7 +176,7 @@ new class extends Component
         </div>
     </div>
 
-    <x-wui-modal name="simpleModal" allign='center' max-width='sm' x-on:close-modal.window="on = false" x-data="{ on: true }">
+    <x-wui-modal name="simpleModal" align='center' max-width='sm' persistent>
         <x-wui-card title="Profile Picture">
             <p class="text-gray-600">
 
@@ -207,7 +206,7 @@ new class extends Component
             <span class="mt-2 text-sm text-negative-600 hidden" id="uploadError">You have not uploaded any image yet.</span>
             <x-slot name="footer">
                 <div class="flex justify-end gap-x-4">
-                    <x-wui-button flat label="Cancel" x-on:click="close" />
+                    <x-wui-button flat label="Cancel" x-on:click="close" id="uploadClose"/>
                     <x-wui-button primary label="Save Cropped Image" spinner id="saveAndCrop"/>
                 </div>
             </x-slot>
@@ -270,54 +269,84 @@ new class extends Component
 
     {{-- CropperJS Script --}}
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const image = document.getElementById("avatar");
-            let cropper;
+        const image = document.getElementById("avatar");
+        let cropper;
 
-            // File input: if file exists then image gets the src of the uploaded image and cropperJS
-            // will handle the cropping feature
-            document.getElementById("uploadInput").addEventListener("change", function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    image.src = URL.createObjectURL(file);
-                    image.onload = () => {
-                        // if there's a cropper opened. it will destroy and make a new Cropper object
-                        if (cropper) cropper.destroy();
-                        cropper = new Cropper(image, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                        });
-                    };
-                    document.getElementById("uploadContainer").classList.add('hidden');
-                    document.getElementById("uploadError").classList.add('hidden');
-                }
-            });
+        // File input: if file exists then image gets the src of the uploaded image and cropperJS
+        // will handle the cropping feature
+        document.getElementById("uploadInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                image.src = URL.createObjectURL(file);
+                image.onload = () => {
+                    // if there's a cropper opened. it will destroy and make a new Cropper object
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        movable: false,
+                        zoomOnWheel: false,
+                        minCropBoxWidth: 200,
+                        minCropBoxHeight: 200,
+                    });
+                };
+                document.getElementById("uploadContainer").classList.add('hidden');
+                document.getElementById("uploadError").classList.add('hidden');
+            }
+        });
 
-            // Submit: if file's cropped, it generates a data URL:
+        // Submit: if file's cropped, it generates a data URL:
 
-            // toDataURL: it returns a data URL containing a representation of the image
-            // in the format specified by the type parameter
+        // toDataURL: it returns a data URL containing a representation of the image
+        // in the format specified by the type parameter
 
-            // afterwards, cropped_image gets that image and store it inside croppedImage livewire property
-            // it also calls the livewire function "saveCroppedImage" for storing inside database :)
-            document.getElementById("saveAndCrop").addEventListener("click", () => {
-                if(cropper){
-                    const croppedCanvas = cropper.getCroppedCanvas();
+        // afterwards, cropped_image gets that image and store it inside croppedImage livewire property
+        // it also calls the livewire function "saveCroppedImage" for storing inside database :)
+        document.getElementById("saveAndCrop").addEventListener("click", () => {
+            if (cropper) {
+                const croppedCanvas = cropper.getCroppedCanvas();
+                if(croppedCanvas){
 
-                    if (croppedCanvas) {
-                        const croppedImage = croppedCanvas.toDataURL("image/png");
-                        document.getElementById("cropped_image").src = croppedImage;
-                        @this.set('cropped_image', croppedImage, true).then(() => {
-                            @this.call('saveCroppedImage');
-                        });
-                    }
+                    const croppedImage = croppedCanvas.toDataURL("image/png");
+                    document.getElementById("cropped_image").src = croppedImage;
+                    @this.set('cropped_image', croppedImage, true).then(() => {
+                        @this.call('saveCroppedImage');
+                    }).then(() => {
+                        image.src = '';
+                        if(cropper) cropper.destroy();
+                        @this.set('cropped_image', null, true);
+                        document.getElementById("cropped_image").src = '';
+                        document.getElementById("uploadInput").value = '';
+                    });
+                    console.log('save and crop if');
                 } else{
-                    console.log('hello');
+                    console.log('save and crop else');
                     document.getElementById("uploadLabel").classList.remove('border-gray-300');
                     document.getElementById("uploadLabel").classList.add('border-negative-300');
                     document.getElementById("uploadError").classList.remove('hidden');
                 }
-            });
+            } else{
+                document.getElementById("uploadLabel").classList.remove('border-gray-300');
+                document.getElementById("uploadLabel").classList.add('border-negative-300');
+                document.getElementById("uploadError").classList.remove('hidden');
+            }
+        });
+
+        document.getElementById("uploadClose").addEventListener("click", () => {
+            setTimeout(() => {
+                // Reset values upon closing modal
+                image.src = '';
+                if(cropper) cropper.destroy();
+                @this.set('cropped_image', null, true);
+                document.getElementById("cropped_image").src = '';
+                document.getElementById("uploadInput").value = '';
+
+                // Reset styles
+                document.getElementById("uploadContainer").classList.remove('hidden');
+                document.getElementById("uploadLabel").classList.remove('border-negative-300');
+                document.getElementById("uploadLabel").classList.add('border-gray-300');
+                document.getElementById("uploadError").classList.add('hidden');
+            }, 100);
         });
     </script>
 </section>

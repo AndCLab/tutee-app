@@ -24,7 +24,7 @@
 
 {{-- bg-[#FAFAFA] --}}
 
-<body class="font-inter antialiased">
+<body class="font-inter antialiased soft-scrollbar">
     <div class="min-h-screen">
 
         <!-- Page Heading -->
