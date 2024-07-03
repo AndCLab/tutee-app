@@ -65,19 +65,19 @@ new class extends Component
         <!-- Old Password -->
         <div>
             <x-wui-inputs.password placeholder='Enter your current password' wire:model="current_password" label="Password"
-                autocomplete="current_password"/>
+                autocomplete="current_password" id="current_password"/>
         </div>
 
         <!-- New Password -->
         <div>
             <x-wui-inputs.password placeholder='Enter your new password' wire:model="password" label="New Password"
-                autocomplete="new-password" />
+                autocomplete="new-password" id="password"/>
         </div>
 
         <!-- Confirm Password -->
         <div>
             <x-wui-inputs.password placeholder='Confirm password' wire:model="password_confirmation"
-                label="Password" autocomplete="new-password" />
+                label="Password" autocomplete="new-password" id="password_confirmation"/>
         </div>
 
         <div class="flex items-center gap-4">

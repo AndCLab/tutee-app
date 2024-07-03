@@ -64,9 +64,13 @@ new class extends Component {
             'hover:bg-[#F2F2F2]' => $role == 'tutee',
             'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
         ])>
-            <img alt=""
-                src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                class="size-10 rounded-full object-cover" />
+            @if (Auth::user()->avatar == 'default.png')
+                <img alt="default.png" src="{{ asset('images/' . Auth::user()->avatar) }}"
+                    class="size-10 rounded-full object-cover" />
+            @else
+                <img alt="current avatar" src="{{ asset('storage/' . Auth::user()->avatar) }}"
+                    class="size-10 rounded-full object-cover" />
+            @endif
             <div>
                 <p @class([
                     'text-xs max-w-28 truncate',

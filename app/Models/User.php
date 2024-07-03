@@ -22,6 +22,7 @@ class User extends Authenticatable
         'is_stepper',
         'user_type',
         'email',
+        'avatar',
         'password',
     ];
 

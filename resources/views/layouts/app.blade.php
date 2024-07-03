@@ -15,6 +15,10 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- CropperJS --}}
+    <link rel="stylesheet" href="cropperjs/cropper.css">
+    <script src="cropperjs/cropper.js"></script>
+
     <wireui:scripts />
 </head>
 

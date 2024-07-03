@@ -18,6 +18,7 @@ return new class extends Migration
             $table->boolean('is_stepper')->default(1);
             $table->enum('user_type', ['tutee', 'tutor'])->nullable();
             $table->string('email')->unique();
+            $table->string('avatar')->default('default.png')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

@@ -110,7 +110,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $extension = $certificate->getClientOriginalExtension();
                 $filename = uniqid() . '_' . time() . '.' . $extension;
 
-                $filePath = $certificate->storeAs('certificate', $filename);
+                $filePath = $certificate->storeAs('certificates', $filename, 'public');
 
                 Certificate::create([
                     'tutor_id' => $tutorId,
@@ -127,7 +127,7 @@ new #[Layout('layouts.app')] class extends Component {
             $extension = $this->resume->getClientOriginalExtension();
             $filename = uniqid() . '_' . time() . '.' . $extension;
 
-            $filePath = $this->resume->storeAs('resumes', $filename);
+            $filePath = $this->resume->storeAs('resume', $filename, 'public');
 
             Resume::create([
                 'tutor_id' => $tutorId,
