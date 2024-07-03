@@ -59,7 +59,7 @@ new class extends Component {
     </div>
 
     <div class="sticky inset-x-0 bottom-0 px-4">
-        <a href="{{ route('profile') }}" wire:navigate @class([
+        <a href="{{ route('profile') }}" @class([
             'flex items-center gap-2 px-2  py-2 rounded-md w-full',
             'hover:bg-[#F2F2F2]' => $role == 'tutee',
             'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
