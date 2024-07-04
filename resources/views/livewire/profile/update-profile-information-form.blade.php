@@ -114,8 +114,6 @@ new class extends Component
         $user->avatar = null;
         $user->save();
 
-        $this->reset('uploadInput');
-
         $this->notification([
             'title'       => 'Profile picture saved!',
             'description' => 'Your profile picture has successfully removed',
@@ -172,14 +170,14 @@ new class extends Component
                 ])>
 
                 @if (Auth::user()->avatar !== null)
-                    <x-wui-button negative xs flat type='submit' label='Remove' wire:click.prevent='removeAvatar' spinner='removeAvatar'/>
+                    <x-wui-button negative xs flat type='submit' label='Remove' wire:click.prevent='removeAvatar' icon='trash' spinner='removeAvatar'/>
                 @endif
                 <x-wui-button flat xs type='button' wire:click="$set('showModal', true)" label='Change Profile' spinner='saveCroppedImage' />
             </div>
         </div>
     </div>
 
-    <x-wui-modal wire:model.defer="showModal" align='center' max-width='sm' persistent>
+    <x-wui-modal wire:model.defer="showModal" align='center' max-width='md' persistent>
         <x-wui-card title="Profile Picture">
             <p class="text-gray-600">
 
@@ -197,8 +195,14 @@ new class extends Component
                     </label>
                 </div>
 
-                <div class="max-w-full">
-                    <img id="avatar" >
+                <div class="flex gap-3">
+                    <div class="h-auto w-2/3">
+                        <img id="avatar" class="max-w-full">
+                    </div>
+                    <div class="flex-col justify-start gap-2 hidden" id="previewContainer">
+                        <div class="border-2 rounded-md border-[#F1F5F9] size-20 overflow-hidden" id="preview"></div>
+                        <p class="text-xs text-gray-500">Profile Preview</p>
+                    </div>
                 </div>
                 <img id="cropped_image" class="max-w-full hidden">
             </p>
@@ -212,7 +216,7 @@ new class extends Component
             <x-slot name="footer">
                 <div class="flex justify-end gap-x-4">
                     <x-wui-button flat label="Cancel" x-on:click="close" id="uploadClose"/>
-                    <x-wui-button primary label="Save Cropped Image" spinner='saveCroppedImage' id="saveAndCrop"/>
+                    <x-wui-button primary label="Save Profile" spinner='saveCroppedImage' id="saveAndCrop"/>
                 </div>
             </x-slot>
         </x-wui-card>
@@ -220,7 +224,7 @@ new class extends Component
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-3">
 
-        <div class="flex items-center gap-4">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
             <!-- First Name -->
             <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus
                 autocomplete="fname" hint='Update your first name'/>
@@ -255,7 +259,7 @@ new class extends Component
             @endif
         </div>
 
-        <div class="grid grid-cols-2 items-center gap-4">
+        <div class="grid grid-rows-2 md:grid-cols-2 items-center gap-4">
             <x-secondary-button type='submit' class="w-full">{{ __('Save') }}</x-secondary-button>
             {{-- <x-action-message class="me-3" on="profile-updated">
                 {{ __('Saved.') }}
@@ -273,6 +277,8 @@ new class extends Component
         document.addEventListener('DOMContentLoaded', function () {
 
             const image = document.getElementById("avatar");
+            const preview = document.getElementById("preview");
+            const previewContainer = document.getElementById("previewContainer");
             let cropper;
 
             // File input: if file exists then image gets the src of the uploaded image and cropperJS
@@ -292,8 +298,16 @@ new class extends Component
                             zoomOnWheel: false,
                             minCropBoxWidth: 200,
                             minCropBoxHeight: 200,
+
+                            // minCanvasHeight: 200,
+                            // minCanvasWidth: 200,
+                            minContainerHeight: 100,
+                            minContainerWidth: 100,
+                            preview: '#preview'
                         });
                     };
+                    previewContainer.classList.remove('hidden');
+                    previewContainer.classList.add('flex');
                     document.getElementById("uploadContainer").classList.add('hidden');
                     document.getElementById("uploadError").classList.add('hidden');
                 }
@@ -324,11 +338,6 @@ new class extends Component
                         });
 
                         console.log('save and crop if');
-                    } else{
-                        console.log('save and crop else');
-                        document.getElementById("uploadLabel").classList.remove('border-gray-300');
-                        document.getElementById("uploadLabel").classList.add('border-negative-300');
-                        document.getElementById("uploadError").classList.remove('hidden');
                     }
                 } else{
                     document.getElementById("uploadLabel").classList.remove('border-gray-300');
@@ -351,7 +360,7 @@ new class extends Component
                     document.getElementById("uploadLabel").classList.remove('border-negative-300');
                     document.getElementById("uploadLabel").classList.add('border-gray-300');
                     document.getElementById("uploadError").classList.add('hidden');
-                }, 100);
+                }, 50);
             });
         })
     </script>

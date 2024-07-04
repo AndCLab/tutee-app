@@ -52,7 +52,7 @@
                 </ul>
 
                 {{-- Divider --}}
-                <div class="h-96 w-0.5 rounded-md bg-[#D9D9D9]"></div>
+                <div class="h-96 w-0.5 hidden md:block rounded-md bg-[#D9D9D9]"></div>
 
                 {{-- Right panel --}}
                 <div>
