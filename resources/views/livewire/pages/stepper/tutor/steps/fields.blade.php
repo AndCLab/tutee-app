@@ -1,4 +1,4 @@
-<div class="my-5 md:w-3/4 mx-auto">
+<div class="md:w-3/4 mx-auto">
     <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select your Fields</h1>
     {{-- <div class="grid grid-cols-3 text-[#0F172A] gap-4"> --}}
     <div class="text-[#0F172A] gap-4">

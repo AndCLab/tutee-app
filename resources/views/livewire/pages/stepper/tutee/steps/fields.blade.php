@@ -1,11 +1,11 @@
-<div class="my-5 md:w-3/4 md:mx-auto">
+<div class="md:w-3/4 md:mx-auto">
     @if (session('error-field'))
         <div
             class="w-full border border-blue-200 text-center py-3 rounded-lg antialiased bg-blue-100 text-blue-900 mb-2">
             {{ session('error-field') }}
         </div>
     @endif
-    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">Select your Fields</h1>
+    <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold mb-10">Select your Fields</h1>
     <div class="flex gap-2 pb-4 flex-wrap w-full">
         {{-- Selected fields --}}
         @if (!empty($selected))
@@ -23,7 +23,7 @@
         @endif
     </div>
 
-    <div class="h-[300px] overflow-y-scroll soft-scrollbar">
+    <div class="h-[200px] md:h-[300px] overflow-y-scroll soft-scrollbar">
         <div class="flex flex-col">
 
             {{-- Loop the parent array --}}

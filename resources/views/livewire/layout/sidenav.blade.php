@@ -33,7 +33,7 @@ new class extends Component {
 --}}
 
 <div @class([
-    'hidden sm:flex sticky top-0 h-screen flex-col justify-between border-e min-w-fit',
+    'hidden md:flex sticky top-0 h-screen flex-col justify-between border-e min-w-fit',
     'bg-white' => $role == 'tutee',
     'bg-[#0C3B2E]' => $role == 'tutor',
 ])>

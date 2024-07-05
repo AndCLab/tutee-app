@@ -57,7 +57,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         <hr class="my-2">
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
             @if (Route::has('password.request'))
                 <a class="text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     href="{{ route('password.request') }}" wire:navigate>

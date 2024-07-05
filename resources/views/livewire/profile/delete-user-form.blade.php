@@ -2,8 +2,14 @@
 
 use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Fields;
 use Livewire\Volt\Component;
+use App\Models\Fields;
+use App\Models\Work;
+use App\Models\Resume;
+use App\Models\Certificate;
+use App\Models\Institute;
+use App\Models\Tutor;
+use App\Models\Tutee;
 
 new class extends Component
 {
@@ -17,6 +23,25 @@ new class extends Component
         $this->validate([
             'password' => ['required', 'string', 'current_password'],
         ]);
+
+        if (Auth::user()->user_type == 'tutor') {
+            $tutor = Tutor::where('user_id', Auth::id())->first();
+            if ($tutor) {
+                Work::where('tutor_id', $tutor->id)->delete();
+                Resume::where('tutor_id', $tutor->id)->delete();
+                Certificate::where('tutor_id', $tutor->id)->delete();
+
+                Tutor::where('user_id', Auth::id())->delete();
+            }
+        } else {
+            $tutee = Tutee::where('user_id', Auth::id())->first();
+            if ($tutee) {
+                Institute::where('tutee_id', $tutee->id)->delete();
+
+                Tutee::where('user_id', Auth::id())->delete();
+            }
+        }
+
 
         Fields::where('user_id', Auth::id())->delete();
 

@@ -49,8 +49,8 @@
     ];
 @endphp
 
-<div>
-    <div class="flex md:flex-col gap-8 justify-center">
+<div class="pt-5">
+    <div class="flex md:flex-col gap-4 sm:gap-9 md:gap-8 md:justify-center">
         @foreach($steps as $index => $step)
             @php
                 $stepNumber = $index + 1;
@@ -59,7 +59,7 @@
             @endphp
             <div class="flex flex-col gap-4">
                 <p @class([
-                    'font-semibold text-xl text-nowrap',
+                    'font-semibold text-sm sm:text-xl text-nowrap',
                     'text-[#1589C3]' => $isActive,
                     'text-[#292D32]' => !$isActive,
                 ])>{{ $step['title'] }}</p>

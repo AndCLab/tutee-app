@@ -174,7 +174,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'from.*' => 'required|date',
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
-                    'certificate.*' => 'required|file|mimes:png,jpg,jpeg|max:2048',
+                    'certificate.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
                     'resume' => 'required|file|mimes:pdf|max:2048',
                 ],
                 [
@@ -182,6 +182,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'to.*.required' => 'The field is required',
                     'work.*.required' => 'The field is required',
                     'certificate.*.required' => 'The field is required',
+                    'certificate.*.mimes:pdf,png,jpg,jpeg|max:2048' => 'The field is required',
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                 ],
             );

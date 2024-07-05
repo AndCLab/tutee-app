@@ -46,7 +46,7 @@
                 @foreach ($input_cert as $index => $input)
                     <div class="flex gap-x-3 items-center">
                         <div class="w-full">
-                            <x-wui-input type="file" wire:model="certificate.{{ $index }}" type="file" accept=".pdf,.png,.jpg,.jpeg"
+                            <x-wui-input wire:model="certificate.{{ $index }}" type="file" accept=".pdf,.png,.jpg,.jpeg"
                             class="p-0 text-gray-500 font-medium text-sm border-none shadow-none bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-[#0F172A] file:hover:bg-[#0F172A]/90 file:text-white rounded" />
                         </div>
                         <div @class([

@@ -12,10 +12,10 @@
         'Contact Information' => ['If you have any questions or concerns about these terms and conditions, please contact us at [tutee@email.com].'],
     ];
 @endphp
-<div class="my-5 md:w-3/4 mx-auto">
-    <h1 class="text-[#0C3B2E] text-center text-3xl font-extrabold mb-10">User Profile Overview</h1>
-    <div class="grid grid-cols-3 text-[#0F172A]">
-        <div class="space-y-2 text-sm">
+<div class="mb-5 md:w-3/4 mx-auto">
+    <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold mb-10">User Profile Overview</h1>
+    <div class="grid md:grid-cols-3 md:items-start text-[#0F172A] space-y-4 md:space-y-4">
+        <div class="space-y-2 md:space-y-0 text-sm">
             <div class="flex flex-col">
                 <p class="font-bold">Full Name</p>
                 <p>{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</p>
@@ -26,9 +26,9 @@
             </div>
         </div>
         <div class="col-span-2">
-            <div class="flex flex-col items-center justify-center space-y-2">
+            <div class="flex flex-col md:items-center md:justify-center space-y-2 md:space-y-0">
                 <p class="font-bold">Your Chosen Fields</p>
-                <div class="flex w-full flex-wrap justify-center text-sm gap-1 pb-4">
+                <div class="flex w-full flex-wrap md:justify-center text-sm gap-1 pb-4">
                     @foreach ($selected as $index => $select)
                         <div class="bg-[#F1F5F9] text-[#0F172A] px-2 py-1 text-sm rounded-3xl flex items-center gap-2">
                             <p>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="my-2 text-pretty text-sm text-center">
+    <div class="my-2 text-pretty text-sm md:text-center">
         <p>By using this website, you agree to our <span class="underline cursor-pointer" x-data=""
                 x-on:click.prevent="$dispatch('open-modal', 'terms-and-conditions')">Terms and Condition</span></p>
     </div>

@@ -1,6 +1,7 @@
-<div class="max-w-6xl md:mx-auto mx-10">
-    <div class="grid md:grid-flow-col md:grid-cols-12 grid-flow-row md:grid-rows-1 grid-rows-12 h-screen md:h-fit md:mx-10">
-        <div class="mx-auto md:col-span-4 row-span-4 my-auto md:my-0">
+<div class="max-w-6xl md:mx-auto mx-10 relative">
+    @include('livewire.pages.stepper.logout-stepper')
+    <div class="grid md:grid-flow-col md:grid-cols-12 h-screen md:h-fit md:mx-10">
+        <div class="mx-auto md:col-span-4 my-auto md:my-0">
             <div class="md:sticky md:top-0 md:flex md:h-screen md:justify-center gap-8 md:flex-col">
                 @include('livewire.pages.stepper.header')
             </div>
@@ -25,7 +26,7 @@
 
             @includeWhen($count === 4, 'livewire.pages.stepper.confirm')
 
-            <div class="flex justify-between md:w-3/4 mx-auto gap-3 mb-5">
+            <div class="flex flex-col-reverse md:flex-row justify-between md:w-3/4 mx-auto gap-3 my-5">
                 <x-secondary-button wire:click='prev_step' @class(['w-full', 'hidden' => $count === 1])>
                     Back
                 </x-secondary-button>

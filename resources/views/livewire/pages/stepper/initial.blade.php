@@ -2,6 +2,7 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Livewire\Actions\Logout;
 
 new #[Layout('layouts.app')] class extends Component {
     public $user_type = '';
@@ -23,6 +24,14 @@ new #[Layout('layouts.app')] class extends Component {
         } elseif ($this->user_type == 'tutor') {
             return redirect()->route('stepper.tutor');
         }
+    }
+
+
+    public function logout(Logout $logout): void
+    {
+        $logout();
+
+        $this->redirect('/login', navigate: true);
     }
 }; ?>
 

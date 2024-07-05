@@ -40,7 +40,7 @@ new #[Layout('layouts.guest')] class extends Component {
 <div class="max-w-sm mx-auto">
     <form wire:submit="register">
         <div class="flex flex-col gap-4">
-            <div class="inline-flex items-center gap-4">
+            <div class="sm:inline-flex sm:items-center gap-4 space-y-4">
                 <!-- First Name -->
                 <div>
                     <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus

@@ -15,10 +15,10 @@ new class extends Component {
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="bg-white sticky top-0">
+<nav x-data="{ open: false }" class="sticky top-0 z-10 drop-shadow-md border-b border-border/40 bg-background/95 backdrop-blur">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between min-h-fit py-2">
+        <div class="flex justify-between min-h-fit py-3">
             <div></div>
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-wui-dropdown>
