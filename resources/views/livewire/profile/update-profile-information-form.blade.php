@@ -157,9 +157,9 @@ new class extends Component
     <div class="flex justify-between items-end gap-2">
         <div class="size-20">
             @if (Auth::user()->avatar !== null)
-                <img class="rounded-lg" src="{{ Storage::url(Auth::user()->avatar) }}">
+                <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ Storage::url(Auth::user()->avatar) }}">
             @else
-                <img class="rounded-lg" src="{{ asset('images/default.jpg') }}">
+                <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ asset('images/default.jpg') }}">
             @endif
         </div>
 
