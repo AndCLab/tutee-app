@@ -32,12 +32,9 @@ new class extends Component {
 
 --}}
 
-<div class="hidden md:flex min-w-fit transition-all relative" x-data='sidenav()' x-init='initialize()' >
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
+<div class="hidden md:flex min-w-fit transition-all relative" x-data='sidenav()' x-init='initialize()' x-cloak>
+
+    {{-- sidenav container --}}
     <div @class([
         'flex h-screen flex-col sticky top-0 justify-between border-e ',
         'bg-white' => $role == 'tutee',
@@ -45,40 +42,26 @@ new class extends Component {
     ])>
         <div class="px-4 py-6">
 
+            {{-- temporary Logo --}}
             <h1 @class([
                 'uppercase font-bold text-4xl px-2 font-anton mb-4',
                 'text-[#0C3B2E]' => $role == 'tutee',
                 'text-[#6D9773]' => $role == 'tutor',
-            ]) x-if='!expanded' x-show='expanded'
-                {{-- x-transition:enter="transition ease-out duration-100"
-                x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90" --}}
-                >
-            t</h1>
+            ]) x-show='expanded'>t</h1>
 
+            {{-- tutee header --}}
             <h1 @class([
                 'uppercase font-bold text-4xl px-2 font-anton mb-4',
                 'text-[#0C3B2E]' => $role == 'tutee',
                 'text-[#6D9773]' => $role == 'tutor',
-            ]) x-if='expanded' x-show='!expanded'
-                {{-- x-transition:enter="transition ease-out duration-100"
-                x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90" --}}
-                >
-            tutee</h1>
+            ]) x-show='!expanded'>tutee</h1>
 
+            {{-- tutee and tutor list --}}
             <ul @class([
                 'mt-6 space-y-1',
                 'text-[#0C3B2E]' => $role == 'tutee',
                 'text-[#D9D9D9]' => $role == 'tutor',
             ])>
-
                 @if ($role == 'tutee')
                     @include('livewire.layout.sidenav_tutee.list')
                 @elseif ($role == 'tutor')
@@ -87,13 +70,16 @@ new class extends Component {
             </ul>
         </div>
 
+        {{-- profile and logout --}}
         <div class="sticky inset-x-0 bottom-0 px-4">
             <div x-data="{ tooltip: false }" class="relative">
                 <a href="{{ route('profile') }}" @class([
-                    'flex items-center gap-2 px-2  py-2 rounded-md w-full',
+                    'flex items-center gap-2 px-2 py-2 rounded-md w-full',
                     'hover:bg-[#F2F2F2]' => $role == 'tutee',
                     'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
                 ]) x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false">
+
+                    {{-- profile picture --}}
                     @if (Auth::user()->avatar == null)
                         <img alt="default.png" src="{{ asset('images/default.jpg') }}"
                             :class="expanded ? 'size-6' : 'size-10' "
@@ -103,14 +89,9 @@ new class extends Component {
                             :class="expanded ? 'size-6' : 'size-10' "
                             class="rounded-full object-cover"/>
                     @endif
-                    <div x-show='!expanded'
-                        {{-- x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90" --}}
-                        >
+
+                    {{-- full name and email --}}
+                    <div x-show='!expanded'>
                         <p @class([
                             'text-xs max-w-28 truncate',
                             'text-[#0C3B2E]' => $role == 'tutee',
@@ -123,7 +104,7 @@ new class extends Component {
                         </p>
                     </div>
                 </a>
-                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-90"
                     x-transition:enter-end="opacity-100 scale-100"
@@ -131,12 +112,7 @@ new class extends Component {
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-90"
                     >
-                    <p x-if='expanded' x-show='expanded'>
-                        {{ Auth::user()->fname . ' ' . Auth::user()->lname}}
-                    </p>
-                    <p x-if='!expanded' x-show='!expanded'>
-                        Profile
-                    </p>
+                    Profile
                 </div>
             </div>
 
@@ -157,48 +133,42 @@ new class extends Component {
                         <path d="M9 12h12l-3 -3" />
                         <path d="M18 15l3 -3" />
                     </svg>
-                    <p x-show='!expanded'
-                        {{-- x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90"--}}
-                        >
+                    <p x-show='!expanded'>
                         Log Out
                     </p>
                 </button>
-                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-90"
                     x-transition:enter-end="opacity-100 scale-100"
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-90"
-                    >
+                    x-transition:leave-end="opacity-0 scale-90">
                     Log Out
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Collapse button --}}
+    {{-- collapse button --}}
     <div class="absolute h-full left-full">
         <div class="sticky top-0 flex h-screen justify-center items-center">
             <button @click='toggleSidenav' class="text-[#0C3B2E]">
-                <div x-if='!expanded'>
+                <template x-if='!expanded'>
                     <svg x-show='!expanded' xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
-                </div>
-                <div x-if='expanded`'>
+                </template>
+                <template x-if='expanded'>
                     <svg x-show='expanded' xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                     </svg>
-                </div>
+                </template>
             </button>
         </div>
     </div>
+
+    {{-- script for collapse sidenav --}}
     <script>
         function sidenav() {
             return {

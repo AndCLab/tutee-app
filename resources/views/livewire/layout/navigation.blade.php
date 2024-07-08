@@ -4,6 +4,32 @@ use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    public string $role = '';
+
+    public function mount()
+    {
+        if (Auth::user()->user_type != null) {
+            $this->role = Auth::user()->user_type;
+        }
+    }
+
+    // Testing purposes
+    public function switchRole(){
+        $user = Auth::user();
+        if($this->role == 'tutee'){
+            $user->user_type = 'tutor';
+            $user->save();
+
+            $this->redirectIntended(default: route('tutor.discover', absolute: false), navigate: true);
+
+        } else{
+            $user->user_type = 'tutee';
+            $user->save();
+
+            $this->redirectIntended(default: route('tutee.discover', absolute: false), navigate: true);
+        }
+    }
+
     /**
      * Log the current user out of the application.
      */
@@ -15,12 +41,15 @@ new class extends Component {
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="sticky top-0 z-10 drop-shadow-md border-b border-border/40 bg-background/95 backdrop-blur">
+{{-- drop-shadow-md --}}
+<nav x-data="{ open: false }" class="sticky top-0 z-10 border-b border-border/40 bg-background/95 backdrop-blur">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between min-h-fit py-3">
             <div></div>
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6">
+                {{-- Switch role testing purposes --}}
+                <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='switch role testing kay kapuy logout :)' />
                 <x-wui-dropdown>
                     <x-slot name="trigger">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -37,6 +66,7 @@ new class extends Component {
                         Your notifications
                     </x-wui-dropdown.item>
                 </x-wui-dropdown>
+
             </div>
 
             <!-- Settings Dropdown -->

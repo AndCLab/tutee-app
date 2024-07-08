@@ -12,7 +12,7 @@ new #[Layout('layouts.app')] class extends Component {
     }
 }; ?>
 
-<x-app-layout>
+<section>
     <x-slot name="header">
     </x-slot>
 
@@ -21,4 +21,4 @@ new #[Layout('layouts.app')] class extends Component {
             <p>{{ $tutor->user->email }}</p>
         @endforeach
     </div>
-</x-app-layout>
+</section>
