@@ -14,7 +14,7 @@
 @endphp
 <div class="mb-5 md:w-3/4 mx-auto">
     <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold mb-10">User Profile Overview</h1>
-    <div class="grid md:grid-cols-3 md:items-start text-[#0F172A] space-y-4 md:space-y-4">
+    <div class="grid md:grid-cols-3 md:items-center text-[#0F172A] space-y-4 md:space-y-4">
         <div class="space-y-2 md:space-y-0 text-sm">
             <div class="flex flex-col">
                 <p class="font-bold">Full Name</p>

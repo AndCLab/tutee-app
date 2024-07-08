@@ -32,7 +32,7 @@ new class extends Component {
 
 --}}
 
-<div class="hidden md:flex min-w-fit transition-all relative" x-data='sidenav()' x-init='initialize()' x-cloak>
+<div class="hidden md:flex min-w-fit transition-all relative" x-data='sidenav()' x-init='initialize()' >
     <style>
         [x-cloak] {
             display: none !important;
@@ -44,19 +44,34 @@ new class extends Component {
         'bg-[#0C3B2E]' => $role == 'tutor',
     ])>
         <div class="px-4 py-6">
+
             <h1 @class([
                 'uppercase font-bold text-4xl px-2 font-anton mb-4',
                 'text-[#0C3B2E]' => $role == 'tutee',
                 'text-[#6D9773]' => $role == 'tutor',
-            ]) x-show='!expanded'
-                x-transition:enter="transition ease-out duration-100"
+            ]) x-if='!expanded' x-show='expanded'
+                {{-- x-transition:enter="transition ease-out duration-100"
                 x-transition:enter-start="opacity-0 scale-90"
                 x-transition:enter-end="opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-100"
                 x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90"
+                x-transition:leave-end="opacity-0 scale-90" --}}
+                >
+            t</h1>
 
-            >tutee</h1>
+            <h1 @class([
+                'uppercase font-bold text-4xl px-2 font-anton mb-4',
+                'text-[#0C3B2E]' => $role == 'tutee',
+                'text-[#6D9773]' => $role == 'tutor',
+            ]) x-if='expanded' x-show='!expanded'
+                {{-- x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="opacity-0 scale-90"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-90" --}}
+                >
+            tutee</h1>
 
             <ul @class([
                 'mt-6 space-y-1',
@@ -73,66 +88,97 @@ new class extends Component {
         </div>
 
         <div class="sticky inset-x-0 bottom-0 px-4">
-            <a href="{{ route('profile') }}" @class([
-                'flex items-center gap-2 px-2  py-2 rounded-md w-full',
-                'hover:bg-[#F2F2F2]' => $role == 'tutee',
-                'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
-            ])>
-                @if (Auth::user()->avatar == null)
-                    <img alt="default.png" src="{{ asset('images/default.jpg') }}"
-                        :class="expanded ? 'size-6' : 'size-10' "
-                        class="rounded-full object-cover"/>
-                @else
-                    <img alt="current avatar" src="{{ Storage::url(Auth::user()->avatar) }}"
-                        :class="expanded ? 'size-6' : 'size-10' "
-                        class="rounded-full object-cover"/>
-                @endif
-                <div x-show='!expanded'
-                    x-transition:enter="transition ease-out duration-100"
+            <div x-data="{ tooltip: false }" class="relative">
+                <a href="{{ route('profile') }}" @class([
+                    'flex items-center gap-2 px-2  py-2 rounded-md w-full',
+                    'hover:bg-[#F2F2F2]' => $role == 'tutee',
+                    'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
+                ]) x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false">
+                    @if (Auth::user()->avatar == null)
+                        <img alt="default.png" src="{{ asset('images/default.jpg') }}"
+                            :class="expanded ? 'size-6' : 'size-10' "
+                            class="rounded-full object-cover"/>
+                    @else
+                        <img alt="current avatar" src="{{ Storage::url(Auth::user()->avatar) }}"
+                            :class="expanded ? 'size-6' : 'size-10' "
+                            class="rounded-full object-cover"/>
+                    @endif
+                    <div x-show='!expanded'
+                        {{-- x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 scale-90"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-90" --}}
+                        >
+                        <p @class([
+                            'text-xs max-w-28 truncate',
+                            'text-[#0C3B2E]' => $role == 'tutee',
+                            'text-[#D9D9D9]' => $role == 'tutor',
+                        ])>
+                            <strong
+                                class="block font-medium max-w-28 truncate">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
+
+                            <span>{{ Auth::user()->email }}</span>
+                        </p>
+                    </div>
+                </a>
+                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+                    x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-90"
                     x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-90">
-                    <p @class([
-                        'text-xs max-w-28 truncate',
-                        'text-[#0C3B2E]' => $role == 'tutee',
-                        'text-[#D9D9D9]' => $role == 'tutor',
-                    ])>
-                        <strong
-                            class="block font-medium max-w-28 truncate">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
-
-                        <span>{{ Auth::user()->email }}</span>
+                    x-transition:leave-end="opacity-0 scale-90"
+                    >
+                    <p x-if='expanded' x-show='expanded'>
+                        {{ Auth::user()->fname . ' ' . Auth::user()->lname}}
+                    </p>
+                    <p x-if='!expanded' x-show='!expanded'>
+                        Profile
                     </p>
                 </div>
-            </a>
+            </div>
 
             <!-- Logout -->
-            <button wire:click='logout'
-                :class="expanded ? 'w-fit' : 'w-full' "
-                @class([
-                    'inline-flex gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md',
-                    'text-[#0C3B2E] hover:bg-[#F2F2F2]' => $role == 'tutee',
-                    'text-[#D9D9D9] hover:bg-[#F2F2F2]/10' => $role == 'tutor',
-            ])>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-logout">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
-                    <path d="M9 12h12l-3 -3" />
-                    <path d="M18 15l3 -3" />
-                </svg>
-                <p x-show='!expanded'
-                    x-transition:enter="transition ease-out duration-100"
+            <div x-data="{ tooltip: false }" class="relative">
+                <button wire:click='logout'
+                    :class="expanded ? 'w-fit' : 'w-full' "
+                    @class([
+                        'inline-flex gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md',
+                        'text-[#0C3B2E] hover:bg-[#F2F2F2]' => $role == 'tutee',
+                        'text-[#D9D9D9] hover:bg-[#F2F2F2]/10' => $role == 'tutor',
+                ]) x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-logout">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
+                        <path d="M9 12h12l-3 -3" />
+                        <path d="M18 15l3 -3" />
+                    </svg>
+                    <p x-show='!expanded'
+                        {{-- x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 scale-90"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-90"--}}
+                        >
+                        Log Out
+                    </p>
+                </button>
+                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+                    x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-90"
                     x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-90">
+                    x-transition:leave-end="opacity-0 scale-90"
+                    >
                     Log Out
-                </p>
-            </button>
+                </div>
+            </div>
         </div>
     </div>
 

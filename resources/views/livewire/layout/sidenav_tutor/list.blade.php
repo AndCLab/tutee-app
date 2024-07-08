@@ -11,21 +11,23 @@
                 d="M9 3a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2zm0 12a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2zm10 -4a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2zm0 -8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2z" />
         </svg>
         <p x-show='!expanded'
-            x-transition:enter="transition ease-out duration-100"
+            {{-- x-transition:enter="transition ease-out duration-100"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-100"
             x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90">
+            x-transition:leave-end="opacity-0 scale-90" --}}
+            >
             Discover
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1"
+        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90">
+            x-transition:leave-end="opacity-0 scale-90"
+            >
             Discover
         </div>
     </a>
@@ -44,21 +46,23 @@
                 d="M12.088 4.82a10 10 0 0 1 9.412 .314a1 1 0 0 1 .493 .748l.007 .118v13a1 1 0 0 1 -1.5 .866a8 8 0 0 0 -8 0a1 1 0 0 1 -1 0a8 8 0 0 0 -7.733 -.148l-.327 .18l-.103 .044l-.049 .016l-.11 .026l-.061 .01l-.117 .006h-.042l-.11 -.012l-.077 -.014l-.108 -.032l-.126 -.056l-.095 -.056l-.089 -.067l-.06 -.056l-.073 -.082l-.064 -.089l-.022 -.036l-.032 -.06l-.044 -.103l-.016 -.049l-.026 -.11l-.01 -.061l-.004 -.049l-.002 -.068v-13a1 1 0 0 1 .5 -.866a10 10 0 0 1 9.412 -.314l.088 .044l.088 -.044z" />
         </svg>
         <p x-show='!expanded'
-            x-transition:enter="transition ease-out duration-100"
+            {{-- x-transition:enter="transition ease-out duration-100"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-100"
             x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90">
+            x-transition:leave-end="opacity-0 scale-90" --}}
+            >
             Classes
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1"
+        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90">
+            x-transition:leave-end="opacity-0 scale-90"
+            >
             Classes
         </div>
     </a>
@@ -78,21 +82,23 @@
                 d="M12 12a1 1 0 0 1 .993 .883l.007 .117v3a1 1 0 0 1 -1.993 .117l-.007 -.117v-2a1 1 0 0 1 -.117 -1.993l.117 -.007h1z" />
         </svg>
         <p x-show='!expanded'
-            x-transition:enter="transition ease-out duration-100"
+            {{-- x-transition:enter="transition ease-out duration-100"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-100"
             x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90">
+            x-transition:leave-end="opacity-0 scale-90" --}}
+            >
             Schedule
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1"
+        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90">
+            x-transition:leave-end="opacity-0 scale-90"
+            >
             Schedule
         </div>
     </a>

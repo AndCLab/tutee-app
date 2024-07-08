@@ -1,5 +1,5 @@
 <div class="md:w-3/4 mx-auto">
-    <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold mb-4 md:mb-10">Choose your Initial Role</h1>
+    <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold my-4 md:mb-10">Choose your Initial Role</h1>
     <div class="grid md:grid-cols-2 gap-5">
         <div>
             <input type="radio" id="tutee" name="tutee" value="tutee" class="hidden peer/tutee"

@@ -31,7 +31,7 @@
 
         <!-- Page Heading -->
         @if (isset($header))
-            <div class="flex flex-row">
+            <div class="flex flex-row" x-cloak>
                 <livewire:layout.sidenav />
                 <div class="w-full">
                     <livewire:layout.navigation />

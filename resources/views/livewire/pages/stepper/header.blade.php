@@ -50,7 +50,7 @@
 @endphp
 
 <div class="pt-5">
-    <div class="flex md:flex-col gap-4 sm:gap-9 md:gap-8 md:justify-center">
+    <div class="flex md:flex-col gap-4 sm:gap-9 md:gap-8">
         @foreach($steps as $index => $step)
             @php
                 $stepNumber = $index + 1;
@@ -58,13 +58,22 @@
                 $isExactActive = $count === $stepNumber;
             @endphp
             <div class="flex flex-col gap-4">
+                {{-- step number --}}
                 <p @class([
                     'font-semibold text-sm sm:text-xl text-nowrap',
                     'text-[#1589C3]' => $isActive,
                     'text-[#292D32]' => !$isActive,
-                ])>{{ $step['title'] }}</p>
+                ])>
+                    {{ $step['title'] }}
+                </p>
+
+                {{-- step body --}}
                 <div class="flex h-11 items-center gap-2">
+
+                    {{-- step bar if active --}}
                     <div class="h-full w-1 rounded-md @if ($isExactActive) bg-[#1589C3] @endif"></div>
+
+                    {{-- step icon --}}
                     <svg @class([
                         'text-[#1589C3]' => $isActive,
                         'text-[#292D32]' => !$isActive,
@@ -75,6 +84,8 @@
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         {!! $step['svg'] !!}
                     </svg>
+
+                    {{-- step description --}}
                     <div class="md:block hidden">
                         <p @class([
                             'text-xl font-semibold',

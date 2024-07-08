@@ -3,6 +3,12 @@
         <p class="font-semibold pb-3 md:pb-0">Institute</p>
         <div class="md:col-span-3 space-y-3">
             @foreach ($inputs as $index => $input)
+                <div @class([
+                    'hidden' => count($inputs) === 1,
+                    'block' => count($inputs) >= 1
+                    ])>
+                    <p class="font-medium text-sm">Institute {{ $index + 1 }}</p>
+                </div>
                 <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0">
                     <div class="space-y-3">
                         <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">

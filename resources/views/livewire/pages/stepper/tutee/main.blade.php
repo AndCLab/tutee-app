@@ -58,8 +58,6 @@ new #[Layout('layouts.app')] class extends Component {
             $this->from[] = ''; // Ensure from, to, and institute arrays are synchronized
             $this->to[] = '';
             $this->institute[] = '';
-        } else {
-            session()->flash('error-institute', 'You cannot add more than 3');
         }
     }
 

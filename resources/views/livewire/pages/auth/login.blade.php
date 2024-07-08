@@ -19,7 +19,15 @@ new #[Layout('layouts.guest')] class extends Component {
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        if (Auth::check()) {
+            $role = Auth::user()->user_type;
+            if ($role == 'tutee') {
+                $this->redirectIntended(default: route('tutee.discover', absolute: false), navigate: true);
+            } else if($role == 'tutor'){
+                $this->redirectIntended(default: route('tutor.discover', absolute: false), navigate: true);
+            }
+        }
+
     }
 }; ?>
 
