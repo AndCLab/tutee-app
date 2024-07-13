@@ -27,6 +27,11 @@
                             class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
                             x-on:click.prevent="tab='#interests'"> Interests </a>
                     </li>
+                    <li class="w-full">
+                        <a :class="tab !== '#log-sessions' ? 'hover:bg-[#F2F2F2]' : 'bg-white'"
+                            class="inline-flex w-full cursor-pointer text-nowrap justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
+                            x-on:click.prevent="tab='#log-sessions'"> Log Sessions </a>
+                    </li>
                 </ul>
 
                 {{-- Web-based left panel --}}
@@ -48,6 +53,12 @@
                         <a :class="tab !== '#interests' ? 'hover:bg-[#F2F2F2]' : 'cursor-auto'"
                             class="inline-flex w-full cursor-pointer items-center gap-3 rounded-md px-2 pr-10 py-1.5 text-sm font-semibold transition-all ease-in-out"
                             x-on:click.prevent="tab='#interests'"> Interests </a>
+                    </li>
+                    <li class="flex items-center gap-1">
+                        <div :class="tab === '#log-sessions' ? 'bg-[#0C3B2E]' : 'bg-transparent'" class="h-5 w-1 rounded-full"></div>
+                        <a :class="tab !== '#log-sessions' ? 'hover:bg-[#F2F2F2]' : 'cursor-auto'"
+                            class="inline-flex text-nowrap w-full cursor-pointer items-center gap-3 rounded-md px-2 pr-10 py-1.5 text-sm font-semibold transition-all ease-in-out"
+                            x-on:click.prevent="tab='#log-sessions'"> Log Sessions </a>
                     </li>
                 </ul>
 
@@ -71,6 +82,12 @@
                     <div x-show="tab == '#interests'" x-cloak>
                         <div class="max-w-xl">
                             <livewire:profile.interest-user-form />
+                        </div>
+                    </div>
+
+                    <div x-show="tab == '#log-sessions'" x-cloak>
+                        <div class="max-w-xl">
+                            <livewire:profile.browser-sessions />
                         </div>
                     </div>
                 </div>

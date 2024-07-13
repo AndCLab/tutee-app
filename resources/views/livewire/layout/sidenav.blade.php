@@ -81,7 +81,7 @@ new class extends Component {
 
                     {{-- profile picture --}}
                     @if (Auth::user()->avatar == null)
-                        <img alt="default.png" src="{{ asset('images/default.jpg') }}"
+                        <img alt="default.png" src="https://ui-avatars.com/api/?name={{ Auth::user()->fname }}+{{ Auth::user()->lname }}&color=7F9CF5&background=EBF4FF"
                             :class="expanded ? 'size-6' : 'size-10' "
                             class="rounded-full object-cover"/>
                     @else

@@ -19,6 +19,7 @@ new class extends Component
     public $avatar;
     public $cropped_image;
     public $showModal;
+    public $default_profile;
 
     /**
      * Mount the component.
@@ -28,6 +29,12 @@ new class extends Component
         $this->fname = Auth::user()->fname;
         $this->lname = Auth::user()->lname;
         $this->email = Auth::user()->email;
+        $this->default_profile = "https://ui-avatars.com/api/?name=" . $this->fname . "+" . $this->lname . "&color=7F9CF5&background=EBF4FF";
+    }
+
+    public function updated(): void
+    {
+        $this->default_profile = "https://ui-avatars.com/api/?name=" . $this->fname . "+" . $this->lname . "&color=7F9CF5&background=EBF4FF";
     }
 
     /**
@@ -159,7 +166,7 @@ new class extends Component
             @if (Auth::user()->avatar !== null)
                 <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ Storage::url(Auth::user()->avatar) }}">
             @else
-                <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ asset('images/default.jpg') }}">
+                <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ $default_profile }}">
             @endif
         </div>
 

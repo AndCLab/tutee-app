@@ -118,8 +118,7 @@ new class extends Component {
 
     <form wire:submit='add_field' class="space-y-2 mt-2">
         <div class="w-full">
-            <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="input"
-                wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition' autofocus autocomplete='off' />
+            <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="input" autofocus autocomplete='off' />
         </div>
         <div class="grid">
             <x-secondary-button type='submit'>Add Field</x-secondary-button>
