@@ -137,7 +137,7 @@ new class extends Component
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                             </svg>
                             <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                            <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX: 2MB)</p>
                         </div>
                         {{-- image input --}}
                         <input type="file" name="uploadInput" class="hidden" id="uploadInput" accept="image/png, image/jpeg">
@@ -187,6 +187,7 @@ new class extends Component
             const croppedImageElement = document.getElementById("cropped_image");
             const saveAndCropButton = document.getElementById("saveAndCrop");
             const uploadCloseButton = document.getElementById("uploadClose");
+            const maxFileSize = 2 * 1024 * 1024;
             let cropper;
 
             // reset function for clearing upon closing the modal
@@ -211,6 +212,15 @@ new class extends Component
             uploadInput.addEventListener("change", function (event) {
                 const file = event.target.files[0];
                 if (file) {
+                    if (file.size > maxFileSize) {
+                        window.$wireui.notify({
+                            title: 'File size exceeds',
+                            description: 'File size should not exceed 2MB',
+                            icon: 'error'
+                        })
+                        resetUpload();
+                        return;
+                    }
                     image.src = URL.createObjectURL(file);
                     image.onload = () => {
                         // if there's a cropper opened. it will destroy and make a new Cropper object
