@@ -177,16 +177,38 @@ new class extends Component
     {{-- CropperJS Script --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
             const image = document.getElementById("avatar");
             const preview = document.getElementById("preview");
             const previewContainer = document.getElementById("previewContainer");
+            const uploadInput = document.getElementById("uploadInput");
+            const uploadContainer = document.getElementById("uploadContainer");
+            const uploadError = document.getElementById("uploadError");
+            const uploadLabel = document.getElementById("uploadLabel");
+            const croppedImageElement = document.getElementById("cropped_image");
+            const saveAndCropButton = document.getElementById("saveAndCrop");
+            const uploadCloseButton = document.getElementById("uploadClose");
             let cropper;
+
+            // reset function for clearing upon closing the modal
+            function resetUpload() {
+                image.src = '';
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                @this.set('cropped_image', null, true);
+                croppedImageElement.src = '';
+                uploadInput.value = '';
+
+                uploadContainer.classList.remove('hidden');
+                uploadLabel.classList.remove('border-negative-300');
+                uploadLabel.classList.add('border-gray-300');
+                uploadError.classList.add('hidden');
+            }
 
             // File input: if file exists then image gets the src of the uploaded image and cropperJS
             // will handle the cropping feature
-            document.getElementById("uploadInput").addEventListener("change", function (event) {
-                console.log('clicked');
+            uploadInput.addEventListener("change", function (event) {
                 const file = event.target.files[0];
                 if (file) {
                     image.src = URL.createObjectURL(file);
@@ -200,9 +222,6 @@ new class extends Component
                             zoomOnWheel: false,
                             minCropBoxWidth: 200,
                             minCropBoxHeight: 200,
-
-                            // minCanvasHeight: 200,
-                            // minCanvasWidth: 200,
                             minContainerHeight: 100,
                             minContainerWidth: 100,
                             preview: '#preview'
@@ -210,8 +229,8 @@ new class extends Component
                     };
                     previewContainer.classList.remove('hidden');
                     previewContainer.classList.add('flex');
-                    document.getElementById("uploadContainer").classList.add('hidden');
-                    document.getElementById("uploadError").classList.add('hidden');
+                    uploadContainer.classList.add('hidden');
+                    uploadError.classList.add('hidden');
                 }
             });
 
@@ -222,48 +241,31 @@ new class extends Component
 
             // afterwards, cropped_image gets that image and store it inside croppedImage livewire property
             // it also calls the livewire function "saveCroppedImage" for storing inside database :)
-            document.getElementById("saveAndCrop").addEventListener("click", () => {
+            saveAndCropButton.addEventListener("click", () => {
                 if (cropper) {
                     const croppedCanvas = cropper.getCroppedCanvas();
-                    if(croppedCanvas){
-
+                    if (croppedCanvas) {
                         const croppedImage = croppedCanvas.toDataURL("image/png");
-                        document.getElementById("cropped_image").src = croppedImage;
+                        croppedImageElement.src = croppedImage;
+
+                        // sets cropped_image value of croppedImage and call the saveCroppedImage function
+                        // then resets the modal
                         @this.set('cropped_image', croppedImage, true).then(() => {
                             @this.call('saveCroppedImage');
-                        }).then(() => {
-                            image.src = '';
-                            if(cropper) cropper.destroy();
-                            @this.set('cropped_image', null, true);
-                            document.getElementById("cropped_image").src = '';
-                            document.getElementById("uploadInput").value = '';
-                        });
-
-                        console.log('save and crop if');
+                        }).then(resetUpload);
                     }
-                } else{
-                    document.getElementById("uploadLabel").classList.remove('border-gray-300');
-                    document.getElementById("uploadLabel").classList.add('border-negative-300');
-                    document.getElementById("uploadError").classList.remove('hidden');
+                } else {
+                    uploadLabel.classList.remove('border-gray-300');
+                    uploadLabel.classList.add('border-negative-300');
+                    uploadError.classList.remove('hidden');
                 }
             });
 
-            document.getElementById("uploadClose").addEventListener("click", () => {
-                setTimeout(() => {
-                    // Reset values upon closing modal
-                    image.src = '';
-                    if(cropper) cropper.destroy();
-                    @this.set('cropped_image', null, true);
-                    document.getElementById("cropped_image").src = '';
-                    document.getElementById("uploadInput").value = '';
-
-                    // Reset styles
-                    document.getElementById("uploadContainer").classList.remove('hidden');
-                    document.getElementById("uploadLabel").classList.remove('border-negative-300');
-                    document.getElementById("uploadLabel").classList.add('border-gray-300');
-                    document.getElementById("uploadError").classList.add('hidden');
-                }, 50);
+            // sets 50ms and call the resetUpload function
+            uploadCloseButton.addEventListener("click", () => {
+                setTimeout(resetUpload, 50);
             });
-        })
+        });
+
     </script>
 </section>
