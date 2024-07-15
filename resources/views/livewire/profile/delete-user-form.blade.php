@@ -53,7 +53,7 @@ new class extends Component
 
 <section class="space-y-6">
     <x-danger-button
-        class="w-full"
+        class="w-full text-nowrap"
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
     >{{ __('Delete Account') }}</x-danger-button>

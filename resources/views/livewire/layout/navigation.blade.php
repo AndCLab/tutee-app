@@ -60,6 +60,7 @@ new class extends Component {
                             <path d="M16 2a4 4 0 0 1 4 4v11a1 1 0 0 1 -2 0v-11a2 2 0 0 0 -2 -2h-5a1 1 0 0 1 0 -2h5z" />
                         </svg>
                     </x-slot>
+
                     <x-wui-dropdown.item>
                         Your bookmarks
                     </x-wui-dropdown.item>
@@ -73,6 +74,7 @@ new class extends Component {
                             <path d="M18 3a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-4.724l-4.762 2.857a1 1 0 0 1 -1.508 -.743l-.006 -.114v-2h-1a4 4 0 0 1 -3.995 -3.8l-.005 -.2v-8a4 4 0 0 1 4 -4zm-4 9h-6a1 1 0 0 0 0 2h6a1 1 0 0 0 0 -2m2 -4h-8a1 1 0 1 0 0 2h8a1 1 0 0 0 0 -2" />
                         </svg>
                     </x-slot>
+
                     <x-wui-dropdown.item>
                         Your messages
                     </x-wui-dropdown.item>
@@ -89,6 +91,7 @@ new class extends Component {
                                 d="M12 2c1.358 0 2.506 .903 2.875 2.141l.046 .171l.008 .043a8.013 8.013 0 0 1 4.024 6.069l.028 .287l.019 .289v2.931l.021 .136a3 3 0 0 0 1.143 1.847l.167 .117l.162 .099c.86 .487 .56 1.766 -.377 1.864l-.116 .006h-16c-1.028 0 -1.387 -1.364 -.493 -1.87a3 3 0 0 0 1.472 -2.063l.021 -.143l.001 -2.97a8 8 0 0 1 3.821 -6.454l.248 -.146l.01 -.043a3.003 3.003 0 0 1 2.562 -2.29l.182 -.017l.176 -.004z" />
                         </svg>
                     </x-slot>
+                    
                     <x-wui-dropdown.item>
                         Your notifications
                     </x-wui-dropdown.item>

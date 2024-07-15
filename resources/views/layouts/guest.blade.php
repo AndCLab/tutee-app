@@ -37,6 +37,14 @@
                 <div class="md:flex hidden justify-center items-center">
                     <img class="size-3/4" src="{{ asset('images/register_image.jpg') }}" alt="">
                 </div>
+            @elseif (request()->path() == 'forgot-password')
+                <div>
+                    <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
+                    {{ $slot }}
+                </div>
+                <div class="md:flex hidden justify-center items-center">
+                    <img class="size-2/3" src="{{ asset('images/forgot-password.jpg') }}" alt="">
+                </div>
             @endif
         </div>
     </div>

@@ -2,15 +2,45 @@
 
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
+use Livewire\Attributes\On;
 
 new class extends Component {
     public string $role = '';
+    public $fullName;
+    public $email;
+    public $defaultProfile;
+
+    public $avatar;
 
     public function mount()
     {
         if (Auth::user()->user_type != null) {
             $this->role = Auth::user()->user_type;
         }
+        
+        $this->fullName = Auth::user()->fname . ' ' . Auth::user()->lname;
+        $this->email = Auth::user()->email;
+        $this->defaultProfile = "https://ui-avatars.com/api/?name=" . Auth::user()->fname . "+" . Auth::user()->lname . "&color=7F9CF5&background=EBF4FF";
+    }
+
+    #[On('profile-updated')]
+    public function updatedDefaultProfile($name, $email): void
+    {
+        $this->fullName = $name;
+        $this->email = $email;
+        $this->defaultProfile = "https://ui-avatars.com/api/?name=" . $name . "&color=7F9CF5&background=EBF4FF";
+    }
+    
+    #[On('avatar-path')]
+    public function updatedAvatar($avatar): void
+    {
+        $this->avatar = $avatar;
+    }
+
+    #[On('remove-avatar')]
+    public function updatedProfile($defaultProfile): void
+    {
+        $this->defaultProfile = $defaultProfile;
     }
 
     /**
@@ -81,11 +111,11 @@ new class extends Component {
 
                     {{-- profile picture --}}
                     @if (Auth::user()->avatar == null)
-                        <img alt="default.png" src="{{ asset('images/default.jpg') }}"
+                        <img alt="default.png" src="{{ $defaultProfile }}"
                             :class="expanded ? 'size-6' : 'size-10' "
                             class="rounded-full object-cover"/>
                     @else
-                        <img alt="current avatar" src="{{ Storage::url(Auth::user()->avatar) }}"
+                        <img alt="current avatar" src="{{ $avatar }}"
                             :class="expanded ? 'size-6' : 'size-10' "
                             class="rounded-full object-cover"/>
                     @endif
@@ -98,7 +128,7 @@ new class extends Component {
                             'text-[#D9D9D9]' => $role == 'tutor',
                         ])>
                             <strong
-                                class="block font-medium max-w-28 truncate">{{ Auth::user()->fname . ' ' . Auth::user()->lname }}</strong>
+                                class="block font-medium max-w-28 truncate">{{ $fullName }}</strong>
 
                             <span>{{ Auth::user()->email }}</span>
                         </p>
