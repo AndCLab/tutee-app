@@ -20,7 +20,7 @@
 
 <body class="font-inter text-gray-900 antialiased">
     <div class="mx-10">
-        <div class="grid grid-rows-1 md:grid-cols-2 items-center md:justify-center h-screen mx-auto md:max-w-6xl">
+        <div class="grid grid-rows-1 md:grid-cols-2 items-start md:justify-center h-screen mx-auto md:max-w-6xl">
             @if (request()->path() == 'login')
                 <div class="md:flex hidden justify-center items-center">
                     <img class="size-3/4" src="{{ asset('images/login_image.svg') }}" alt="">
@@ -30,12 +30,12 @@
                     {{ $slot }}
                 </div>
             @elseif (request()->path() == 'register')
-                <div>
+                <div class="my-auto">
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
                 </div>
-                <div class="md:flex hidden justify-center items-center">
-                    <img class="size-3/4" src="{{ asset('images/register_image.jpg') }}" alt="">
+                <div class="md:flex hidden justify-center items-center my-auto sticky top-0">
+                    <img class="size-3/4" src="{{ asset('images/register_image.svg') }}" alt="">
                 </div>
             @elseif (request()->path() == 'forgot-password')
                 <div>
