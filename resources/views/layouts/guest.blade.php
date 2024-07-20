@@ -18,32 +18,32 @@
     <wireui:scripts />
 </head>
 
-<body class="font-inter text-gray-900 antialiased">
+<body class="font-inter text-gray-900 antialiased soft-scrollbar">
     <div class="mx-10">
-        <div class="grid grid-rows-1 md:grid-cols-2 items-start md:justify-center h-screen mx-auto md:max-w-6xl">
+        <div class="grid grid-rows-1 md:grid-cols-2 h-screen md:h-full items-start md:justify-center mx-auto md:max-w-6xl">
             @if (request()->path() == 'login')
-                <div class="md:flex hidden justify-center items-center">
+                <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
                     <img class="size-3/4" src="{{ asset('images/login_image.svg') }}" alt="">
                 </div>
-                <div>
+                <div class="my-auto py-10 md:py-32">
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
                 </div>
             @elseif (request()->path() == 'register')
-                <div class="my-auto">
+                <div class="my-auto py-10 md:py-32">
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
                 </div>
-                <div class="md:flex hidden justify-center items-center my-auto sticky top-0">
+                <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
                     <img class="size-3/4" src="{{ asset('images/register_image.svg') }}" alt="">
                 </div>
             @elseif (request()->path() == 'forgot-password')
-                <div>
+                <div class="my-auto py-10 md:py-32">
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
                 </div>
-                <div class="md:flex hidden justify-center items-center">
-                    <img class="size-2/3" src="{{ asset('images/forgot-password.jpg') }}" alt="">
+                <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
+                    <img class="size-2/3" src="{{ asset('images/forgot-password.svg') }}" alt="">
                 </div>
             @endif
         </div>

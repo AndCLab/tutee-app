@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'address',
         'zip_code', 
+        'phone_prefix',
         'phone_number',
          
         'is_stepper',

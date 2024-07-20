@@ -18,17 +18,22 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $password = '';
     public string $password_confirmation = '';
 
+    public string $phone_prefix = '';
+
     /**
      * Handle an incoming registration request.
      */
     public function register(): void
     {
+        $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
+
         $validated = $this->validate([
             'fname' => ['required', 'string', 'max:255'],
             'lname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'zip_code' => ['required'],
-            'phone_number' => ['required', 'numeric'],
+            'zip_code' => ['required', 'numeric'],
+            'phone_prefix' => ['required', 'string'],
+            'phone_number' => ['required', 'string', 'phone'],
             'address' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -97,24 +102,45 @@ new #[Layout('layouts.guest')] class extends Component {
                     placeholder="1234"
                     mask="#####"
                     wire:model="zip_code"
-                    autocomplete='zip_code'
+                    autocomplete='postal-code'
                 />
             </div>
 
-            {{-- Phone Number --}}
-            <div>
-                <x-wui-inputs.phone 
-                    label="Phone" 
-                    wire:model='phone_number' 
-                    placeholder='Enter your phone number' 
-                    mask="[
-                        '(+##) ####-####', 
-                        '(+##) #####-####', 
-                        '(+##) ### ###-#####',
-                        '(+###) ### ###-#####',
-                        '(+####) ### ###-#####'
-                    ]" />
-            </div>
+            <div class="flex flex-col md:items-start">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                </label>
+                <div class="md:inline-flex space-y-2 md:space-y-0 md:gap-2">
+                    <div class="md:w-5/6">
+                        <x-wui-select
+                            placeholder="Phone Prefix"
+                            :async-data="route('phone-prefix')"
+                            option-label="phone_code"
+                            option-description="country_name"
+                            option-value="phone_code"
+                            wire:model='phone_prefix'
+                            :template="[
+                                'name'   => 'user-option',
+                                'config' => ['src' => 'country_image']
+                            ]"
+                        />
+                    </div>
+
+                    {{-- Phone Number --}}
+                    <div class="w-full">
+                        <x-wui-inputs.phone 
+                        wire:model='phone_number' 
+                        placeholder='Enter your phone number' 
+                        mask="[
+                                '####-####',
+                                '### ###-####',
+                                '### ###-#####',
+                                '##### #######',
+                            ]" 
+                            />
+                    </div>     
+                </div>
+            </div>               
 
             <!-- Password -->
             <div>

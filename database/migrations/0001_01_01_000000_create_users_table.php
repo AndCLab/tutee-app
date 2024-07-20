@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('address');
             $table->string('zip_code', 5);
+            $table->string('phone_prefix');
             $table->string('phone_number')->unique();
 
             $table->boolean('is_stepper')->default(1);

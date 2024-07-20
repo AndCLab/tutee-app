@@ -1,3 +1,17 @@
+@php
+    $fields = [
+        'English' => ['Grammar', 'Literature', 'Poetry', 'Writing'],
+        'Mathematics' => ['Algebra', 'Geometry', 'Calculus', 'Statistics', 'Trigonometry'],
+        'Science' => ['Biology', 'Chemistry', 'Physics', 'Astronomy', 'Geology'],
+        'History' => ['Ancient', 'Medieval', 'Modern', 'World Wars', 'American'],
+        'Geography' => ['Maps', 'Climate', 'Continents', 'Oceans', 'Countries'],
+        'Computer Science' => ['Programming', 'Algorithms', 'Data Structures', 'Databases', 'Networks'],
+        'Art' => ['Painting', 'Sculpture', 'Drawing', 'Photography', 'Film'],
+        'Music' => ['Theory', 'Composition', 'Performance', 'Genres', 'History'],
+        'Physical Education' => ['Sports', 'Exercise', 'Health', 'Fitness', 'Nutrition'],
+    ];
+@endphp
+
 <div class="md:w-3/4 w-full">
     <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold mb-3">Select your Fields</h1>
 
