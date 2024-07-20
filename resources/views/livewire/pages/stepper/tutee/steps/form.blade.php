@@ -8,15 +8,15 @@
 <div class="md:w-3/4 w-full">
     <div class="md:grid md:grid-cols-4 pb-5">
         <p class="font-semibold pb-3 md:pb-0">Institute</p>
-        <div class="md:col-span-3 space-y-3 md:space-y-0">
+        <div class="md:col-span-3">
             @foreach ($inputs as $index => $input)
                 <div @class([
                     'hidden' => count($inputs) === 1,
                     'block' => count($inputs) >= 1
                     ])>
-                    <p class="font-medium text-sm">Institute {{ $index + 1 }}</p>
+                    <p class="font-medium text-sm pb-3">Institute {{ $index + 1 }}</p>
                 </div>
-                <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0">
+                <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0 pb-3">
                     <div class="space-y-3">
                         <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">
                             {{-- From --}}

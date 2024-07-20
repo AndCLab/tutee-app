@@ -12,6 +12,7 @@
         'Contact Information' => ['If you have any questions or concerns about these terms and conditions, please contact us at [tutee@email.com].'],
     ];
 @endphp
+
 <div class="mb-5 md:w-3/4 mx-auto">
     <h1 class="text-[#0C3B2E] text-center text-2xl md:text-3xl font-extrabold mb-10">User Profile Overview</h1>
     <div class="grid md:grid-cols-3 md:items-center text-[#0F172A] space-y-4 md:space-y-4">
@@ -42,69 +43,66 @@
     </div>
 
     <div class="my-2 text-pretty text-sm md:text-center">
-        <p>By using this website, you agree to our <span class="underline cursor-pointer" x-data=""
-                x-on:click.prevent="$dispatch('open-modal', 'terms-and-conditions')">Terms and Condition</span></p>
+        <p>By using this website, you agree to our <span class="underline cursor-pointer"
+            onclick="$openModal('cardModal')">Terms and Condition</span></p>
     </div>
 
-    <x-modal name="terms-and-conditions" focusable>
-        <form wire:submit="submit" class="p-6">
+    {{-- Create class modal --}}
+    <x-wui-modal name="cardModal" align='center' max-width='xl' persistent>
+        <x-wui-card>
+            <form wire:submit="submit" x-data="{ open: false }">
 
-            <h2 class="text-lg font-medium text-gray-900">
-                TUTEE Platform - Terms and Conditions
-            </h2>
+                <h2 class="text-lg font-medium text-gray-900">
+                    TUTEE Platform - Terms and Conditions
+                </h2>
 
-            <div class="mt-1 text-sm text-gray-600 overflow-auto soft-scrollbar h-[390px] space-y-5">
-                <p>
-                    Welcome to TUTEE, the revolutionary platform designed to enhance the tutoring experience for both
-                    tutees
-                    and tutors. Before you begin using our services, please carefully review the following terms and
-                    conditions:
-                </p>
+                <div class="mt-2 text-sm text-gray-600 overflow-auto soft-scrollbar h-[390px] space-y-5 p-3">
+                    <p>
+                        Welcome to TUTEE, the revolutionary platform designed to enhance the tutoring experience for both
+                        tutees
+                        and tutors. Before you begin using our services, please carefully review the following terms and
+                        conditions:
+                    </p>
 
-                <ol class="list-outside list-decimal p-4 pl-8">
-                    @foreach ($confirmation as $item => $confirm)
-                        <div class="pb-5">
-                            <li>{{ $item }}</li>
-                            @foreach ($confirm as $content)
-                                <div class="pl-10">
-                                    <ul class="list-outside list-disc">
-                                        <li>{{ $content }}</li>
-                                    </ul>
-                                </div>
-                            @endforeach
+                    <ol class="list-outside list-decimal p-4 pl-8">
+                        @foreach ($confirmation as $item => $confirm)
+                            <div class="pb-5">
+                                <li>{{ $item }}</li>
+                                @foreach ($confirm as $content)
+                                    <div class="pl-10">
+                                        <ul class="list-outside list-disc">
+                                            <li>{{ $content }}</li>
+                                        </ul>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </ol>
+
+                    By using the TUTEE platform, you acknowledge that you have read, understood, and agree to be bound by
+                    these terms and conditions. If you do not agree to these terms, you may not access or use the TUTEE
+                    platform.
+
+                    <div class="mt-6">
+                        <div class="block">
+                            <x-wui-checkbox class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
                         </div>
-                    @endforeach
-                </ol>
-
-                By using the TUTEE platform, you acknowledge that you have read, understood, and agree to be bound by
-                these terms and conditions. If you do not agree to these terms, you may not access or use the TUTEE
-                platform.
-
-            </div>
-
-            <div x-data="{ open: false }">
-                <div class="mt-6">
-                    <div class="block">
-                        <label for="confirm" class="inline-flex items-center">
-                            <input id="confirm" type="checkbox" x-model="open"
-                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                            <span class="ms-2 text-sm text-gray-600">I agree to the terms and condition</span>
-                        </label>
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-end">
-                    <x-secondary-button x-on:click="$dispatch('close')">
-                        {{ __('Cancel') }}
-                    </x-secondary-button>
+                <div>
 
-                    <x-primary-button class="ms-3" x-bind:disabled="!open">
-                        {{ __('Submit') }}
-                    </x-primary-button>
+                    <div class="mt-6 flex justify-end">
+                        <x-secondary-button x-on:click='close'>
+                            {{ __('Cancel') }}
+                        </x-secondary-button>
+
+                        <x-primary-button class="ms-3" x-bind:disabled="!open">
+                            {{ __('Submit') }}
+                        </x-primary-button>
+                    </div>
                 </div>
-            </div>
-
-
-        </form>
-    </x-modal>
+            </form>
+        </x-wui-card>
+    </x-wui-modal>
 </div>
