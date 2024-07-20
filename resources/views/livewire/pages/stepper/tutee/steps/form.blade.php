@@ -59,8 +59,11 @@
         <div class="md:col-span-3">
             <x-wui-select class="w-full" placeholder="Select school level" wire:model.live="grade_level"
                 autocomplete="off">
-                <x-wui-select.option label="High School" value="highschool" />
-                <x-wui-select.option label="College" value="college" />
+                @foreach ($gradeLevelList as $item)
+                    <x-wui-select.option label="{{ $item }}" value="{{ $item }}" />
+                @endforeach
+                {{-- <x-wui-select.option label="High School" value="highschool" />
+                <x-wui-select.option label="College" value="college" /> --}}
             </x-wui-select>
         </div>
     </div>

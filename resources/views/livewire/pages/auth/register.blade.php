@@ -9,6 +9,8 @@ use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
+    public $title = 'Register | Tutee';
+
     public string $fname = '';
     public string $lname = '';
     public string $email = '';
@@ -49,6 +51,10 @@ new #[Layout('layouts.guest')] class extends Component {
 }; ?>
 
 <div class="max-w-sm mx-auto">
+    @push('title')
+        {{ $title }}
+    @endpush
+    
     <form wire:submit="register">
         <div class="flex flex-col gap-4">
             <div class="sm:inline-flex sm:items-center gap-4 space-y-4 sm:space-y-0">

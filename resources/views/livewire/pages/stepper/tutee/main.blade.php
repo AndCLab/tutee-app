@@ -23,6 +23,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $specific = '';
 
     // Tutee
+    public $gradeLevelList = Tutee::GRADE_LEVELS;
     public $grade_level = '';
     public $from = [];
     public $to = [];
