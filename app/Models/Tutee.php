@@ -9,8 +9,18 @@ class Tutee extends Model
 {
     use HasFactory;
 
-    protected $table = 'tutee';
+    const GRADE_LEVELS = [
+        'Preschool', 
+        'Kindergarten', 
+        'Elementary School',
+        'Middle School', 
+        'Highschool', 
+        'Undergraduate',
+        'College'
+    ];
 
+    protected $table = 'tutee';
+    
     protected $fillable = ['user_id', 'grade_level'];
 
     public function user()

@@ -9,27 +9,57 @@ use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
+    public $title = 'Register | Tutee';
+
     public string $fname = '';
     public string $lname = '';
     public string $email = '';
+    public string $zip_code = '';
+    public string $phone_number = '';
+    public string $address = '';
     public string $password = '';
     public string $password_confirmation = '';
+    
+    public string $phone_prefix = '';
+    public string $tempPhoneStorage = '';
 
     /**
      * Handle an incoming registration request.
      */
     public function register(): void
     {
-        $validated = $this->validate([
-            'fname' => ['required', 'string', 'max:255'],
-            'lname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ]);
+        // sample phone number: 9562398125
+        $this->tempPhoneStorage = $this->phone_number;
+        
+        // for validation
+        // merge prefix with phone number: +639562398125
+        $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
+
+        try {
+            $validated = $this->validate([
+                'fname' => ['required', 'string', 'max:255'],
+                'lname' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'zip_code' => ['required', 'numeric'],
+                'phone_prefix' => ['required', 'string'],
+                'phone_number' => ['required', 'string', 'phone'],
+                'address' => ['required', 'string', 'max:255'],
+                'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            ]);
+        } catch (\Throwable $th) {
+            // clear validation errors
+            $this->reset('phone_number', 'password', 'password_confirmation');
+            throw $th;
+        }
+
+        // resets to without prefix: 9562398125
+        $validated['phone_number'] = $this->tempPhoneStorage;
 
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));
+
+        $this->reset('phone_number');
 
         Auth::login($user);
 
@@ -38,26 +68,102 @@ new #[Layout('layouts.guest')] class extends Component {
 }; ?>
 
 <div class="max-w-sm mx-auto">
+    @push('title')
+        {{ $title }}
+    @endpush
+    
     <form wire:submit="register">
         <div class="flex flex-col gap-4">
-            <div class="sm:inline-flex sm:items-center gap-4 space-y-4 sm:space-y-0">
+            <div class="sm:inline-flex sm:items-center gap-2 space-y-4 sm:space-y-0">
                 <!-- First Name -->
                 <div>
-                    <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus
-                        autocomplete="fname" />
+                    <x-wui-input 
+                        label="First Name" 
+                        placeholder="Enter your first name" 
+                        wire:model="fname" 
+                        autofocus
+                        autocomplete="fname" 
+                    />
                 </div>
 
                 {{-- Last Name --}}
                 <div>
-                    <x-wui-input label="Last Name" placeholder="Enter your last name" wire:model="lname" autofocus
-                        autocomplete="lname" />
+                    <x-wui-input 
+                        label="Last Name" 
+                        placeholder="Enter your last name" 
+                        wire:model="lname" 
+                        autofocus
+                        autocomplete="lname" 
+                    />
                 </div>
             </div>
 
             <!-- Email Address -->
             <div>
-                <x-wui-input label="Email" placeholder="Email" wire:model="email" autocomplete='username' />
+                <x-wui-input 
+                    label="Email" 
+                    placeholder="Email" 
+                    wire:model="email" 
+                    autocomplete='username'
+                />
             </div>
+
+            {{-- Address --}}
+            <div>
+                <x-wui-input 
+                    label="Address" 
+                    placeholder="Address" 
+                    wire:model="address" 
+                    autocomplete='address' 
+                />
+            </div>
+
+            {{-- Zip Code --}}
+            <div>
+                <x-wui-inputs.maskable
+                    label="Zip Code"
+                    placeholder="1234"
+                    mask="#####"
+                    wire:model="zip_code"
+                    autocomplete='postal-code'
+                />
+            </div>
+
+            <div class="flex flex-col md:items-start">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                </label>
+                <div class="md:inline-flex space-y-2 md:space-y-0 md:gap-2">
+                    <div class="md:w-5/6">
+                        <x-wui-select
+                            placeholder="Phone Prefix"
+                            :async-data="route('phone-prefix')"
+                            option-label="phone_code"
+                            option-description="country_name"
+                            option-value="phone_code"
+                            wire:model='phone_prefix'
+                            :template="[
+                                'name'   => 'user-option',
+                                'config' => ['src' => 'country_image']
+                            ]"
+                        />
+                    </div>
+
+                    {{-- Phone Number --}}
+                    <div class="w-full">
+                        <x-wui-inputs.phone 
+                        wire:model='phone_number' 
+                        placeholder='Enter your phone number' 
+                        mask="[
+                                '####-####',
+                                '### ###-####',
+                                '### ###-#####',
+                                '##### #######',
+                            ]" 
+                            />
+                    </div>     
+                </div>
+            </div>               
 
             <!-- Password -->
             <div>

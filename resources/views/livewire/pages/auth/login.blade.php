@@ -6,6 +6,8 @@ use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
+    public $title = 'Login | Tutee';
+
     public LoginForm $form;
 
     /**
@@ -32,6 +34,10 @@ new #[Layout('layouts.guest')] class extends Component {
 }; ?>
 
 <div class="max-w-sm mx-auto">
+    @push('title')
+        {{ $title }}
+    @endpush
+    
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

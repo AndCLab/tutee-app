@@ -18,7 +18,12 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'fname' => 'Test',
             'lname' => 'User',
+            'lname' => 'User',
             'email' => 'test@example.com',
+            'address' => 'address',
+            'zip_code' => '6015', 
+            'phone_prefix' => '+63',
+            'phone_number' => '9582938479',
         ]);
         
         User::factory()->create([
@@ -28,6 +33,10 @@ class DatabaseSeeder extends Seeder
             'is_stepper' => 0,
             'user_type' => 'tutee',
             'email' => 'tutee@example.com',
+            'address' => 'address',
+            'zip_code' => '6015', 
+            'phone_prefix' => '+63',
+            'phone_number' => '9582938379',
         ]);
         
         User::factory()->create([
@@ -37,6 +46,10 @@ class DatabaseSeeder extends Seeder
             'is_stepper' => 0,
             'user_type' => 'tutor',
             'email' => 'tutor@example.com',
+            'address' => 'address',
+            'zip_code' => '6015', 
+            'phone_prefix' => '+63',
+            'phone_number' => '9576238479',
         ]);
 
         $this->call(TutorSeeder::class);
