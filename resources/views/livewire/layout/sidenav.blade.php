@@ -17,7 +17,7 @@ new class extends Component {
         if (Auth::user()->user_type != null) {
             $this->role = Auth::user()->user_type;
         }
-        
+
         $this->fullName = Auth::user()->fname . ' ' . Auth::user()->lname;
         $this->email = Auth::user()->email;
         $this->defaultProfile = "https://ui-avatars.com/api/?name=" . Auth::user()->fname . "+" . Auth::user()->lname . "&color=7F9CF5&background=EBF4FF";
@@ -30,7 +30,7 @@ new class extends Component {
         $this->email = $email;
         $this->defaultProfile = "https://ui-avatars.com/api/?name=" . $name . "&color=7F9CF5&background=EBF4FF";
     }
-    
+
     #[On('avatar-path')]
     public function updatedAvatar($avatar): void
     {

@@ -1,24 +1,37 @@
+@php
+    $dates = [];
+    for ($year = 1990; $year <= 2024; $year++) {
+        $dates[] = $year;
+    }
+@endphp
+
 <div class="md:w-3/4 w-full">
     <div class="md:grid md:grid-cols-4 pb-5">
         <p class="font-semibold pb-3 md:pb-0">Institute</p>
-        <div class="md:col-span-3 space-y-3">
+        <div class="md:col-span-3">
             @foreach ($inputs as $index => $input)
                 <div @class([
                     'hidden' => count($inputs) === 1,
                     'block' => count($inputs) >= 1
                     ])>
-                    <p class="font-medium text-sm">Institute {{ $index + 1 }}</p>
+                    <p class="font-medium text-sm pb-3">Institute {{ $index + 1 }}</p>
                 </div>
-                <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0">
+                <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0 pb-3">
                     <div class="space-y-3">
                         <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">
                             {{-- From --}}
-                            <x-wui-select wire:model="from.{{ $index }}" placeholder="From" :async-data="route('dates')"
-                                option-label="year" option-value="id" autocomplete="off" />
+                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}">
+                                @foreach ($dates as $year)
+                                    <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
+                                @endforeach
+                            </x-wui-select>
 
                             {{-- To --}}
-                            <x-wui-select wire:model="to.{{ $index }}" placeholder="To" :async-data="route('dates')"
-                                option-label="year" option-value="id" autocomplete="off" />
+                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}">
+                                @foreach ($dates as $year)
+                                    <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
+                                @endforeach
+                            </x-wui-select>
                         </div>
 
                         <x-wui-input class="w-full" id="institute.{{ $index }}"
@@ -46,8 +59,11 @@
         <div class="md:col-span-3">
             <x-wui-select class="w-full" placeholder="Select school level" wire:model.live="grade_level"
                 autocomplete="off">
-                <x-wui-select.option label="High School" value="highschool" />
-                <x-wui-select.option label="College" value="college" />
+                @foreach ($gradeLevelList as $item)
+                    <x-wui-select.option label="{{ $item }}" value="{{ $item }}" />
+                @endforeach
+                {{-- <x-wui-select.option label="High School" value="highschool" />
+                <x-wui-select.option label="College" value="college" /> --}}
             </x-wui-select>
         </div>
     </div>

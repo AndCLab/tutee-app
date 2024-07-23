@@ -2,6 +2,7 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Livewire\Actions\Logout;
 use App\Models\User;
 use App\Models\Tutor;
 use App\Models\Work;
@@ -223,6 +224,13 @@ new #[Layout('layouts.app')] class extends Component {
 
             return redirect()->route('dashboard');
         }
+    }
+
+    public function logout(Logout $logout): void
+    {
+        $logout();
+
+        $this->redirect('/login', navigate: true);
     }
 }; ?>
 

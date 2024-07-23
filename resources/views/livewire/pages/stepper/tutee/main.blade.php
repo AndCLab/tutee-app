@@ -2,6 +2,7 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Livewire\Actions\Logout;
 use Livewire\Attributes\Validate;
 use App\Models\User;
 use App\Models\Tutee;
@@ -21,19 +22,8 @@ new #[Layout('layouts.app')] class extends Component {
     public $i;
     public $specific = '';
 
-    public $fields = [
-        'English' => ['Grammar', 'Literature', 'Poetry', 'Writing'],
-        'Mathematics' => ['Algebra', 'Geometry', 'Calculus', 'Statistics', 'Trigonometry'],
-        'Science' => ['Biology', 'Chemistry', 'Physics', 'Astronomy', 'Geology'],
-        'History' => ['Ancient', 'Medieval', 'Modern', 'World Wars', 'American'],
-        'Geography' => ['Maps', 'Climate', 'Continents', 'Oceans', 'Countries'],
-        'Computer Science' => ['Programming', 'Algorithms', 'Data Structures', 'Databases', 'Networks'],
-        'Art' => ['Painting', 'Sculpture', 'Drawing', 'Photography', 'Film'],
-        'Music' => ['Theory', 'Composition', 'Performance', 'Genres', 'History'],
-        'Physical Education' => ['Sports', 'Exercise', 'Health', 'Fitness', 'Nutrition'],
-    ];
-
     // Tutee
+    public $gradeLevelList = Tutee::GRADE_LEVELS;
     public $grade_level = '';
     public $from = [];
     public $to = [];
@@ -182,6 +172,13 @@ new #[Layout('layouts.app')] class extends Component {
 
             return redirect()->route('dashboard');
         }
+    }
+
+    public function logout(Logout $logout): void
+    {
+        $logout();
+
+        $this->redirect('/login', navigate: true);
     }
 }; ?>
 

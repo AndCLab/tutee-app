@@ -12,6 +12,8 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
+    public $title = 'Reset Password | Tutee';
+
     #[Locked]
     public string $token = '';
     public string $email = '';
@@ -70,6 +72,10 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    @push('title')
+        {{ $title }}
+    @endpush
+    
     <form wire:submit="resetPassword">
         <!-- Email Address -->
         <div>

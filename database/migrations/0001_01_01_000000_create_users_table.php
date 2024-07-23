@@ -15,9 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('fname');
             $table->string('lname');
+            $table->string('email')->unique();
+            $table->string('address');
+            $table->string('zip_code', 5);
+            $table->string('phone_prefix');
+            $table->string('phone_number')->unique();
+
             $table->boolean('is_stepper')->default(1);
             $table->enum('user_type', ['tutee', 'tutor'])->nullable();
-            $table->string('email')->unique();
             $table->string('avatar')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
