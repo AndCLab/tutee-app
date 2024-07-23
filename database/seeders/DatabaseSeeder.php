@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'address' => 'address',
             'zip_code' => '6015', 
             'phone_prefix' => '+63',
-            'phone_number' => '+639582938479',
+            'phone_number' => '9582938479',
         ]);
         
         User::factory()->create([
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             'address' => 'address',
             'zip_code' => '6015', 
             'phone_prefix' => '+63',
-            'phone_number' => '+639582938379',
+            'phone_number' => '9582938379',
         ]);
         
         User::factory()->create([
@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
             'address' => 'address',
             'zip_code' => '6015', 
             'phone_prefix' => '+63',
-            'phone_number' => '+639576238479',
+            'phone_number' => '9576238479',
         ]);
 
         $this->call(TutorSeeder::class);

@@ -19,30 +19,47 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $address = '';
     public string $password = '';
     public string $password_confirmation = '';
-
+    
     public string $phone_prefix = '';
+    public string $tempPhoneStorage = '';
 
     /**
      * Handle an incoming registration request.
      */
     public function register(): void
     {
+        // sample phone number: 9562398125
+        $this->tempPhoneStorage = $this->phone_number;
+        
+        // for validation
+        // merge prefix with phone number: +639562398125
         $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
 
-        $validated = $this->validate([
-            'fname' => ['required', 'string', 'max:255'],
-            'lname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'zip_code' => ['required', 'numeric'],
-            'phone_prefix' => ['required', 'string'],
-            'phone_number' => ['required', 'string', 'phone'],
-            'address' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ]);
+        try {
+            $validated = $this->validate([
+                'fname' => ['required', 'string', 'max:255'],
+                'lname' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'zip_code' => ['required', 'numeric'],
+                'phone_prefix' => ['required', 'string'],
+                'phone_number' => ['required', 'string', 'phone'],
+                'address' => ['required', 'string', 'max:255'],
+                'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            ]);
+        } catch (\Throwable $th) {
+            // clear validation errors
+            $this->reset('phone_number', 'password', 'password_confirmation');
+            throw $th;
+        }
+
+        // resets to without prefix: 9562398125
+        $validated['phone_number'] = $this->tempPhoneStorage;
 
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));
+
+        $this->reset('phone_number');
 
         Auth::login($user);
 
@@ -57,7 +74,7 @@ new #[Layout('layouts.guest')] class extends Component {
     
     <form wire:submit="register">
         <div class="flex flex-col gap-4">
-            <div class="sm:inline-flex sm:items-center gap-4 space-y-4 sm:space-y-0">
+            <div class="sm:inline-flex sm:items-center gap-2 space-y-4 sm:space-y-0">
                 <!-- First Name -->
                 <div>
                     <x-wui-input 
