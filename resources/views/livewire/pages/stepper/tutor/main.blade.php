@@ -13,7 +13,7 @@ use App\Models\Fields;
 use WireUi\Traits\Actions;
 
 new #[Layout('layouts.app')] class extends Component {
-    use Actions;
+    use Actions, WithFileUploads;
 
     public $count = 2;
 
@@ -21,14 +21,13 @@ new #[Layout('layouts.app')] class extends Component {
     public $user_type = 'tutor';
     public $dates = [''];
     public $input_work = [];
-    public $input_cert = [];
     public $i;
 
     // Tutor
     public $from = [];
     public $to = [];
     public $work = [];
-    public $certificate = [];
+    public $certificates = [];
     public $selected = [];
     public $resume;
     public $specific = '';
@@ -38,11 +37,10 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->i = 0;
         $this->input_work = [0];
-        $this->input_cert = [0];
         $this->from = [''];
         $this->to = [''];
         $this->work = [''];
-        $this->certificate = [''];
+        $this->certificates = [''];
     }
 
     // Work experience
@@ -70,17 +68,13 @@ new #[Layout('layouts.app')] class extends Component {
     // Certificate
     public function add_cert()
     {
-        $this->input_cert[] = count($this->input_cert);
-        $this->certificate[] = '';
+        $this->certificates[] = '';
     }
 
     public function remove_cert($index)
     {
-        unset($this->input_cert[$index]);
-        unset($this->certificate[$index]);
-
-        $this->input_cert = array_values($this->input_cert);
-        $this->certificate = array_values($this->certificate);
+        unset($this->certificates[$index]);
+        $this->certificates = array_values($this->certificates);
     }
 
     // Fields
@@ -103,11 +97,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->selected = array_values($this->selected);
     }
 
-    use WithFileUploads;
-    public function upload_certificate($tutorId)
+    public function upload_certificates($tutorId)
     {
-        if ($this->certificate) {
-            foreach ($this->certificate as $certificate) {
+        if ($this->certificates) {
+            foreach ($this->certificates as $certificate) {
                 $extension = $certificate->getClientOriginalExtension();
                 $filename = uniqid() . '_' . time() . '.' . $extension;
 
@@ -118,7 +111,6 @@ new #[Layout('layouts.app')] class extends Component {
                     'file_path' => $filePath,
                 ]);
             }
-            $this->reset('certificate');
         }
     }
 
@@ -134,8 +126,6 @@ new #[Layout('layouts.app')] class extends Component {
                 'tutor_id' => $tutorId,
                 'file_path' => $filePath,
             ]);
-
-            $this->reset('resume');
         }
     }
 
@@ -175,15 +165,15 @@ new #[Layout('layouts.app')] class extends Component {
                     'from.*' => 'required|date',
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
-                    'certificate.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
+                    'certificates.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
                     'resume' => 'required|file|mimes:pdf|max:2048',
                 ],
                 [
                     'from.*.required' => 'The field is required',
                     'to.*.required' => 'The field is required',
                     'work.*.required' => 'The field is required',
-                    'certificate.*.required' => 'The field is required',
-                    'certificate.*.mimes:pdf,png,jpg,jpeg|max:2048' => 'The field is required',
+                    'certificates.*.required' => 'The field is required',
+                    'certificates.*.mimes:pdf,png,jpg,jpeg|max:2048' => 'The field is required',
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                 ],
             );
@@ -219,7 +209,7 @@ new #[Layout('layouts.app')] class extends Component {
                 ]);
             }
 
-            $this->upload_certificate($tutor->id);
+            $this->upload_certificates($tutor->id);
             $this->upload_resume($tutor->id);
 
             return redirect()->route('dashboard');

@@ -177,7 +177,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     label="Password" autocomplete="new-password" />
             </div>
 
-            <x-primary-button>
+            <x-primary-button type='submit'>
                 {{ __('Register') }}
             </x-primary-button>
 

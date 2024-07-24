@@ -55,7 +55,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     autocomplete="current-password" />
             </div>
 
-            <x-primary-button>
+            <x-primary-button type='submit'>
                 Login
             </x-primary-button>
 
