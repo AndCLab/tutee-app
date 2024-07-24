@@ -26,7 +26,7 @@ class ApiSelect extends Controller
             )
             ->when(
                 $request->exists('selected'),
-                fn (Collection $collection) => $collection->whereIn('country_code', $request->input('selected', [])),
+                fn (Collection $collection) => $collection->whereIn('phone_code', $request->input('selected', [])),
                 // fn (Collection $collection) => $collection->take(10)
             )
             ->sortBy('country_name')
