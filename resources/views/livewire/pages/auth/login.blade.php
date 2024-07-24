@@ -23,12 +23,18 @@ new #[Layout('layouts.guest')] class extends Component {
 
         if (Auth::check()) {
             $role = Auth::user()->user_type;
-            if ($role == 'tutee') {
-                $this->redirectIntended(default: route('tutee.discover', absolute: false), navigate: true);
-            } else if($role == 'tutor'){
-                $this->redirectIntended(default: route('tutor.discover', absolute: false), navigate: true);
+            $routes = [
+                'tutee' => route('tutee.discover', [], false),
+                'tutor' => route('tutor.discover', [], false),
+            ];
+
+            if (array_key_exists($role, $routes)) {
+                $this->redirectIntended(default: $routes[$role], navigate: true);
+            } else {
+                $this->redirectIntended(default: route('stepper'), navigate: true);
             }
         }
+
 
     }
 }; ?>
@@ -37,7 +43,7 @@ new #[Layout('layouts.guest')] class extends Component {
     @push('title')
         {{ $title }}
     @endpush
-    
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -55,7 +61,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     autocomplete="current-password" />
             </div>
 
-            <x-primary-button type='submit'>
+            <x-primary-button wireTarget='login'>
                 Login
             </x-primary-button>
 

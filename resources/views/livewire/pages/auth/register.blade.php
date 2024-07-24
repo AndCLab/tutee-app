@@ -19,7 +19,7 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $address = '';
     public string $password = '';
     public string $password_confirmation = '';
-    
+
     public string $phone_prefix = '';
     public string $tempPhoneStorage = '';
 
@@ -30,7 +30,7 @@ new #[Layout('layouts.guest')] class extends Component {
     {
         // sample phone number: 9562398125
         $this->tempPhoneStorage = $this->phone_number;
-        
+
         // for validation
         // merge prefix with phone number: +639562398125
         $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
@@ -71,50 +71,50 @@ new #[Layout('layouts.guest')] class extends Component {
     @push('title')
         {{ $title }}
     @endpush
-    
+
     <form wire:submit="register">
         <div class="flex flex-col gap-4">
             <div class="sm:inline-flex sm:items-center gap-2 space-y-4 sm:space-y-0">
                 <!-- First Name -->
                 <div>
-                    <x-wui-input 
-                        label="First Name" 
-                        placeholder="Enter your first name" 
-                        wire:model="fname" 
+                    <x-wui-input
+                        label="First Name"
+                        placeholder="Enter your first name"
+                        wire:model="fname"
                         autofocus
-                        autocomplete="fname" 
+                        autocomplete="fname"
                     />
                 </div>
 
                 {{-- Last Name --}}
                 <div>
-                    <x-wui-input 
-                        label="Last Name" 
-                        placeholder="Enter your last name" 
-                        wire:model="lname" 
+                    <x-wui-input
+                        label="Last Name"
+                        placeholder="Enter your last name"
+                        wire:model="lname"
                         autofocus
-                        autocomplete="lname" 
+                        autocomplete="lname"
                     />
                 </div>
             </div>
 
             <!-- Email Address -->
             <div>
-                <x-wui-input 
-                    label="Email" 
-                    placeholder="Email" 
-                    wire:model="email" 
+                <x-wui-input
+                    label="Email"
+                    placeholder="Email"
+                    wire:model="email"
                     autocomplete='username'
                 />
             </div>
 
             {{-- Address --}}
             <div>
-                <x-wui-input 
-                    label="Address" 
-                    placeholder="Address" 
-                    wire:model="address" 
-                    autocomplete='address' 
+                <x-wui-input
+                    label="Address"
+                    placeholder="Address"
+                    wire:model="address"
+                    autocomplete='address'
                 />
             </div>
 
@@ -151,19 +151,19 @@ new #[Layout('layouts.guest')] class extends Component {
 
                     {{-- Phone Number --}}
                     <div class="w-full">
-                        <x-wui-inputs.phone 
-                        wire:model='phone_number' 
-                        placeholder='Enter your phone number' 
+                        <x-wui-inputs.phone
+                        wire:model='phone_number'
+                        placeholder='Enter your phone number'
                         mask="[
                                 '####-####',
                                 '### ###-####',
                                 '### ###-#####',
                                 '##### #######',
-                            ]" 
+                            ]"
                             />
-                    </div>     
+                    </div>
                 </div>
-            </div>               
+            </div>
 
             <!-- Password -->
             <div>
@@ -177,7 +177,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     label="Password" autocomplete="new-password" />
             </div>
 
-            <x-primary-button type='submit'>
+            <x-primary-button wireTarget='register'>
                 {{ __('Register') }}
             </x-primary-button>
 
