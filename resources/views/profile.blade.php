@@ -6,9 +6,9 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-xl mx-auto px-10 sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-2xl mx-auto px-10 sm:px-6 lg:px-8 space-y-6">
             {{-- Sets the default tab --}}
-            <div class="flex flex-col md:flex-row md:items-start gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#account' }">
+            <div class="flex flex-col md:flex-row gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#account' }">
 
                 {{-- Mobile-based left panel --}}
                 <ul class="flex md:hidden bg-[#F1F5F9] px-1.5 py-1.5 gap-2 rounded-lg">
@@ -63,7 +63,7 @@
                 </ul>
 
                 {{-- Divider --}}
-                <div class="h-96 w-0.5 hidden md:block rounded-md bg-[#D9D9D9]"></div>
+                <div class="max-h-fit w-[0.063rem] hidden md:block rounded-md bg-[#D9D9D9]"></div>
 
                 {{-- Right panel --}}
                 <div>

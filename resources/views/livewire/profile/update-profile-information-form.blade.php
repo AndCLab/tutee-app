@@ -36,19 +36,32 @@ new class extends Component
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
-        
-        $this->tempPhoneStorage = $this->phone_number;
-        $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
 
         $validated = $this->validate([
-            'fname' => ['required', 'string', 'max:255'],
-            'lname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
-            'phone_prefix' => ['required', 'string'],
-            'phone_number' => ['required', 'string', 'phone'],
+            'phone_prefix' => ['required'],
+            'phone_number' => ['required'],
         ]);
 
+        if ($this->phone_prefix && $this->phone_number) {
+            $this->tempPhoneStorage = $this->phone_number;
+            $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
+        }
+
+        try {
+            $validated = $this->validate([
+                'fname' => ['required', 'string', 'max:255'],
+                'lname' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'phone_prefix' => ['string'],
+                'phone_number' => ['string', 'phone'],
+            ]);
+        } catch (\Throwable $th) {
+            $this->phone_number = $this->tempPhoneStorage;
+            throw $th;
+        }
+
         $validated['phone_number'] = $this->tempPhoneStorage;
+        $this->phone_number = $this->tempPhoneStorage;
 
         $user->fill($validated);
 
@@ -163,21 +176,24 @@ new class extends Component
 
                 {{-- Phone Number --}}
                 <div class="w-full">
-                    <x-wui-inputs.phone 
-                    wire:model='phone_number' 
-                    placeholder='Update your phone number' 
+                    <x-wui-inputs.phone
+                    wire:model='phone_number'
+                    placeholder='Phone Number'
                     mask="[
                             '####-####',
                             '### ###-####',
                             '### ###-#####',
                             '##### #######',
-                        ]" 
+                        ]"
                         />
                 </div>
             </div>
+            <label class="mt-1 text-sm text-secondary-500 dark:text-secondary-400">
+                Update your phone number
+            </label>
         </div>
 
-        <div class="grid grid-rows-2 md:grid-cols-2 items-center gap-4">
+        <div class="grid md:grid-cols-2 items-center gap-4">
             <x-secondary-button type='submit' class="w-full">{{ __('Update Account') }}</x-secondary-button>
             {{-- <x-action-message class="me-3" on="profile-updated">
                 {{ __('Saved.') }}
