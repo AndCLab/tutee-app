@@ -14,6 +14,9 @@ new class extends Component
     public string $fname = '';
     public string $lname = '';
     public string $email = '';
+    public string $phone_prefix = '';
+    public string $phone_number = '';
+    public string $tempPhoneStorage = '';
 
     /**
      * Mount the component.
@@ -23,6 +26,8 @@ new class extends Component
         $this->fname = Auth::user()->fname;
         $this->lname = Auth::user()->lname;
         $this->email = Auth::user()->email;
+        $this->phone_prefix = Auth::user()->phone_prefix;
+        $this->phone_number = Auth::user()->phone_number;
     }
 
     /**
@@ -31,12 +36,19 @@ new class extends Component
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
+        
+        $this->tempPhoneStorage = $this->phone_number;
+        $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
 
         $validated = $this->validate([
             'fname' => ['required', 'string', 'max:255'],
             'lname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'phone_prefix' => ['required', 'string'],
+            'phone_number' => ['required', 'string', 'phone'],
         ]);
+
+        $validated['phone_number'] = $this->tempPhoneStorage;
 
         $user->fill($validated);
 
@@ -126,6 +138,43 @@ new class extends Component
                     @endif
                 </div>
             @endif
+        </div>
+
+        <!-- Phone Number -->
+        <div class="flex flex-col md:items-start">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+            </label>
+            <div class="md:inline-flex space-y-2 md:space-y-0 md:gap-2">
+                <div class="md:w-5/6">
+                    <x-wui-select
+                        placeholder="Phone Prefix"
+                        :async-data="route('phone-prefix')"
+                        option-label="phone_code"
+                        option-description="country_name"
+                        option-value="phone_code"
+                        wire:model='phone_prefix'
+                        :template="[
+                            'name'   => 'user-option',
+                            'config' => ['src' => 'country_image']
+                        ]"
+                    />
+                </div>
+
+                {{-- Phone Number --}}
+                <div class="w-full">
+                    <x-wui-inputs.phone 
+                    wire:model='phone_number' 
+                    placeholder='Update your phone number' 
+                    mask="[
+                            '####-####',
+                            '### ###-####',
+                            '### ###-#####',
+                            '##### #######',
+                        ]" 
+                        />
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-rows-2 md:grid-cols-2 items-center gap-4">
