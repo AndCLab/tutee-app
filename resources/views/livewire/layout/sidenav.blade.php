@@ -134,7 +134,7 @@ new class extends Component {
                         </p>
                     </div>
                 </a>
-                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-90"
                     x-transition:enter-end="opacity-100 scale-100"
@@ -148,13 +148,17 @@ new class extends Component {
 
             <!-- Logout -->
             <div x-data="{ tooltip: false }" class="relative">
-                <button wire:click='logout'
+                <button 
+                    wire:click='logout'
                     :class="expanded ? 'w-fit' : 'w-full' "
                     @class([
                         'inline-flex gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md',
                         'text-[#0C3B2E] hover:bg-[#F2F2F2]' => $role == 'tutee',
                         'text-[#D9D9D9] hover:bg-[#F2F2F2]/10' => $role == 'tutor',
-                ]) x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false">
+                    ]) 
+                    x-on:mouseenter="tooltip = !tooltip" 
+                    x-on:mouseleave="tooltip = !tooltip"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="icon icon-tabler icons-tabler-outline icon-tabler-logout">
@@ -167,7 +171,8 @@ new class extends Component {
                         Log Out
                     </p>
                 </button>
-                <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+                <div x-show="tooltip" 
+                    class="z-50 text-sm absolute top-0 left-full bg-white border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-90"
                     x-transition:enter-end="opacity-100 scale-100"
@@ -214,4 +219,3 @@ new class extends Component {
         }
     </script>
 </div>
-

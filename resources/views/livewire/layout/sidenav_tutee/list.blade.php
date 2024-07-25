@@ -14,15 +14,16 @@
             Discover
         </p>
     </a>
-    <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+    <div x-show="tooltip"
+        class="z-50 text-sm absolute top-0 left-full bg-white text-black border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 scale-90"
         x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-90"
-        >
-        Discover
+    >
+        Profile
     </div>
 </li>
 
@@ -41,17 +42,18 @@
         <p x-show='!expanded'>
             Tutors
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90"
-            >
-            Tutors
-        </div>
     </a>
+    <div x-show="tooltip" 
+        class="z-50 text-sm absolute top-0 left-full bg-white text-black border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
+    >
+        Tutors
+    </div>
 </li>
 
 {{-- Schedule --}}
@@ -71,15 +73,16 @@
         <p x-show='!expanded'>
             Schedule
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90"
-            >
-            Schedule
-    </div>
     </a>
+    <div x-show="tooltip" 
+        class="z-50 text-sm absolute top-0 left-full bg-white text-black border-2 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
+    >
+        Schedule
+    </div>
 </li>

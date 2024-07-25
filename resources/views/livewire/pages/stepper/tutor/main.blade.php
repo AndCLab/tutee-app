@@ -169,12 +169,12 @@ new #[Layout('layouts.app')] class extends Component {
                     'resume' => 'required|file|mimes:pdf|max:2048',
                 ],
                 [
-                    'from.*.required' => 'The field is required',
-                    'to.*.required' => 'The field is required',
-                    'work.*.required' => 'The field is required',
-                    'certificates.*.required' => 'The field is required',
-                    'certificates.*.mimes:pdf,png,jpg,jpeg|max:2048' => 'The field is required',
+                    'from.*.required' => 'The from is required',
+                    'to.*.required' => 'The to is required',
+                    'work.*.required' => 'The work is required',
+                    'certificates.*.required' => 'The certificate is required',
                     'to.*.after' => 'The "to" date must be after the "from" date.',
+                    'resume.required' => 'The resume is required',
                 ],
             );
         }

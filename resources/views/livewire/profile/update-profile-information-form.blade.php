@@ -38,8 +38,14 @@ new class extends Component
         $user = Auth::user();
 
         $validated = $this->validate([
+            'fname' => ['required'],
+            'lname' => ['required'],
+            'email' => ['required'],
             'phone_prefix' => ['required'],
             'phone_number' => ['required'],
+        ], [
+            'fname.required' => 'The first name is required',
+            'lname.required' => 'The last name is required',
         ]);
 
         if ($this->phone_prefix && $this->phone_number) {
@@ -49,9 +55,9 @@ new class extends Component
 
         try {
             $validated = $this->validate([
-                'fname' => ['required', 'string', 'max:255'],
-                'lname' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'fname' => ['string', 'max:255'],
+                'lname' => ['string', 'max:255'],
+                'email' => ['string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
                 'phone_prefix' => ['string'],
                 'phone_number' => ['string', 'phone'],
             ]);
@@ -117,21 +123,24 @@ new class extends Component
     <livewire:profile.profile-picture />
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-3">
+        <div class="my-2">
+            <x-wui-errors />
+        </div>
 
-        <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex flex-col md:flex-row md:items-center gap-2">
             <!-- First Name -->
-            <x-wui-input label="First Name" placeholder="Enter your first name" wire:model="fname" autofocus
-                autocomplete="fname" hint='Update your first name'/>
+            <x-wui-input label="First Name" placeholder="First Name" wire:model="fname" autofocus
+                autocomplete="fname" hint='Update your first name' errorless/>
 
             {{-- Last Name --}}
-            <x-wui-input label="Last Name" placeholder="Enter your last name" wire:model="lname" autofocus
-                autocomplete="lname" hint='Update your last name'/>
+            <x-wui-input label="Last Name" placeholder="Last Name" wire:model="lname" autofocus
+                autocomplete="lname" hint='Update your last name' errorless/>
         </div>
 
         <div>
             <!-- Email Address -->
             <div>
-                <x-wui-input label="Email" placeholder="Email" wire:model="email" autocomplete='username' hint='Update your email'/>
+                <x-wui-input label="Email" placeholder="Email" wire:model="email" autocomplete='username' hint='Update your email' errorless/>
             </div>
 
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
@@ -171,21 +180,23 @@ new class extends Component
                             'name'   => 'user-option',
                             'config' => ['src' => 'country_image']
                         ]"
+                        errorless
                     />
                 </div>
 
                 {{-- Phone Number --}}
                 <div class="w-full">
                     <x-wui-inputs.phone
-                    wire:model='phone_number'
-                    placeholder='Phone Number'
-                    mask="[
-                            '####-####',
-                            '### ###-####',
-                            '### ###-#####',
-                            '##### #######',
-                        ]"
-                        />
+                        wire:model='phone_number'
+                        placeholder='Phone Number'
+                        mask="[
+                                '####-####',
+                                '### ###-####',
+                                '### ###-#####',
+                                '##### #######',
+                            ]"
+                        errorless
+                    />
                 </div>
             </div>
             <label class="mt-1 text-sm text-secondary-500 dark:text-secondary-400">

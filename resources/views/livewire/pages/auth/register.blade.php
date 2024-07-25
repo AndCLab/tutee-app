@@ -45,6 +45,9 @@ new #[Layout('layouts.guest')] class extends Component {
                 'phone_number' => ['required', 'string', 'phone'],
                 'address' => ['required', 'string', 'max:255'],
                 'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            ], [
+                'fname.required' => 'The first name is required',
+                'lname.required' => 'The last name is required',
             ]);
         } catch (\Throwable $th) {
             // clear validation errors
@@ -83,6 +86,7 @@ new #[Layout('layouts.guest')] class extends Component {
                         wire:model="fname"
                         autofocus
                         autocomplete="fname"
+                        errorless
                     />
                 </div>
 
@@ -94,6 +98,7 @@ new #[Layout('layouts.guest')] class extends Component {
                         wire:model="lname"
                         autofocus
                         autocomplete="lname"
+                        errorless
                     />
                 </div>
             </div>
@@ -105,6 +110,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     placeholder="Email"
                     wire:model="email"
                     autocomplete='username'
+                    errorless
                 />
             </div>
 
@@ -115,6 +121,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     placeholder="Address"
                     wire:model="address"
                     autocomplete='address'
+                    errorless
                 />
             </div>
 
@@ -126,6 +133,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     mask="#####"
                     wire:model="zip_code"
                     autocomplete='postal-code'
+                    errorless
                 />
             </div>
 
@@ -146,41 +154,53 @@ new #[Layout('layouts.guest')] class extends Component {
                                 'name'   => 'user-option',
                                 'config' => ['src' => 'country_image']
                             ]"
+                            errorless
                         />
                     </div>
 
                     {{-- Phone Number --}}
                     <div class="w-full">
                         <x-wui-inputs.phone
-                        wire:model='phone_number'
-                        placeholder='Enter your phone number'
-                        mask="[
-                                '####-####',
-                                '### ###-####',
-                                '### ###-#####',
-                                '##### #######',
-                            ]"
-                            />
+                            wire:model='phone_number'
+                            placeholder='Enter your phone number'
+                            mask="[
+                                    '####-####',
+                                    '### ###-####',
+                                    '### ###-#####',
+                                    '##### #######',
+                                ]"
+                            errorless
+                        />
                     </div>
                 </div>
             </div>
 
             <!-- Password -->
             <div>
-                <x-wui-inputs.password placeholder='Enter your password' wire:model="password" label="Password"
-                    autocomplete="new-password" />
+                <x-wui-inputs.password 
+                    placeholder='Enter your password'
+                    wire:model='password' 
+                    label="Password"
+                    autocomplete="new-password"
+                    errorless
+                />
             </div>
 
             <!-- Confirm Password -->
             <div>
-                <x-wui-inputs.password placeholder='Enter your password' wire:model="password_confirmation"
-                    label="Password" autocomplete="new-password" />
+                <x-wui-inputs.password 
+                    placeholder='Re-enter your password' 
+                    wire:model="password_confirmation"
+                    label="Confirm Password" 
+                    autocomplete="new-password" 
+                    errorless
+                />
             </div>
 
             <x-primary-button wireTarget='register'>
                 {{ __('Register') }}
             </x-primary-button>
-
+            <x-wui-errors />
         </div>
         <hr class="my-2 mt-4">
 

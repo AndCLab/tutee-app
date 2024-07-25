@@ -131,9 +131,9 @@ new #[Layout('layouts.app')] class extends Component {
                     'grade_level' => 'required',
                 ],
                 [
-                    'from.*.required' => 'The field is required',
-                    'to.*.required' => 'The field is required',
-                    'institute.*.required' => 'The field is required',
+                    'from.*.required' => 'The from is required',
+                    'to.*.required' => 'The to is required',
+                    'institute.*.required' => 'The institute is required',
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                 ],
             );
