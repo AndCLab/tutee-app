@@ -61,6 +61,8 @@ new #[Layout('layouts.guest')] class extends Component {
                     autocomplete="current-password" />
             </div>
 
+            {{-- <x-wui-button type='submit' spinner='login' class="ring-[#0C3B2E] text-white bg-[#0C3B2E] hover:bg-[#0C3B2E] hover:ring-[#0C3B2E]" label='Login' /> --}}
+
             <x-primary-button wireTarget='login'>
                 Login
             </x-primary-button>

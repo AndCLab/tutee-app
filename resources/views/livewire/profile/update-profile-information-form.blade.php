@@ -205,7 +205,7 @@ new class extends Component
         </div>
 
         <div class="grid md:grid-cols-2 items-center gap-4">
-            <x-secondary-button type='submit' class="w-full">{{ __('Update Account') }}</x-secondary-button>
+            <x-secondary-button type='submit' wireTarget='updateProfileInformation' class="w-full">{{ __('Update Account') }}</x-secondary-button>
             {{-- <x-action-message class="me-3" on="profile-updated">
                 {{ __('Saved.') }}
             </x-action-message> --}}
@@ -215,5 +215,5 @@ new class extends Component
         </div>
 
     {{-- Notification --}}
-    <x-wui-notifications position="bottom-right" />
+    <x-wui-notifications position="bottom-right"/>
 </section>

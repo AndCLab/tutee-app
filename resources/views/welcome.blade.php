@@ -30,8 +30,8 @@
                                 <livewire:welcome.navigation />
                             @endif
                         @else
-                            <p class="bg-red-100">
-                                {{ Auth::user()->fname . ' ' . Auth::user()->lname  }}
+                            <p>
+                                Welcome {{ Auth::user()->fname . ' ' . Auth::user()->lname  }}!
                             </p>
                         @endguest
                     </div>
@@ -40,7 +40,7 @@
         </nav>
 
         <div data-aos="fade-down" style="background-image: url('{{ asset('images/grid.svg') }}');" class="hidden md:block -z-10 absolute inset-0 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
-        
+
         {{-- main --}}
         <main class="max-w-6xl mx-auto md:py-10">
             <div class="flex flex-col-reverse md:grid md:grid-cols-2 justify-center items-center my-auto mx-auto">
@@ -49,7 +49,7 @@
                         <p class="text-2xl md:text-5xl text-center md:text-start text-[#0C3B2E] font-black">Revolutionize Your Tutoring Experience.</p>
                     </div>
                     <span data-aos="fade-right" data-aos-duration="500" class="text-[#64748B] text-center md:text-start md:w-4/5">Enhance Learning and Efficiency with Our All-in-One Tutoring Platform.</span>
-                    
+
                     @auth
                         <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ url('/dashboard') }}" class="sm:w-fit w-full text-center">
                             Dashboard
@@ -69,7 +69,7 @@
                         <img class="scale-x-[-1] object-cover md:w-4/5" src="{{ asset('images/landing_desktop.svg') }}" alt="">
                     </div>
                 </div>
-                
+
                 {{-- mobile image --}}
                 <div data-aos="fade-left" class="md:hidden flex items-center justify-center w-full h-60 overflow-hidden">
                     <img class="object-contain" src="{{ asset('images/landing_mobile.svg') }}" alt="">

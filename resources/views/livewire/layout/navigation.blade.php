@@ -38,7 +38,7 @@ new class extends Component {
             return redirect()->route('stepper.tutor');
         }
     }
-    
+
     /**
      * Log the current user out of the application.
      */
@@ -51,7 +51,7 @@ new class extends Component {
 }; ?>
 
 {{-- drop-shadow-md --}}
-<nav x-data="{ open: false }" class="sticky top-0 z-10 border-b border-border/40 bg-background/95 backdrop-blur">
+<nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-border/40 bg-background/95 backdrop-blur">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between min-h-fit py-3">
