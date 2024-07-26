@@ -7,6 +7,7 @@ use App\Livewire\Actions\Logout;
 new #[Layout('layouts.app')] class extends Component {
     public $user_type = '';
     public $count;
+    public $confirm;
 
     public function mount()
     {

@@ -85,7 +85,7 @@
 
                     <div class="mt-6">
                         <div class="block">
-                            <x-wui-checkbox class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
+                            <x-wui-checkbox wire:model='confirm' class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
                         </div>
                     </div>
                 </div>

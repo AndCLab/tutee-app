@@ -20,14 +20,14 @@
                     <div class="space-y-3">
                         <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">
                             {{-- From --}}
-                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}">
+                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}" errorless>
                                 @foreach ($dates as $year)
                                     <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
                                 @endforeach
                             </x-wui-select>
 
                             {{-- To --}}
-                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}">
+                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}" errorless>
                                 @foreach ($dates as $year)
                                     <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
                                 @endforeach
@@ -36,7 +36,7 @@
 
                         {{-- Input Work Experience --}}
                         <x-wui-input class="w-full" id="work.{{ $index }}" name="work.{{ $index }}"
-                            placeholder="Work Experience" wire:model='work.{{ $index }}' />
+                            placeholder="Work Experience" wire:model='work.{{ $index }}' errorless/>
                     </div>
                     <div>
                         {{-- Remove Work --}}
@@ -61,27 +61,29 @@
         <div class="md:grid md:grid-cols-4">
             <p class="font-semibold pb-2 md:pb-0">Certificates</p>
             <div class="col-span-3 mb-5">
-                @foreach ($input_cert as $index => $input)
+                @foreach ($certificates as $index => $input)
                     <div @class([
-                        'hidden' => count($input_cert) === 1,
-                        'block' => count($input_cert) >= 1
-                        ])>
+                        'hidden' => count($certificates) === 1,
+                        'block' => count($certificates) >= 1
+                        ])
+                        wire:key="{{ $index }}">
                         <p class="font-medium text-sm pb-3">Certificate {{ $index + 1 }}</p>
                     </div>
                     <div class="flex gap-x-3 items-center pb-3">
                         <div class="w-full">
-                            <x-wui-input wire:model="certificate.{{ $index }}" type="file" accept=".pdf,.png,.jpg,.jpeg"
-                            class="p-0 text-gray-500 font-medium text-sm border-none shadow-none bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-[#0F172A] file:hover:bg-[#0F172A]/90 file:text-white rounded" />
+                            <x-wui-input wire:model="certificates.{{ $index }}" type="file" accept=".pdf,.png,.jpg,.jpeg"
+                            class="p-0 text-gray-500 font-medium text-sm border-none shadow-none bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-[#0F172A] file:hover:bg-[#0F172A]/90 file:text-white rounded" 
+                            errorless />
                         </div>
                         <div @class([
-                                'hidden' => count($input_cert) === 1,
-                                'block' => count($input_cert) >= 1
+                                'hidden' => count($certificates) === 1,
+                                'block' => count($certificates) >= 1
                             ])>
                             <x-wui-button.circle negative flat sm wire:click='remove_cert({{ $index }})' icon="x" />
                         </div>
                     </div>
                 @endforeach
-                @if (count($input_cert) !== 3)
+                @if (count($certificates) !== 3)
                     <x-wui-button xs spinner='add_cert' wire:click='add_cert' flat secondary label="Add Certificate" icon='plus-sm' />
                 @endif
             </div>
@@ -144,11 +146,11 @@
                 <input wire:model="resume" class="hidden" type="file" accept=".pdf" name="resume"
                     id="upload-resume">
 
-                @error('resume')
-                    <p class="text-[#dc2626] pt-2 text-sm">{{ $message }}</p>
-                @enderror
             </div>
         </div>
     </div>
+
     <x-wui-notifications />
+    
+    <x-wui-errors />
 </div>

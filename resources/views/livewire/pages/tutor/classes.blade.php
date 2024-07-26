@@ -2,12 +2,32 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Models\Classes;
+use App\Models\Schedule;
 
 new #[Layout('layouts.app')] class extends Component {
     // class properties
+    public string $class_name;
+    public string $class_description;
+    public string $class_location;
+    public string $class_fee;
+    public array $fields = [];
+    public $start_date;
+    public $end_date;
 
     // states
     public $showModal;
+    public $search;
+    public $sort_by;
+
+    public function create_a_class(): void
+    {
+        $validated = $this->validate([
+            'class_name' => ['required', 'string', 'max:255'],
+            'class_description' => ['required', 'string', 'max:255'],
+            'class_fee' => ['required', 'digits:5'],
+        ]);
+    }
 
 }; ?>
 
@@ -25,10 +45,10 @@ new #[Layout('layouts.app')] class extends Component {
                 {{-- Class List: Search and Filter --}}
                 <div class="flex gap-2">
                     <div class="w-full">
-                        <x-wui-input placeholder='Search class...' icon='search' />
+                        <x-wui-input wire:model='search' placeholder='Search class...' icon='search' />
                     </div>
                     <div class="w-fit">
-                        <x-wui-select placeholder="Sort by">
+                        <x-wui-select wire:model='sort_by' placeholder="Sort by">
                             <x-wui-select.option label="Ascending" value="1" />
                             <x-wui-select.option label="Descending" value="2" />
                         </x-wui-select>
@@ -81,10 +101,10 @@ new #[Layout('layouts.app')] class extends Component {
                 <p class="capitalize font-semibold text-xl mb-9">create class</p>
                 <div class="space-y-3">
                     <div>
-                        <x-wui-input label="Class Name" placeholder='Enter class name'/>
+                        <x-wui-input wire:model='class_name' label="Class Name" placeholder='Enter class name'/>
                     </div>
                     <div>
-                        <x-wui-textarea label="Class Description" class="resize-none" placeholder='Enter class description'/>
+                        <x-wui-textarea wire:model='class_description' label="Class Description" class="resize-none" placeholder='Enter class description'/>
                     </div>
                     <div>
                         <div class="flex flex-col justify-between items-start mb-1">
@@ -102,6 +122,7 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
                     <div>
                         <x-wui-select
+                            wire:model='fields'
                             label="Class Fields"
                             placeholder="Select fields"
                             multiselect
@@ -110,10 +131,10 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
                     <div x-data="{ open: false }">
                         <div class="mb-1">
-                            <x-wui-toggle left-label="Class Price" @click="open = ! open" wire:model='model'/>
+                            <x-wui-toggle left-label="Class Price" @click="open = ! open"/>
                         </div>
                         <div x-show='open' x-cloak x-transition>
-                            <x-wui-inputs.currency placeholder="Enter class price" wire:model="class_price" />
+                            <x-wui-inputs.currency wire:model='class_fee' placeholder="Enter class price" />
                         </div>
                     </div>
                 </div>
@@ -129,11 +150,15 @@ new #[Layout('layouts.app')] class extends Component {
                     label="Start Schedule Time"
                     placeholder="January 1, 2000"
                     wire:model="start_date"
+                    display-format='dddd, MMMM D, YYYY h:mm A'
+                    :min="now()"
                 />
                 <x-wui-datetime-picker
                     label="End Schedule Time"
                     placeholder="December 1, 2000"
                     wire:model="end_date"
+                    display-format='dddd, MMMM D, YYYY h:mm A'
+                    :min="now()"
                 />
             </div>
             <x-slot name="footer">

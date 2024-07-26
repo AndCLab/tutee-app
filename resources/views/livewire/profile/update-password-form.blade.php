@@ -81,7 +81,7 @@ new class extends Component
         </div>
 
         <div class="flex items-center gap-4">
-            <x-secondary-button type='submit' class="w-full">{{ __('Save') }}</x-secondary-button>
+            <x-secondary-button type='submit' wireTarget='updatePassword' class="w-full">{{ __('Save') }}</x-secondary-button>
 
             <x-action-message class="me-3" on="password-updated">
                 {{ __('Saved.') }}

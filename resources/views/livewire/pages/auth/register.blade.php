@@ -19,7 +19,7 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $address = '';
     public string $password = '';
     public string $password_confirmation = '';
-    
+
     public string $phone_prefix = '';
     public string $tempPhoneStorage = '';
 
@@ -30,7 +30,7 @@ new #[Layout('layouts.guest')] class extends Component {
     {
         // sample phone number: 9562398125
         $this->tempPhoneStorage = $this->phone_number;
-        
+
         // for validation
         // merge prefix with phone number: +639562398125
         $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
@@ -45,6 +45,9 @@ new #[Layout('layouts.guest')] class extends Component {
                 'phone_number' => ['required', 'string', 'phone'],
                 'address' => ['required', 'string', 'max:255'],
                 'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            ], [
+                'fname.required' => 'The first name is required',
+                'lname.required' => 'The last name is required',
             ]);
         } catch (\Throwable $th) {
             // clear validation errors
@@ -71,50 +74,54 @@ new #[Layout('layouts.guest')] class extends Component {
     @push('title')
         {{ $title }}
     @endpush
-    
+
     <form wire:submit="register">
         <div class="flex flex-col gap-4">
             <div class="sm:inline-flex sm:items-center gap-2 space-y-4 sm:space-y-0">
                 <!-- First Name -->
                 <div>
-                    <x-wui-input 
-                        label="First Name" 
-                        placeholder="Enter your first name" 
-                        wire:model="fname" 
+                    <x-wui-input
+                        label="First Name"
+                        placeholder="Enter your first name"
+                        wire:model="fname"
                         autofocus
-                        autocomplete="fname" 
+                        autocomplete="fname"
+                        errorless
                     />
                 </div>
 
                 {{-- Last Name --}}
                 <div>
-                    <x-wui-input 
-                        label="Last Name" 
-                        placeholder="Enter your last name" 
-                        wire:model="lname" 
+                    <x-wui-input
+                        label="Last Name"
+                        placeholder="Enter your last name"
+                        wire:model="lname"
                         autofocus
-                        autocomplete="lname" 
+                        autocomplete="lname"
+                        errorless
                     />
                 </div>
             </div>
 
             <!-- Email Address -->
             <div>
-                <x-wui-input 
-                    label="Email" 
-                    placeholder="Email" 
-                    wire:model="email" 
+                <x-wui-input
+                    label="Email"
+                    placeholder="Email"
+                    wire:model="email"
                     autocomplete='username'
+                    errorless
                 />
             </div>
 
             {{-- Address --}}
             <div>
-                <x-wui-input 
-                    label="Address" 
-                    placeholder="Address" 
-                    wire:model="address" 
-                    autocomplete='address' 
+                <x-wui-input
+                    label="Address"
+                    placeholder="Address"
+                    wire:model="address"
+                    autocomplete='address'
+                    errorless
                 />
             </div>
 
@@ -126,6 +133,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     mask="#####"
                     wire:model="zip_code"
                     autocomplete='postal-code'
+                    errorless
                 />
             </div>
 
@@ -146,41 +154,53 @@ new #[Layout('layouts.guest')] class extends Component {
                                 'name'   => 'user-option',
                                 'config' => ['src' => 'country_image']
                             ]"
+                            errorless
                         />
                     </div>
 
                     {{-- Phone Number --}}
                     <div class="w-full">
-                        <x-wui-inputs.phone 
-                        wire:model='phone_number' 
-                        placeholder='Enter your phone number' 
-                        mask="[
-                                '####-####',
-                                '### ###-####',
-                                '### ###-#####',
-                                '##### #######',
-                            ]" 
-                            />
-                    </div>     
+                        <x-wui-inputs.phone
+                            wire:model='phone_number'
+                            placeholder='Enter your phone number'
+                            mask="[
+                                    '####-####',
+                                    '### ###-####',
+                                    '### ###-#####',
+                                    '##### #######',
+                                ]"
+                            errorless
+                        />
+                    </div>
                 </div>
-            </div>               
+            </div>
 
             <!-- Password -->
             <div>
-                <x-wui-inputs.password placeholder='Enter your password' wire:model="password" label="Password"
-                    autocomplete="new-password" />
+                <x-wui-inputs.password 
+                    placeholder='Enter your password'
+                    wire:model='password' 
+                    label="Password"
+                    autocomplete="new-password"
+                    errorless
+                />
             </div>
 
             <!-- Confirm Password -->
             <div>
-                <x-wui-inputs.password placeholder='Enter your password' wire:model="password_confirmation"
-                    label="Password" autocomplete="new-password" />
+                <x-wui-inputs.password 
+                    placeholder='Re-enter your password' 
+                    wire:model="password_confirmation"
+                    label="Confirm Password" 
+                    autocomplete="new-password" 
+                    errorless
+                />
             </div>
 
-            <x-primary-button>
+            <x-primary-button wireTarget='register'>
                 {{ __('Register') }}
             </x-primary-button>
-
+            <x-wui-errors />
         </div>
         <hr class="my-2 mt-4">
 

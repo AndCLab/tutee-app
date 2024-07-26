@@ -10,6 +10,7 @@
         :icon="$icon"
         :prefix="$prefix"
         :prepend="$prepend"
+        :errorless="$errorless"
         x-bind:type="type"
         type="password"
     >

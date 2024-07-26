@@ -58,7 +58,7 @@ new class extends Component
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
     >{{ __('Delete Account') }}</x-danger-button>
 
-    <x-modal name="confirm-user-deletion" maxWidth='sm' :show="$errors->isNotEmpty()" focusable>
+    <x-modal name="confirm-user-deletion" maxWidth='md' :show="$errors->isNotEmpty()" focusable>
         <div class="">
             <form wire:submit="deleteUser" class="p-6">
                 <h2 class="text-lg font-medium text-gray-900">
@@ -81,7 +81,7 @@ new class extends Component
                         {{ __('Cancel') }}
                     </x-secondary-button>
 
-                    <x-danger-button class="ms-3">
+                    <x-danger-button class="ms-3" wireTarget='deleteUser'>
                         {{ __('Delete Account') }}
                     </x-danger-button>
                 </div>

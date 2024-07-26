@@ -25,6 +25,8 @@ new class extends Component {
     {
         $this->validate([
             'input' => 'required',
+        ], [
+            'input.required' => 'The specific field is required'
         ]);
 
         if (!in_array(['field_name' => $this->input], $this->interests)) {
@@ -121,10 +123,8 @@ new class extends Component {
             <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="input" autofocus autocomplete='off' />
         </div>
         <div class="grid">
-            <x-secondary-button type='submit'>Add Field</x-secondary-button>
+            <x-secondary-button type='submit' wireTarget='add_field'>Add Field</x-secondary-button>
         </div>
     </form>
-    <x-wui-notifications position="bottom-right" />
-
     <x-wui-notifications position="bottom-right" />
 </section>
