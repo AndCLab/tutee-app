@@ -1,7 +1,4 @@
-{{-- Apply as Tutor --}}
-<x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical' spinner='applyAsTutor' label='Apply as Tutor' />  
-
-{{-- Icons --}}                
+{{-- Tutee Icons --}}                
 <x-wui-dropdown>
     <x-slot name="trigger">
         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  

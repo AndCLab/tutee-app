@@ -57,11 +57,17 @@ new class extends Component {
         <div class="flex justify-between min-h-fit py-3">
             <div></div>
             <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6">
-                @if ($role == 'tutee')
-                    @include('livewire.layout.topnav_tutee.menu')
-                @elseif ($role == 'tutor')
+                {{-- Tutor Role --}}
+                @if ($role == 'tutor' && 'is_applied'== 0) {{-- Tutor and not Tutee --}}
+                    {{-- Be a Tutee --}}
+                    <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical' spinner='beATutee' label='Be a Tutee' />
                     @include('livewire.layout.topnav_tutor.menu')
+                @elseif ($role == 'tutor' && 'is_applied'== 1) {{-- Tutor and applied as Tutee --}}
+                    {{-- Switch to Tutor --}}
+                    <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='Switch to Tutor' />
+                    @include('livewire.layout.topnav_tutee.menu')
                 @endif
+                
                 {{-- Switch role testing purposes
                 <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='switch role testing kay kapuy logout :)' />
                 --}}
