@@ -110,6 +110,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     placeholder="Email"
                     wire:model="email"
                     autocomplete='username'
+                    suffix="@mail.com"
                     errorless
                 />
             </div>
@@ -177,9 +178,9 @@ new #[Layout('layouts.guest')] class extends Component {
 
             <!-- Password -->
             <div>
-                <x-wui-inputs.password 
+                <x-wui-inputs.password
                     placeholder='Enter your password'
-                    wire:model='password' 
+                    wire:model='password'
                     label="Password"
                     autocomplete="new-password"
                     errorless
@@ -188,11 +189,11 @@ new #[Layout('layouts.guest')] class extends Component {
 
             <!-- Confirm Password -->
             <div>
-                <x-wui-inputs.password 
-                    placeholder='Re-enter your password' 
+                <x-wui-inputs.password
+                    placeholder='Re-enter your password'
                     wire:model="password_confirmation"
-                    label="Confirm Password" 
-                    autocomplete="new-password" 
+                    label="Confirm Password"
+                    autocomplete="new-password"
                     errorless
                 />
             </div>

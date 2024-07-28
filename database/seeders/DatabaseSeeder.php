@@ -21,37 +21,36 @@ class DatabaseSeeder extends Seeder
             'lname' => 'User',
             'email' => 'test@example.com',
             'address' => 'address',
-            'zip_code' => '6015', 
+            'zip_code' => '6015',
             'phone_prefix' => '+63',
             'phone_number' => '9582938479',
         ]);
-        
+
         User::factory()->create([
-            'id' => 30,
             'fname' => 'Tutee',
             'lname' => 'Example',
             'is_stepper' => 0,
             'user_type' => 'tutee',
             'email' => 'tutee@example.com',
             'address' => 'address',
-            'zip_code' => '6015', 
+            'zip_code' => '6015',
             'phone_prefix' => '+63',
             'phone_number' => '9582938379',
         ]);
-        
+
         User::factory()->create([
-            'id' => 31,
             'fname' => 'Tutor',
             'lname' => 'Example',
             'is_stepper' => 0,
             'user_type' => 'tutor',
             'email' => 'tutor@example.com',
             'address' => 'address',
-            'zip_code' => '6015', 
+            'zip_code' => '6015',
             'phone_prefix' => '+63',
             'phone_number' => '9576238479',
         ]);
 
+        $this->call(FieldsSeeder::class);
         $this->call(TutorSeeder::class);
         $this->call(TuteeSeeder::class);
     }

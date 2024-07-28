@@ -15,9 +15,9 @@ class FieldsFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    
+
     protected $model = Fields::class;
-    
+
     public function definition(): array
     {
 
@@ -31,12 +31,43 @@ class FieldsFactory extends Factory
             'Medicine',
             'Psychology',
             'Economics',
-            'Sociology'
+            'Sociology',
+            'History',
+            'Geography',
+            'Political Science',
+            'Philosophy',
+            'Arts',
+            'Literature',
+            'Law',
+            'Business Administration',
+            'Statistics',
+            'Environmental Science',
+            'Architecture',
+            'Music',
+            'Theatre',
+            'Cultural Studies',
+            'Religious Studies',
+            'Anthropology',
+            'Public Health',
+            'Criminal Justice',
+            'Journalism',
+            'Education',
+            'Social Work',
+            'International Relations',
+            'Mathematical Finance',
+            'Nursing',
+            'Biochemistry',
+            'Neuroscience',
+            'Veterinary Medicine',
+            'Marine Biology',
+            'Astronomy',
+            'Astronautics'
         ];
-        
+
+
         return [
             'user_id' => $this->faker->numberBetween(1, 3),
-            'field_name' => $this->faker->randomElements($fields)
+            'field_name' => $this->faker->randomElement($fields)
         ];
     }
 }

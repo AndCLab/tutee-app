@@ -1,32 +1,113 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
+use Carbon\Carbon;
+use WireUi\Traits\Actions;
+use App\Models\Tutor;
 use App\Models\Classes;
 use App\Models\Schedule;
+use App\Models\Registration;
+use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
+    use Actions;
+
     // class properties
-    public string $class_name;
-    public string $class_description;
-    public string $class_location;
-    public string $class_fee;
-    public array $fields = [];
-    public $start_date;
-    public $end_date;
+    public string $class_name = '';
+    public string $class_description = '';
+    public string $class_type = '';
+    public string $class_location = '';
+    public string $class_link = '';
+    public $class_fee = 0;
+    public $class_status;
+    public $class_fields = []; //fields setter
+    public $getFields = []; // fields getter
+
+    // for class schedule date
+    public $sched_start_date;
+    public $sched_end_date;
+
+    // for registration date
+    public $regi_start_date;
+    public $regi_end_date;
 
     // states
-    public $showModal;
-    public $search;
-    public $sort_by;
+    public $IndiClassFeeToggle;
+    public $GroupClassFeeToggle;
+    public $showRegistrationDate;
+    public $showClassSchedule;
 
-    public function create_a_class(): void
+    public function mount()
     {
+        $this->getFields = Fields::where('user_id', Auth::id())->get(['id', 'field_name'])->toArray();
+        $this->fields = [''];
+    }
+
+    public function createIndividualClass()
+    {
+        $tutor = Tutor::where('user_id', Auth::id())->first();
+
         $validated = $this->validate([
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
-            'class_fee' => ['required', 'digits:5'],
+            'class_fields' => ['required'],
+            'sched_start_date' => ['required', 'date'],
+            'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
+            'class_location' => ['string', 'max:255'],
+            'class_link' => ['string', 'max:255'],
+            // 'class_fee' => ['required', 'digits:5'],
         ]);
+
+        if ($this->class_location) {
+            $this->class_type = 'virtual';
+        } else if ($this->class_link) {
+            $this->class_type = 'physical';
+        } else{
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
+
+        $schedule = Schedule::create([
+            'start_date' => $this->sched_start_date,
+            'end_date' => $this->sched_end_date
+        ]);
+
+        $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
+
+        Classes::create([
+            'tutor_id' => $tutor->id,
+            'class_name' => $this->class_name,
+            'class_description' => $this->class_description,
+            'class_fields' => $classFieldsJson,
+            'class_type' => $this->class_type,
+            'class_category' => 'individual',
+            'class_location' => $this->class_location,
+            'class_fee' => $this->class_fee,
+            'class_status' => 1,
+            'schedule_id' => $schedule->id
+        ]);
+
+        $this->reset(
+            'class_name',
+            'class_description',
+            'class_fields',
+            'sched_start_date',
+            'sched_end_date',
+            'class_location',
+            'class_fee',
+            'class_link',
+        );
+
+        $this->dispatch('new-class', isNotEmpty: 0);
     }
 
 }; ?>
@@ -35,106 +116,48 @@ new #[Layout('layouts.app')] class extends Component {
     <x-slot name="header">
     </x-slot>
 
-    <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 p-6">
+    <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
         <div class="lg:grid lg:grid-cols-3 items-start gap-5">
 
             {{-- Class List --}}
             <div class="lg:col-span-2 space-y-3">
-                <p class="capitalize font-semibold text-xl mb-9">class list</p>
-
-                {{-- Class List: Search and Filter --}}
-                <div class="flex gap-2">
-                    <div class="w-full">
-                        <x-wui-input wire:model='search' placeholder='Search class...' icon='search' />
-                    </div>
-                    <div class="w-fit">
-                        <x-wui-select wire:model='sort_by' placeholder="Sort by">
-                            <x-wui-select.option label="Ascending" value="1" />
-                            <x-wui-select.option label="Descending" value="2" />
-                        </x-wui-select>
-                    </div>
-                    <x-wui-dropdown>
-                        <x-slot name="trigger">
-                            <x-wui-button.circle flat md squared icon='adjustments' />
-                        </x-slot>
-
-                        <x-wui-dropdown.item label="View all classes" />
-                        <x-wui-dropdown.item label="View pending classes" />
-                    </x-wui-dropdown>
-                </div>
-
-                {{-- Class List: Class Cards --}}
-                <div class="space-y-3">
-                    @for ($i = 0; $i < 10; $i++)
-                        <div class="w-full bg-[#F1F5F9] p-4 rounded-md text-[#0F172A] space-y-4">
-                            <div class="space-y-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-semibold">Data Structures and Algorithms</p>
-                                    <x-wui-dropdown>
-                                        <x-wui-dropdown.header class="font-semibold" label="Actions">
-                                            <x-wui-dropdown.item icon='eye' label="Inspect" />
-                                            <x-wui-dropdown.item icon='pencil-alt' label="Edit" />
-                                            <x-wui-dropdown.item icon='trash' label="Withdraw" />
-                                        </x-wui-dropdown.header>
-                                    </x-wui-dropdown>
-                                </div>
-                                <div class="flex gap-2 items-center text-[#64748B] text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p>Class starts on December 2, 2029</p>
-                                </div>
-                            </div>
-                            <p class="line-clamp-3 antialiased leading-snug">
-                                Are you interested in enhancing your proficiency in data structures and algorithms to fortify
-                                your problem-solving skills and elevate your programming expertise? Delving into this
-                                foundational aspect of computer science is crucial for optimizing code efficiency, enabling
-                                seamless problem-solving, and contributing to the creation of robust software solutions.
-                            </p>
-                        </div>
-                    @endfor
-                </div>
+                <livewire:pages.tutor.classes_components.class_list>
             </div>
 
             {{-- Create Class --}}
-            <div class="space-y-3 sticky top-[5rem]">
+            <div class="hidden lg:block space-y-3 sticky top-[5rem] overflow-y-auto max-h-[85vh] soft-scrollbar px-2 pb-3">
+
+                {{-- Header --}}
                 <p class="capitalize font-semibold text-xl mb-9">create class</p>
-                <div class="space-y-3">
+
+                {{-- Individual or Group Class --}}
+                <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#indi' }">
+                    {{-- Left panel --}}
+                    <ul class="flex bg-[#F1F5F9] px-1.5 py-1.5 gap-2 rounded-lg">
+                        <li class="w-full text-center">
+                            <a :class="tab !== '#indi' ? '' : 'bg-white'"
+                                class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
+                                x-on:click.prevent="tab='#indi'"> Individual Class </a>
+                        </li>
+                        <li class="w-full">
+                            <a :class="tab !== '#group' ? '' : 'bg-white'"
+                                class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
+                                x-on:click.prevent="tab='#group'"> Group Class </a>
+                        </li>
+                    </ul>
+
+                    {{-- Right panel --}}
                     <div>
-                        <x-wui-input wire:model='class_name' label="Class Name" placeholder='Enter class name'/>
-                    </div>
-                    <div>
-                        <x-wui-textarea wire:model='class_description' label="Class Description" class="resize-none" placeholder='Enter class description'/>
-                    </div>
-                    <div>
-                        <div class="flex flex-col justify-between items-start mb-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Class Schedule
-                            </label>
-                            <button
-                                type='button'
-                                class="text-secondary-400 text-start border border-secondary-300 focus:ring-primary-500 focus:border-primary-500 form-input block w-full sm:text-sm rounded-md transition ease-in-out duration-100 focus:outline-none shadow-sm"
-                                wire:click="$set('showModal', true)"
-                            >
-                            Class Schedule
-                            </button>
+                        <div x-show="tab == '#indi'" x-cloak>
+                            <div class="max-w-xl">
+                                @include('livewire.pages.tutor.classes_components.individual')
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <x-wui-select
-                            wire:model='fields'
-                            label="Class Fields"
-                            placeholder="Select fields"
-                            multiselect
-                            :options="['Active', 'Pending', 'Stuck', 'Done']"
-                        />
-                    </div>
-                    <div x-data="{ open: false }">
-                        <div class="mb-1">
-                            <x-wui-toggle left-label="Class Price" @click="open = ! open"/>
-                        </div>
-                        <div x-show='open' x-cloak x-transition>
-                            <x-wui-inputs.currency wire:model='class_fee' placeholder="Enter class price" />
+
+                        <div x-show="tab == '#group'" x-cloak>
+                            <div class="max-w-xl">
+                                {{-- @include('livewire.pages.tutor.classes_components.group') --}}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -142,30 +165,63 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     </div>
 
-    {{-- Create class modal --}}
-    <x-wui-modal wire:model="showModal" max-width='md' persistent>
+    {{-- class schedule modal --}}
+    <x-wui-modal wire:model="showClassSchedule" max-width='md' persistent>
         <x-wui-card title='Class Schedule'>
             <div class="grid grid-cols-1 gap-4">
                 <x-wui-datetime-picker
-                    label="Start Schedule Time"
+                    label="Start Date Time"
                     placeholder="January 1, 2000"
-                    wire:model="start_date"
+                    wire:model.blur="sched_start_date"
+                    parse-format="YYYY-MM-DD HH:MM"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
                 />
                 <x-wui-datetime-picker
-                    label="End Schedule Time"
+                    label="End Date Time"
                     placeholder="December 1, 2000"
-                    wire:model="end_date"
+                    wire:model.blur="sched_end_date"
+                    parse-format="YYYY-MM-DD HH:MM"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
                 />
             </div>
             <x-slot name="footer">
                 <div class="flex justify-end gap-x-4">
-                    <x-wui-button primary label="Done" spinner='showModal' x-on:click='close' />
+                    <x-wui-button primary label="Done" spinner='showClassSchedule' x-on:click='close' />
                 </div>
             </x-slot>
         </x-wui-card>
     </x-wui-modal>
+
+    {{-- class registration modal --}}
+    <x-wui-modal wire:model="showRegistrationDate" max-width='md' persistent>
+        <x-wui-card title='Class Registration Date'>
+            <div class="grid grid-cols-1 gap-4">
+                <x-wui-datetime-picker
+                    label="Start Date Time"
+                    placeholder="January 1, 2000"
+                    wire:model.blur="regi_start_date"
+                    parse-format="YYYY-MM-DD HH:MM"
+                    display-format='dddd, MMMM D, YYYY h:mm A'
+                    :min="now()"
+                />
+                <x-wui-datetime-picker
+                    label="End Date Time"
+                    placeholder="December 1, 2000"
+                    wire:model.blur="regi_end_date"
+                    parse-format="YYYY-MM-DD HH:MM"
+                    display-format='dddd, MMMM D, YYYY h:mm A'
+                    :min="now()"
+                />
+            </div>
+            <x-slot name="footer">
+                <div class="flex justify-end gap-x-4">
+                    <x-wui-button primary label="Done" spinner='showClassSchedule' x-on:click='close' />
+                </div>
+            </x-slot>
+        </x-wui-card>
+    </x-wui-modal>
+
+    <x-wui-notifications position="bottom-right" />
 </section>

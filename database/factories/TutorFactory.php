@@ -21,7 +21,7 @@ class TutorFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => 31,
+            'user_id' => 3,
             'work' => $this->faker->word(),
         ];
     }
