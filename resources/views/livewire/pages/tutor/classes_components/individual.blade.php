@@ -57,7 +57,7 @@
                     <x-wui-toggle left-label="Class Price" @click="open = ! open" wire:model='IndiClassFeeToggle'/>
                 </div>
                 <div x-show='open' x-cloak x-transition>
-                    <x-wui-inputs.currency wire:model='class_fee' placeholder="Enter class price" shadowless/>
+                    <x-wui-inputs.currency wire:model='class_fee' icon="cash" placeholder="Enter class price" shadowless/>
                 </div>
             </div>
 

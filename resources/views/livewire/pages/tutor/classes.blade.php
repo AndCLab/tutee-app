@@ -46,11 +46,18 @@ new #[Layout('layouts.app')] class extends Component {
         $this->fields = [''];
     }
 
-    public function createIndividualClass()
+    public function updatedSchedEndDate()
     {
-        $tutor = Tutor::where('user_id', Auth::id())->first();
+        if ($this->sched_start_date) {
+            $this->validateOnly(
+                'sched_end_date', ['sched_end_date' => ['after:sched_start_date']]
+            );
+        }
+    }
 
-        $validated = $this->validate([
+    public function IndividualValidation()
+    {
+        $this->validate([
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
@@ -58,13 +65,19 @@ new #[Layout('layouts.app')] class extends Component {
             'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
             'class_location' => ['string', 'max:255'],
             'class_link' => ['string', 'max:255'],
-            // 'class_fee' => ['required', 'digits:5'],
         ]);
+    }
+
+    public function createIndividualClass()
+    {
+        $tutor = Tutor::where('user_id', Auth::id())->first();
+
+        $this->IndividualValidation();
 
         if ($this->class_location) {
-            $this->class_type = 'virtual';
-        } else if ($this->class_link) {
             $this->class_type = 'physical';
+        } else if ($this->class_link) {
+            $this->class_type = 'virtual';
         } else{
             $this->notification([
                 'title'       => 'Error',
@@ -106,6 +119,93 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fee',
             'class_link',
         );
+
+        $this->notification([
+            'title'       => 'Fresh Class!',
+            'description' => 'Successfully created!',
+            'icon'        => 'success',
+            'timeout'     => 2500,
+        ]);
+
+        $this->dispatch('new-class', isNotEmpty: 0);
+    }
+
+    public function GroupValidation()
+    {
+        $this->validate([
+            'class_name' => ['required', 'string', 'max:255'],
+            'class_description' => ['required', 'string', 'max:255'],
+            'class_fields' => ['required'],
+
+            'regi_start_date' => ['required', 'date'],
+            'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
+
+            'sched_start_date' => ['required', 'date', 'after:regi_start_date', 'after:regi_end_date'],
+            'sched_end_date' => ['required', 'date', 'after:regi_start_date', 'after:regi_end_date' ,'after:sched_start_date'],
+
+            'class_location' => ['string', 'max:255'],
+            'class_link' => ['string', 'max:255'],
+        ]);
+    }
+
+    public function createGroupClass()
+    {
+        $tutor = Tutor::where('user_id', Auth::id())->first();
+
+        $this->GroupValidation();
+
+        if ($this->class_location) {
+            $this->class_type = 'physical';
+        } else if ($this->class_link) {
+            $this->class_type = 'virtual';
+        } else{
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
+
+        $schedule = Schedule::create([
+            'start_date' => $this->sched_start_date,
+            'end_date' => $this->sched_end_date
+        ]);
+
+        $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
+
+        Classes::create([
+            'tutor_id' => $tutor->id,
+            'class_name' => $this->class_name,
+            'class_description' => $this->class_description,
+            'class_fields' => $classFieldsJson,
+            'class_type' => $this->class_type,
+            'class_category' => 'individual',
+            'class_location' => $this->class_location,
+            'class_fee' => $this->class_fee,
+            'class_status' => 1,
+            'schedule_id' => $schedule->id
+        ]);
+
+        $this->reset(
+            'class_name',
+            'class_description',
+            'class_fields',
+            'sched_start_date',
+            'sched_end_date',
+            'class_location',
+            'class_fee',
+            'class_link',
+        );
+
+        $this->notification([
+            'title'       => 'Fresh Class!',
+            'description' => 'Successfully created!',
+            'icon'        => 'success',
+            'timeout'     => 2500,
+        ]);
 
         $this->dispatch('new-class', isNotEmpty: 0);
     }
@@ -156,7 +256,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                         <div x-show="tab == '#group'" x-cloak>
                             <div class="max-w-xl">
-                                {{-- @include('livewire.pages.tutor.classes_components.group') --}}
+                                @include('livewire.pages.tutor.classes_components.group')
                             </div>
                         </div>
                     </div>
@@ -180,7 +280,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <x-wui-datetime-picker
                     label="End Date Time"
                     placeholder="December 1, 2000"
-                    wire:model.blur="sched_end_date"
+                    wire:model.live="sched_end_date"
                     parse-format="YYYY-MM-DD HH:MM"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
