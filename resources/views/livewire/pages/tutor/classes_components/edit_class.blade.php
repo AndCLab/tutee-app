@@ -71,10 +71,16 @@
                         multiselect
                         shadowless
                     >
-                        @foreach ($class_fields as $field)
+                        {{-- @foreach ($class_fields as $field)
                             <x-wui-select.option
                                 label="{{ $field }}"
                                 value="{{ $field }}"
+                            />
+                        @endforeach --}}
+                        @foreach ($getFields as $field)
+                            <x-wui-select.option
+                                label="{{ $field['field_name'] }}"
+                                value="{{ $field['field_name'] }}"
                             />
                         @endforeach
                     </x-wui-select>

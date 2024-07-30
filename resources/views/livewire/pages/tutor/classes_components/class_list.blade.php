@@ -67,6 +67,8 @@ new #[Layout('layouts.app')] class extends Component {
                                     ->orderBy('created_at', $this->sort_by)
                                     ->get();
 
+        $this->getFields = Fields::where('user_id', Auth::id())->get(['field_name'])->toArray();
+
         // default
         $this->classFilter = 'pending';
 
@@ -275,7 +277,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function withdrawClass($classId)
     {
-        $class = Classes::where('id', $classId)->first();
+        $class = Classes::find($classId);
         $sched = $class->schedule;
         $regi = $class->registration;
 
@@ -285,10 +287,6 @@ new #[Layout('layouts.app')] class extends Component {
 
         if ($regi) {
             $regi->delete();
-        }
-
-        if ($class) {
-            $class->delete();
         }
 
         $this->mount();
