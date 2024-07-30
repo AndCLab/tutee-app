@@ -45,7 +45,7 @@
                     @foreach ($getFields as $field)
                         <x-wui-select.option
                             label="{{ $field['field_name'] }}"
-                            value="{{ $field['id'] }}"
+                            value="{{ $field['field_name'] }}"
                         />
                     @endforeach
                 </x-wui-select>

@@ -42,7 +42,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
-        $this->getFields = Fields::where('user_id', Auth::id())->get(['id', 'field_name'])->toArray();
+        $this->getFields = Fields::where('user_id', Auth::id())->get(['field_name'])->toArray();
         $this->fields = [''];
     }
 
@@ -55,6 +55,7 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
+    // individual class validation and creation
     public function IndividualValidation()
     {
         $this->validate([
@@ -78,6 +79,7 @@ new #[Layout('layouts.app')] class extends Component {
             $this->class_type = 'physical';
         } else if ($this->class_link) {
             $this->class_type = 'virtual';
+            $this->class_location = $this->class_link;
         } else{
             $this->notification([
                 'title'       => 'Error',
@@ -130,6 +132,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->dispatch('new-class', isNotEmpty: 0);
     }
 
+    // group class validation and creation
     public function GroupValidation()
     {
         $this->validate([
@@ -158,6 +161,7 @@ new #[Layout('layouts.app')] class extends Component {
             $this->class_type = 'physical';
         } else if ($this->class_link) {
             $this->class_type = 'virtual';
+            $this->class_location = $this->class_link;
         } else{
             $this->notification([
                 'title'       => 'Error',
@@ -174,6 +178,11 @@ new #[Layout('layouts.app')] class extends Component {
             'end_date' => $this->sched_end_date
         ]);
 
+        $registration = Registration::create([
+            'start_date' => $this->regi_start_date,
+            'end_date' => $this->regi_end_date
+        ]);
+
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
 
         Classes::create([
@@ -182,11 +191,12 @@ new #[Layout('layouts.app')] class extends Component {
             'class_description' => $this->class_description,
             'class_fields' => $classFieldsJson,
             'class_type' => $this->class_type,
-            'class_category' => 'individual',
+            'class_category' => 'group',
             'class_location' => $this->class_location,
             'class_fee' => $this->class_fee,
             'class_status' => 1,
-            'schedule_id' => $schedule->id
+            'schedule_id' => $schedule->id,
+            'registration_id' => $registration->id
         ]);
 
         $this->reset(
@@ -273,17 +283,19 @@ new #[Layout('layouts.app')] class extends Component {
                     label="Start Date Time"
                     placeholder="January 1, 2000"
                     wire:model.blur="sched_start_date"
-                    parse-format="YYYY-MM-DD HH:MM"
+                    parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    shadowless
                 />
                 <x-wui-datetime-picker
                     label="End Date Time"
                     placeholder="December 1, 2000"
                     wire:model.live="sched_end_date"
-                    parse-format="YYYY-MM-DD HH:MM"
+                    parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    shadowless
                 />
             </div>
             <x-slot name="footer">
@@ -302,17 +314,19 @@ new #[Layout('layouts.app')] class extends Component {
                     label="Start Date Time"
                     placeholder="January 1, 2000"
                     wire:model.blur="regi_start_date"
-                    parse-format="YYYY-MM-DD HH:MM"
+                    parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    shadowless
                 />
                 <x-wui-datetime-picker
                     label="End Date Time"
                     placeholder="December 1, 2000"
                     wire:model.blur="regi_end_date"
-                    parse-format="YYYY-MM-DD HH:MM"
+                    parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    shadowless
                 />
             </div>
             <x-slot name="footer">

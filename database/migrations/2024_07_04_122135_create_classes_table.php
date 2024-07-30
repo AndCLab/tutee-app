@@ -30,14 +30,12 @@ return new class extends Migration
             $table->foreignId('schedule_id')
                 ->nullable()
                 ->constrained('schedules')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->onUpdate('cascade');
 
             $table->foreignId('registration_id')
                 ->nullable()
                 ->constrained('registrations')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->onUpdate('cascade');
 
             $table->timestamps();
         });
