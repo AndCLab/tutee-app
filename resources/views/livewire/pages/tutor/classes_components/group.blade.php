@@ -73,6 +73,9 @@
                 </x-wui-select>
             </div>
 
+            {{-- class students --}}
+            <x-wui-inputs.number wire:model='class_students' label="How many students?" shadowless/>
+
             {{-- class price --}}
             <div x-data="{ open: false }">
                 <div class="mb-1">

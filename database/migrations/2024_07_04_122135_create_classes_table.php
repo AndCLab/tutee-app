@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('class_type', ['virtual', 'physical']);
             $table->enum('class_category', ['individual', 'group']);
             $table->string('class_location');
+            $table->integer('class_students')->default(1);
             $table->decimal('class_fee')->default(0);
 
             // 1 = opened, 0 = closed

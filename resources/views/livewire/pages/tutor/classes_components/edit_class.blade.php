@@ -53,9 +53,14 @@
             </div>
 
             {{-- class name --}}
-            <div>
+            <div class="{{ $class_category == "group" ? 'grid grid-cols-2 gap-4' : '' }}">
                 <x-wui-input wire:model='class_name' label="Class Name" placeholder='Enter class name' shadowless/>
+                {{-- class students --}}
+                @if ($class_category == "group")
+                    <x-wui-inputs.number wire:model='class_students' label="How many students?" shadowless/>
+                @endif
             </div>
+
 
             {{-- class description --}}
             <div>

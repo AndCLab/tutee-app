@@ -24,6 +24,7 @@ new #[Layout('layouts.app')] class extends Component {
     public string $class_location = '';
     public string $class_category = '';
     public string $class_link = '';
+    public $class_students;
     public $class_fee = 0;
     public $class_fields = []; //fields setter
     public $getFields = []; // fields getter
@@ -153,11 +154,12 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     // action buttons
-    public function IndividualValidation()
+    public function Validation()
     {
         $this->validate([
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
+            'class_students' => ['required', 'integer', 'min:2', 'max:50'],
             'class_fields' => ['required'],
             'sched_start_date' => ['required', 'date'],
             'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
@@ -170,11 +172,16 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $edit = Classes::find($this->editClassId);
 
-        $this->IndividualValidation();
+        $this->Validation();
 
         $edit->class_name = $this->class_name;
         $edit->class_description = $this->class_description;
         $edit->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
+
+
+        if ($edit->class_students) {
+            $edit->class_students =$this->class_students;
+        }
 
         if ($this->class_location && $this->class_link) {
             $this->notification([
@@ -224,6 +231,7 @@ new #[Layout('layouts.app')] class extends Component {
             'sched_start_date',
             'sched_end_date',
             'class_location',
+            'class_students',
             'class_fee',
             'class_link',
         );
@@ -244,7 +252,7 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->reset([
             'showEditClassModal', 'editClassId', 'class_name', 'class_description',
-            'class_type', 'class_category', 'class_link', 'class_location',
+            'class_type', 'class_category', 'class_link', 'class_students', 'class_location',
             'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date',
             'regi_start_date', 'regi_end_date'
         ]);
@@ -261,6 +269,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->class_description = $edit->class_description;
         $this->class_type = $edit->class_type;
         $this->class_category = $edit->class_category;
+
+        if ($edit->class_students) {
+            $this->class_students = $edit->class_students;
+        }
 
         if ($edit->class_type == 'virtual') {
             $this->class_link = $edit->class_location;
@@ -411,6 +423,11 @@ new #[Layout('layouts.app')] class extends Component {
                                     {{ number_format($class->class_fee, 2) }}
                                 @endif
                             </p>
+                            @if ($class->class_students >= 2)
+                                <p>
+                                    There are {{ $class->class_students }} slots available
+                                </p>
+                            @endif
                             <p>
                                 Class Fields:
                                 @foreach ($fields = json_decode($class->class_fields, true) as $index => $item)

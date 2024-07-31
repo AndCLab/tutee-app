@@ -23,6 +23,7 @@ new #[Layout('layouts.app')] class extends Component {
     public string $class_type = '';
     public string $class_location = '';
     public string $class_link = '';
+    public $class_students;
     public $class_fee = 0;
     public $class_status;
     public $class_fields = []; //fields setter
@@ -149,6 +150,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->validate([
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
+            'class_students' => ['required', 'integer', 'min:2', 'max:50'],
             'class_fields' => ['required'],
 
             'regi_start_date' => ['required', 'date'],
@@ -213,6 +215,7 @@ new #[Layout('layouts.app')] class extends Component {
             'class_type' => $this->class_type,
             'class_category' => 'group',
             'class_location' => $this->class_location,
+            'class_students' => $this->class_students,
             'class_fee' => $this->class_fee,
             'class_status' => 1,
             'schedule_id' => $schedule->id,
@@ -226,6 +229,7 @@ new #[Layout('layouts.app')] class extends Component {
             'sched_start_date',
             'sched_end_date',
             'class_location',
+            'class_students',
             'class_fee',
             'class_link',
         );

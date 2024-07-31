@@ -19,6 +19,7 @@ class Classes extends Model
         'class_type',
         'class_category',
         'class_location',
+        'class_students',
         'class_fee',
         'class_status',
         'schedule_id',
