@@ -76,7 +76,7 @@
             {{-- class price --}}
             <div x-data="{ open: false }">
                 <div class="mb-1">
-                    <x-wui-toggle left-label="Class Price" @click="open = ! open" wire:model='IndiClassFeeToggle'/>
+                    <x-wui-toggle left-label="Class Price" @click="open = ! open" wire:model='GroupClassFeeToggle'/>
                 </div>
                 <div x-show='open' x-cloak x-transition>
                     <x-wui-inputs.currency wire:model='class_fee' icon="cash" placeholder="Enter class price" shadowless/>
@@ -103,7 +103,7 @@
                 <div>
                     <div x-show="tab == '#virtual'" x-cloak>
                         <div class="max-w-xl">
-                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="your name">
+                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="Virtual Meeting">
                                 <x-slot name="append">
                                     <div class="absolute inset-y-0 right-0 flex items-center p-0.5">
                                         <x-wui-button

@@ -30,7 +30,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
             if (array_key_exists($role, $routes)) {
                 $this->redirectIntended(default: $routes[$role], navigate: true);
-            } else {
+            } else if (Auth::user()->is_stepper === 1) {
                 $this->redirectIntended(default: route('stepper'), navigate: true);
             }
         }

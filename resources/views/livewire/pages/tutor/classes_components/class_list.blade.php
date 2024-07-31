@@ -53,6 +53,7 @@ new #[Layout('layouts.app')] class extends Component {
     public bool $isEmptyPending = false;
     public $sort_by;
 
+    public $showWithdrawClassModal;
     public $showEditClassModal;
     public $editClassId;
 
@@ -175,12 +176,21 @@ new #[Layout('layouts.app')] class extends Component {
         $edit->class_description = $this->class_description;
         $edit->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
 
-        if ($this->class_location) {
-            $edit->class_type = 'physical';
+        if ($this->class_location && $this->class_link) {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
         } else if ($this->class_link) {
-            $edit->class_type = 'virtual';
+            $this->class_type = 'virtual';
             $this->class_location = $this->class_link;
-        } else{
+        } else if ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
             $this->notification([
                 'title'       => 'Error',
                 'description' => 'Either virtual or physical class',
@@ -275,9 +285,10 @@ new #[Layout('layouts.app')] class extends Component {
 
     }
 
-    public function withdrawClass($classId)
+    // delete class
+    public function withdrawClass()
     {
-        $class = Classes::find($classId);
+        $class = Classes::find($this->editClassId);
         $sched = $class->schedule;
         $regi = $class->registration;
 
@@ -289,7 +300,21 @@ new #[Layout('layouts.app')] class extends Component {
             $regi->delete();
         }
 
+        $this->notification([
+            'title'       => 'Removed',
+            'description' => 'Successfully remove class',
+            'icon'        => 'success',
+            'timeout'     => 2500,
+        ]);
+
+        $this->showWithdrawClassModal = false;
         $this->mount();
+    }
+
+    public function withdrawClassModal($classId)
+    {
+        $this->showWithdrawClassModal = true;
+        $this->editClassId = $classId;
     }
 
 }; ?>
@@ -350,7 +375,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-wui-dropdown.header class="font-semibold" label="Actions">
                                     @if ($class->class_status == 1)
                                         <x-wui-dropdown.item wire:click='editClassModal({{ $class->id }})' icon='pencil-alt' label="Edit" />
-                                        <x-wui-dropdown.item wire:click='withdrawClass({{ $class->id }})' icon='trash' label="Withdraw" />
+                                        <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})' icon='trash' label="Withdraw" />
                                     @endif
                                 </x-wui-dropdown.header>
                             </x-wui-dropdown>
@@ -372,7 +397,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 @if ($class->class_status == 1)
                                     Open
                                 @else
-                                    Close
+                                    Closed
                                 @endif
                             </p>
                             <p>
@@ -443,14 +468,35 @@ new #[Layout('layouts.app')] class extends Component {
         </x-wui-card>
     </x-wui-modal>
 
+    <x-wui-modal wire:model="showWithdrawClassModal" persistent align='center' max-width='sm'>
+        <x-wui-card title="Delete Class">
+            <p class="text-gray-600">
+                Do you wanna remove this class?
+                <span class="font-semibold">
+                    {{
+                        Classes::where('id', $editClassId)->pluck('class_name')->first();
+                    }}
+                </span>
+            </p>
+
+            <x-slot name="footer">
+                <div class="flex justify-end gap-x-4">
+                    <x-wui-button flat label="Cancel" x-on:click="close" />
+                    <x-wui-button wire:click='withdrawClass' spinner='withdrawClass' negative label="Yes, Delete it" />
+                </div>
+            </x-slot>
+        </x-wui-card>
+    </x-wui-modal>
+
     <x-class-skeleton loadClass='searchAll' />
     <x-class-skeleton loadClass='searchPending' />
     <x-class-skeleton loadClass='sort_by' />
     <x-class-skeleton loadClass='viewAll' />
     <x-class-skeleton loadClass='viewPending' />
     <x-class-skeleton loadClass='withdrawClass' />
-    <x-class-skeleton loadClass='editClassModal' />
+    <x-class-skeleton loadClass='withdrawClassModal' />
     <x-class-skeleton loadClass='editClass' />
+    <x-class-skeleton loadClass='editClassModal' />
     <x-class-skeleton loadClass='resetModalState' />
 
 </section>

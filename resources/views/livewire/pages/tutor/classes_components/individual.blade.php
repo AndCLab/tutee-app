@@ -81,7 +81,7 @@
                 <div>
                     <div x-show="tab == '#virtual'" x-cloak>
                         <div class="max-w-xl">
-                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="your name">
+                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="Virtual Meeting">
                                 <x-slot name="append">
                                     <div class="absolute inset-y-0 right-0 flex items-center p-0.5">
                                         <x-wui-button

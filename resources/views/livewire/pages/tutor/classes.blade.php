@@ -15,6 +15,8 @@ use App\Models\Fields;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    public $title = 'Classes | Tutee';
+
     // class properties
     public string $class_name = '';
     public string $class_description = '';
@@ -75,12 +77,21 @@ new #[Layout('layouts.app')] class extends Component {
 
         $this->IndividualValidation();
 
-        if ($this->class_location) {
-            $this->class_type = 'physical';
+        if ($this->class_location && $this->class_link) {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
         } else if ($this->class_link) {
             $this->class_type = 'virtual';
             $this->class_location = $this->class_link;
-        } else{
+        } else if ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
             $this->notification([
                 'title'       => 'Error',
                 'description' => 'Either virtual or physical class',
@@ -157,12 +168,21 @@ new #[Layout('layouts.app')] class extends Component {
 
         $this->GroupValidation();
 
-        if ($this->class_location) {
-            $this->class_type = 'physical';
+        if ($this->class_location && $this->class_link) {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
         } else if ($this->class_link) {
             $this->class_type = 'virtual';
             $this->class_location = $this->class_link;
-        } else{
+        } else if ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
             $this->notification([
                 'title'       => 'Error',
                 'description' => 'Either virtual or physical class',
@@ -221,6 +241,10 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <section>
     <x-slot name="header">

@@ -1,29 +1,6 @@
 <section>
     <form wire:submit='editClass'>
         <div class="space-y-3">
-            {{-- class schedule --}}
-            <div class="grid grid-cols-2 gap-4">
-                @if ($sched_start_date && $sched_end_date)
-                    <x-wui-datetime-picker
-                        label="Schhedule Start"
-                        placeholder="January 1, 2000"
-                        wire:model.live="sched_start_date"
-                        parse-format="YYYY-MM-DD HH:mm"
-                        display-format='dddd, MMMM D, YYYY h:mm A'
-                        :min="now()"
-                        shadowless
-                    />
-                    <x-wui-datetime-picker
-                        label="Registration End"
-                        placeholder="December 1, 2000"
-                        wire:model.blur="sched_end_date"
-                        parse-format="YYYY-MM-DD HH:mm"
-                        display-format='dddd, MMMM D, YYYY h:mm A'
-                        :min="now()"
-                        shadowless
-                    />
-                @endif
-            </div>
 
             {{-- class registration --}}
             @if ($class_category == 'group')
@@ -50,6 +27,30 @@
                     @endif
                 </div>
             @endif
+
+            {{-- class schedule --}}
+            <div class="grid grid-cols-2 gap-4">
+                @if ($sched_start_date && $sched_end_date)
+                    <x-wui-datetime-picker
+                        label="Schedule Start"
+                        placeholder="January 1, 2000"
+                        wire:model.live="sched_start_date"
+                        parse-format="YYYY-MM-DD HH:mm"
+                        display-format='dddd, MMMM D, YYYY h:mm A'
+                        :min="now()"
+                        shadowless
+                    />
+                    <x-wui-datetime-picker
+                        label="Schedule End"
+                        placeholder="December 1, 2000"
+                        wire:model.blur="sched_end_date"
+                        parse-format="YYYY-MM-DD HH:mm"
+                        display-format='dddd, MMMM D, YYYY h:mm A'
+                        :min="now()"
+                        shadowless
+                    />
+                @endif
+            </div>
 
             {{-- class name --}}
             <div>
@@ -112,7 +113,7 @@
                 <div>
                     <div x-show="tab == '#virtual'" x-cloak>
                         <div class="w-full">
-                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="your name">
+                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="Virtual Meeting">
                                 <x-slot name="append">
                                     <div class="absolute inset-y-0 right-0 flex items-center p-0.5">
                                         <x-wui-button
