@@ -62,8 +62,7 @@
             <form wire:submit='get_specific_field' class="space-y-2 mt-2">
                 <div class="w-full">
                     <x-wui-input class="py-1.5" label="Specific Field" placeholder="Enter specific field"
-                        wire:model="specific" wire:loading.attr='disabled' wire:loading.class='bg-gray-100 transition'
-                        autofocus autocomplete='off' />
+                        wire:model="specific" autofocus autocomplete='off' />
                 </div>
                 <div class="grid">
                     <x-white-button type='submit'>Add Field</x-white-button>

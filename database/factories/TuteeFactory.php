@@ -21,7 +21,7 @@ class TuteeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => 30,
+            'user_id' => 2,
             'grade_level' => $this->faker->randomElement(['highschool', 'college']),
         ];
     }

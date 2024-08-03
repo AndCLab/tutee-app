@@ -1,6 +1,6 @@
 {{-- Discover --}}
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('tutor.discover') }}"
+    <a href="{{ route('tutor.discover') }}" wire:navigate
         x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false"
         :class="expanded ? 'w-fit' : 'w-full' "
         class="inline-flex gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
@@ -28,7 +28,7 @@
 
 {{-- Classes --}}
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('classes') }}"
+    <a href="{{ route('classes') }}" wire:navigate
         x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false"
         :class="expanded ? 'w-fit' : 'w-full' "
         class="inline-flex gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
@@ -55,7 +55,7 @@
 </li>
 
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('tutor.schedule') }}"
+    <a href="{{ route('tutor.schedule') }}" wire:navigate
         x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false"
         :class="expanded ? 'w-fit' : 'w-full' "
         class="inline-flex gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">

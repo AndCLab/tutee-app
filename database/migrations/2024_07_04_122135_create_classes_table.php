@@ -18,14 +18,25 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('class_name');
             $table->text('class_description');
+            $table->json('class_fields');
             $table->enum('class_type', ['virtual', 'physical']);
+            $table->enum('class_category', ['individual', 'group']);
             $table->string('class_location');
-            $table->decimal('class_fee');
+            $table->integer('class_students')->default(1);
+            $table->decimal('class_fee')->default(0);
 
             // 1 = opened, 0 = closed
             $table->boolean('class_status')->default(1);
 
-            $table->foreignId('schedule_id')->constrained('schedules')
+            $table->foreignId('schedule_id')
+                ->nullable()
+                ->constrained('schedules')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+
+                $table->foreignId('registration_id')
+                ->nullable()
+                ->constrained('registrations')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 

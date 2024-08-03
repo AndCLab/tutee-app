@@ -16,19 +16,11 @@ new class extends Component
     public $avatar;
     public $cropped_image;
     public $showModal;
-    public $default_profile;
 
     public function mount(): void
     {
         $this->fname = Auth::user()->fname;
         $this->lname = Auth::user()->lname;
-        $this->default_profile = "https://ui-avatars.com/api/?name=" . $this->fname . "+" . $this->lname . "&color=7F9CF5&background=EBF4FF";
-    }
-
-    #[On('profile-updated')]
-    public function updatedDefault_profile($name): void
-    {
-        $this->default_profile = "https://ui-avatars.com/api/?name=" . $name . "&color=7F9CF5&background=EBF4FF";
     }
 
     /**
@@ -65,8 +57,8 @@ new class extends Component
 
             $this->showModal = false;
 
-            $passedAvatar = Storage::url(Auth::user()->avatar);
-            $this->dispatch('avatar-path', avatar: $passedAvatar);
+            $changedAvatar = Storage::url(Auth::user()->avatar);
+            $this->dispatch('avatar-path', avatar: $changedAvatar);
         }
 
     }
@@ -94,9 +86,8 @@ new class extends Component
             'timeout'     => 3000
         ]);
 
-
-        $defaultProfile = "https://ui-avatars.com/api/?name=" . $this->fname . "+" . $this->lname . "&color=7F9CF5&background=EBF4FF";
-        $this->dispatch('remove-avatar', defaultProfile: $defaultProfile);
+        $defaultProfile = asset('images/default.jpg');
+        $this->dispatch('removed-avatar', defaultProfile: $defaultProfile);
     }
 
 }; ?>
@@ -108,7 +99,7 @@ new class extends Component
             @if (Auth::user()->avatar !== null)
                 <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ Storage::url(Auth::user()->avatar) }}">
             @else
-                <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ $default_profile }}">
+                <img class="border-2 rounded-lg border-[#F1F5F9] size-20 overflow-hidden" src="{{ asset('images/default.jpg') }}">
             @endif
         </div>
 
@@ -175,8 +166,8 @@ new class extends Component
     <x-wui-notifications position="bottom-right" />
 
     {{-- CropperJS Script --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    <script data-navigate-once>
+        document.addEventListener('livewire:navigated', function () {
             const image = document.getElementById("avatar");
             const preview = document.getElementById("preview");
             const previewContainer = document.getElementById("previewContainer");
@@ -209,40 +200,42 @@ new class extends Component
 
             // File input: if file exists then image gets the src of the uploaded image and cropperJS
             // will handle the cropping feature
-            uploadInput.addEventListener("change", function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    if (file.size > maxFileSize) {
-                        window.$wireui.notify({
-                            title: 'File size exceeds',
-                            description: 'File size should not exceed 2MB',
-                            icon: 'error'
-                        })
-                        resetUpload();
-                        return;
+            if (uploadInput) {
+                uploadInput.addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        if (file.size > maxFileSize) {
+                            window.$wireui.notify({
+                                title: 'File size exceeds',
+                                description: 'File size should not exceed 2MB',
+                                icon: 'error'
+                            })
+                            resetUpload();
+                            return;
+                        }
+                        image.src = URL.createObjectURL(file);
+                        image.onload = () => {
+                            // if there's a cropper opened. it will destroy and make a new Cropper object
+                            if (cropper) cropper.destroy();
+                            cropper = new Cropper(image, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                movable: false,
+                                zoomOnWheel: false,
+                                minCropBoxWidth: 200,
+                                minCropBoxHeight: 200,
+                                minContainerHeight: 100,
+                                minContainerWidth: 100,
+                                preview: '#preview'
+                            });
+                        };
+                        previewContainer.classList.remove('hidden');
+                        previewContainer.classList.add('flex');
+                        uploadContainer.classList.add('hidden');
+                        uploadError.classList.add('hidden');
                     }
-                    image.src = URL.createObjectURL(file);
-                    image.onload = () => {
-                        // if there's a cropper opened. it will destroy and make a new Cropper object
-                        if (cropper) cropper.destroy();
-                        cropper = new Cropper(image, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                            movable: false,
-                            zoomOnWheel: false,
-                            minCropBoxWidth: 200,
-                            minCropBoxHeight: 200,
-                            minContainerHeight: 100,
-                            minContainerWidth: 100,
-                            preview: '#preview'
-                        });
-                    };
-                    previewContainer.classList.remove('hidden');
-                    previewContainer.classList.add('flex');
-                    uploadContainer.classList.add('hidden');
-                    uploadError.classList.add('hidden');
-                }
-            });
+                });
+            }
 
             // Submit: if file's cropped, it generates a data URL:
 
@@ -251,31 +244,36 @@ new class extends Component
 
             // afterwards, cropped_image gets that image and store it inside croppedImage livewire property
             // it also calls the livewire function "saveCroppedImage" for storing inside database :)
-            saveAndCropButton.addEventListener("click", () => {
-                if (cropper) {
-                    const croppedCanvas = cropper.getCroppedCanvas();
-                    if (croppedCanvas) {
-                        const croppedImage = croppedCanvas.toDataURL("image/png");
-                        croppedImageElement.src = croppedImage;
+            if (saveAndCropButton) {
+                saveAndCropButton.addEventListener("click", () => {
+                    if (cropper) {
+                        const croppedCanvas = cropper.getCroppedCanvas();
+                        if (croppedCanvas) {
+                            const croppedImage = croppedCanvas.toDataURL("image/png");
+                            croppedImageElement.src = croppedImage;
 
-                        // sets cropped_image value of croppedImage and call the saveCroppedImage function
-                        // then resets the modal
-                        @this.set('cropped_image', croppedImage, true).then(() => {
-                            @this.call('saveCroppedImage');
-                        }).then(resetUpload);
+                            // sets cropped_image value of croppedImage and call the saveCroppedImage function
+                            // then resets the modal
+                            @this.set('cropped_image', croppedImage, true).then(() => {
+                                @this.call('saveCroppedImage');
+                            }).then(resetUpload);
+                        }
+                    } else {
+                        uploadLabel.classList.remove('border-gray-300');
+                        uploadLabel.classList.add('border-negative-300');
+                        setTimeout(() => {
+                            uploadError.classList.remove('hidden');
+                        }, 50);
                     }
-                } else {
-                    uploadLabel.classList.remove('border-gray-300');
-                    uploadLabel.classList.add('border-negative-300');
-                    uploadError.classList.remove('hidden');
-                }
-            });
+                });
+            }
 
             // sets 50ms and call the resetUpload function
-            uploadCloseButton.addEventListener("click", () => {
-                setTimeout(resetUpload, 50);
-            });
+            if (uploadCloseButton) {
+                uploadCloseButton.addEventListener("click", () => {
+                    setTimeout(resetUpload, 50);
+                });
+            }
         });
-
     </script>
 </section>

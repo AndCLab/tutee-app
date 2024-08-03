@@ -77,13 +77,17 @@
     >
         <div x-show="tab === 'date'" class="space-y-5">
             @unless ($withoutTips)
-                <div class="grid grid-cols-3 gap-x-2 text-center text-secondary-600">
-                    <x-dynamic-component
-                        :component="WireUi::component('button')"
-                        class="bg-secondary-100 border-none dark:bg-secondary-800"
-                        x-on:click="selectYesterday"
-                        :label="__('wireui::messages.datePicker.yesterday')"
-                    />
+                <div class="grid gap-x-2 text-center text-secondary-600"
+                    :class="config.min ? 'grid-cols-2' : 'grid-cols-3'"
+                >
+                    <template x-if="!config.min">
+                        <x-dynamic-component
+                            :component="WireUi::component('button')"
+                            class="bg-secondary-100 border-none dark:bg-secondary-800"
+                            x-on:click="selectYesterday"
+                            :label="__('wireui::messages.datePicker.yesterday')"
+                        />
+                    </template>
 
                     <x-dynamic-component
                         :component="WireUi::component('button')"
