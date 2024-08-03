@@ -60,8 +60,8 @@ new class extends Component {
                                   ->where('field_name', $field['field_name'])->get();
 
             foreach ($check_field as $value) {
-                // check if class id is null
-                if ($value->class_id == null) {
+                // check if class id is 0
+                if ($value->class_count == 0) {
 
                     // Remove from the interests array
                     unset($this->interests[$index]);
@@ -124,15 +124,17 @@ new class extends Component {
                 <div wire:key='{{ $index }}'
                     @class([
                             'bg-[#F1F5F9] text-[#0F172A] px-2 py-1 gap-2 text-sm rounded-3xl flex items-center',
-                            'bg-indigo-500 text-white' => $item['class_id'] != null
+                            'bg-indigo-500 text-white' => $item['class_count'] != 0
                             ])>
                     <p>
                         {{ $item['field_name'] }}
                     </p>
-                    <svg wire:click='remove_field({{ $index }})' xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4 cursor-pointer">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
+                    @if ($item['class_count'] == 0)
+                        <svg wire:click='remove_field({{ $index }})' xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4 cursor-pointer">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    @endif
                 </div>
             @endforeach
         @else

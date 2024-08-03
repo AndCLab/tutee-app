@@ -129,7 +129,7 @@ new #[Layout('layouts.app')] class extends Component {
                             ->get();
 
             foreach ($fields as $field) {
-                $field->class_id = $new_class->id;
+                $field->class_count = $field->class_count + 1;
                 $field->save();
             }
         }
@@ -234,6 +234,17 @@ new #[Layout('layouts.app')] class extends Component {
             'schedule_id' => $schedule->id,
             'registration_id' => $registration->id
         ]);
+
+        foreach ($this->class_fields as $value) {
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('field_name', $value)
+                            ->get();
+
+            foreach ($fields as $field) {
+                $field->class_count = $field->class_count + 1;
+                $field->save();
+            }
+        }
 
         $this->dispatch('new-class', isNotEmpty: 0);
 

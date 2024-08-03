@@ -14,7 +14,6 @@ use App\Models\Registration;
 use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
-
     use Actions;
 
     // class properties
@@ -64,13 +63,14 @@ new #[Layout('layouts.app')] class extends Component {
         $this->sort_by = 'desc';
 
         $this->pendingClasses = Classes::where('class_status', 1)
-                                    ->orderBy('created_at', $this->sort_by)
-                                    ->get();
+            ->orderBy('created_at', $this->sort_by)
+            ->get();
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-                                    ->get();
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
 
-        $this->getFields = Fields::where('user_id', Auth::id())->get(['field_name'])->toArray();
+        $this->getFields = Fields::where('user_id', Auth::id())
+            ->get(['field_name'])
+            ->toArray();
 
         // default
         $this->classFilter = 'pending';
@@ -82,17 +82,16 @@ new #[Layout('layouts.app')] class extends Component {
     #[On('new-class')]
     public function updateList($isNotEmpty)
     {
-        if (($this->isEmptyPending != $isNotEmpty) || ($this->isEmptyAll != $isNotEmpty)) {
+        if ($this->isEmptyPending != $isNotEmpty || $this->isEmptyAll != $isNotEmpty) {
             $this->isEmptyPending = $isNotEmpty;
             $this->isEmptyAll = $isNotEmpty;
         }
 
         $this->pendingClasses = Classes::where('class_status', 1)
-                                    ->orderBy('created_at', $this->sort_by)
-                                    ->get();
+            ->orderBy('created_at', $this->sort_by)
+            ->get();
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-                                    ->get();
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
     }
 
     public function updatedSortBy()
@@ -100,29 +99,24 @@ new #[Layout('layouts.app')] class extends Component {
         $sortOrder = in_array($this->sort_by, ['asc', 'desc']) ? $this->sort_by : 'asc';
 
         if ($this->classFilter === 'all') {
-            $this->allClasses = Classes::orderBy('created_at', $sortOrder)
-                                        ->get();
+            $this->allClasses = Classes::orderBy('created_at', $sortOrder)->get();
         } elseif ($this->classFilter === 'pending') {
-            $this->pendingClasses = Classes::where('class_status', 1)
-                                        ->orderBy('created_at', $sortOrder)
-                                        ->get();
+            $this->pendingClasses = Classes::where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
         }
-
     }
 
     public function viewAll()
     {
         $this->classFilter = 'all';
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-        ->get();
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
     }
 
     public function viewPending()
     {
         $this->classFilter = 'pending';
         $this->pendingClasses = Classes::where('class_status', 1)
-                                        ->orderBy('created_at', $this->sort_by)
-                                        ->get();
+            ->orderBy('created_at', $this->sort_by)
+            ->get();
     }
 
     public function updatedSearchAll()
@@ -138,8 +132,7 @@ new #[Layout('layouts.app')] class extends Component {
     protected function searchClasses(string $filter, string $searchTerm)
     {
         if (($filter === 'all' && !$this->isEmptyAll) || ($filter === 'pending' && !$this->isEmptyPending)) {
-            $query = Classes::orderBy('created_at', $this->sort_by)
-                            ->where('class_name', 'like', '%' . $searchTerm . '%');
+            $query = Classes::orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
 
             if ($filter === 'pending') {
                 $query->where('class_status', 1);
@@ -185,6 +178,9 @@ new #[Layout('layouts.app')] class extends Component {
         // Validate inputs
         $this->validate($rules);
 
+        // Get current fields
+        $currentFields = json_decode($class->class_fields);
+
         // Update class details
         $class->class_name = $this->class_name;
         $class->class_description = $this->class_description;
@@ -220,23 +216,37 @@ new #[Layout('layouts.app')] class extends Component {
             $class->registration->save();
         }
 
+        $newFields = json_decode($class->class_fields);
+
+        // Decrement if current fields are not in the new fields
+        foreach ($currentFields as $currentField) {
+            $fields = Fields::where('user_id', Auth::id())->where('field_name', $currentField)->get();
+
+            if (!in_array($currentField, $newFields)) {
+                foreach ($fields as $field) {
+                    $field->class_count--;
+                    $field->save();
+                }
+            }
+        }
+
+        // Increment if new fields are not in the current fields
+        foreach ($newFields as $newField) {
+            $fields = Fields::where('user_id', Auth::id())->where('field_name', $newField)->get();
+
+            if (!in_array($newField, $currentFields)) {
+                foreach ($fields as $field) {
+                    $field->class_count++;
+                    $field->save();
+                }
+            }
+        }
+
         // Save the class
         $class->save();
 
         // Reset input fields
-        $this->reset([
-            'class_name',
-            'class_description',
-            'class_fields',
-            'sched_start_date',
-            'sched_end_date',
-            'regi_start_date',
-            'regi_end_date',
-            'class_location',
-            'class_students',
-            'class_fee',
-            'class_link',
-        ]);
+        $this->reset(['class_name', 'class_description', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date', 'class_location', 'class_students', 'class_fee', 'class_link']);
 
         // Notify user of success
         $this->sendNotification('Updated Class!', 'Successfully updated!', 'success');
@@ -259,12 +269,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function resetModalState()
     {
-        $this->reset([
-            'showEditClassModal', 'editClassId', 'class_name', 'class_description',
-            'class_type', 'class_category', 'class_link', 'class_students', 'class_location',
-            'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date',
-            'regi_start_date', 'regi_end_date'
-        ]);
+        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
         $this->resetValidation();
     }
 
@@ -304,7 +309,6 @@ new #[Layout('layouts.app')] class extends Component {
             $this->regi_start_date = $class->registration->start_date;
             $this->regi_end_date = $class->registration->end_date;
         }
-
     }
 
     // delete class
@@ -313,6 +317,17 @@ new #[Layout('layouts.app')] class extends Component {
         $class = Classes::find($this->editClassId);
         $sched = $class->schedule;
         $regi = $class->registration;
+
+        $currentFields = json_decode($class->class_fields);
+
+        foreach ($currentFields as $classField) {
+            $fields = Fields::where('user_id', Auth::id())->where('field_name', $classField)->get();
+
+            foreach ($fields as $field) {
+                $field->class_count = $field->class_count - 1;
+                $field->save();
+            }
+        }
 
         if ($sched) {
             $sched->delete();
@@ -323,10 +338,10 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         $this->notification([
-            'title'       => 'Removed',
+            'title' => 'Removed',
             'description' => 'Successfully remove class',
-            'icon'        => 'success',
-            'timeout'     => 2500,
+            'icon' => 'success',
+            'timeout' => 2500,
         ]);
 
         $this->showWithdrawClassModal = false;
@@ -338,11 +353,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->showWithdrawClassModal = true;
         $this->editClassId = $classId;
     }
-
 }; ?>
 
 @php
-    $classes = ($classFilter == 'all') ? $allClasses : $pendingClasses;
+    $classes = $classFilter == 'all' ? $allClasses : $pendingClasses;
 @endphp
 
 <section>
@@ -359,7 +373,8 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         @else
             <div class="w-full">
-                <x-wui-input wire:model.live='searchPending' placeholder='Search pending class...' icon='search' shadowless />
+                <x-wui-input wire:model.live='searchPending' placeholder='Search pending class...' icon='search'
+                    shadowless />
             </div>
         @endif
         <div class="w-fit">
@@ -396,15 +411,19 @@ new #[Layout('layouts.app')] class extends Component {
                             <x-wui-dropdown>
                                 <x-wui-dropdown.header class="font-semibold" label="Actions">
                                     @if ($class->class_status == 1)
-                                        <x-wui-dropdown.item wire:click='editClassModal({{ $class->id }})' icon='pencil-alt' label="Edit" />
-                                        <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})' icon='trash' label="Withdraw" />
+                                        <x-wui-dropdown.item wire:click='editClassModal({{ $class->id }})'
+                                            icon='pencil-alt' label="Edit" />
+                                        <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})'
+                                            icon='trash' label="Withdraw" />
                                     @endif
                                 </x-wui-dropdown.header>
                             </x-wui-dropdown>
                         </div>
                         <div class="flex gap-2 items-center text-[#64748B] text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <p>Created at {{ Carbon::create($class['created_at'])->format('l jS \\of F Y h:i A') }}</p>
                         </div>
@@ -427,7 +446,7 @@ new #[Layout('layouts.app')] class extends Component {
                             </p>
                             <p>
                                 Class Fee:
-                                @if ($class->class_fee == 0.00)
+                                @if ($class->class_fee == 0.0)
                                     Free Class
                                 @else
                                     {{ number_format($class->class_fee, 2) }}
@@ -452,16 +471,19 @@ new #[Layout('layouts.app')] class extends Component {
                                 Class Location: {{ $class->class_location }}
                             </p>
                             <p>
-                                Starts at {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
+                                Starts at
+                                {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
                             </p>
                         </div>
 
                         <div class="flex justify-end">
                             <template x-if='expanded == false' x-transition>
-                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down' flat />
+                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down'
+                                    flat />
                             </template>
                             <template x-if='expanded == true' x-transition>
-                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-up' flat />
+                                <x-wui-button @click="expanded = ! expanded" xs label='View less' icon='arrow-up'
+                                    flat />
                             </template>
                         </div>
                     </div>
@@ -500,9 +522,7 @@ new #[Layout('layouts.app')] class extends Component {
             <p class="text-gray-600">
                 Do you wanna remove this class?
                 <span class="font-semibold">
-                    {{
-                        Classes::where('id', $editClassId)->pluck('class_name')->first();
-                    }}
+                    {{ Classes::where('id', $editClassId)->pluck('class_name')->first() }}
                 </span>
             </p>
 

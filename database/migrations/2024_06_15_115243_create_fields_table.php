@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')
                 ->onDelete('cascade');
             $table->string('field_name');
-            $table->unsignedInteger('class_id')->nullable();
+            $table->unsignedInteger('class_count')->default(0);
             $table->timestamps();
         });
     }
