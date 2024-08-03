@@ -29,13 +29,22 @@ new class extends Component {
             'input.required' => 'The specific field is required'
         ]);
 
-        if (!in_array(['field_name' => $this->input], $this->interests)) {
-            $this->interests[$this->i++] = ['field_name' => $this->input];
+        $found = false;
+        foreach ($this->interests as $interest) {
+            if (Str::lower($interest['field_name']) === Str::lower($this->input)) {
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->interests[$this->i++] = ['field_name' => $this->input, 'class_count' => 0];
 
             // Add new field
             Fields::create([
                 'user_id' => Auth::id(),
                 'field_name' => $this->input,
+                'class_count' => 0,
             ]);
 
             $this->notification([
@@ -44,7 +53,16 @@ new class extends Component {
                 'icon' => 'success',
                 'timeout' => 3000,
             ]);
+        } else{
+            $this->notification([
+                'title' => 'Field Duplication',
+                'description' => 'The field that you\'re about to add is already in the list.',
+                'icon' => 'error',
+                'timeout' => 3000,
+            ]);
         }
+
+
 
         $this->reset('input');
     }
@@ -104,11 +122,11 @@ new class extends Component {
 <section>
     <header>
         <h2 class="text-lg font-semibold text-gray-900">
-            {{ __('Add Interests') }}
+            {{ __('Add Fields') }}
         </h2>
 
         <p class="mt-1 mb-1 text-xs text-gray-600">
-            {{ __('Add any additional interests you want to explore or learn more about in detail.') }}
+            {{ __('Add any additional fields you want to explore or learn more about in detail.') }}
         </p>
         <div class="inline-flex items-center">
             <p class="mt-1 text-xs text-gray-900 italic">Note that interests are highlighted
