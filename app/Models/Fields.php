@@ -13,7 +13,7 @@ class Fields extends Model
 
     protected $table = 'fields';
 
-    protected $fillable = ['user_id', 'field_name'];
+    protected $fillable = ['user_id', 'field_name', 'class_id'];
 
     /**
      * Get all of the comments for the Fields

@@ -97,7 +97,8 @@ new class extends Component
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false));
+            $route = Auth::user()->user_type == 'tutee' ? 'tutee.discover' : 'tutor.discover';
+            $this->redirectIntended(default: route($route, absolute: false), navigate: true);
 
             return;
         }
@@ -130,17 +131,17 @@ new class extends Component
         <div class="flex flex-col md:flex-row md:items-center gap-2">
             <!-- First Name -->
             <x-wui-input label="First Name" placeholder="First Name" wire:model="fname" autofocus
-                autocomplete="fname" hint='Update your first name' errorless/>
+                autocomplete="fname" hint='Update your first name' errorless shadowless/>
 
             {{-- Last Name --}}
             <x-wui-input label="Last Name" placeholder="Last Name" wire:model="lname" autofocus
-                autocomplete="lname" hint='Update your last name' errorless/>
+                autocomplete="lname" hint='Update your last name' errorless shadowless/>
         </div>
 
         <div>
             <!-- Email Address -->
             <div>
-                <x-wui-input label="Email" placeholder="Email" wire:model="email" autocomplete='username' hint='Update your email' errorless/>
+                <x-wui-input label="Email" placeholder="Email" wire:model="email" autocomplete='username' hint='Update your email' errorless shadowless/>
             </div>
 
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
@@ -180,7 +181,7 @@ new class extends Component
                             'name'   => 'user-option',
                             'config' => ['src' => 'country_image']
                         ]"
-                        errorless
+                        errorless shadowless
                     />
                 </div>
 
@@ -195,7 +196,7 @@ new class extends Component
                                 '### ###-#####',
                                 '##### #######',
                             ]"
-                        errorless
+                        errorless shadowless
                     />
                 </div>
             </div>
@@ -214,6 +215,4 @@ new class extends Component
             <livewire:profile.delete-user-form/>
         </div>
 
-    {{-- Notification --}}
-    <x-wui-notifications position="bottom-right"/>
 </section>

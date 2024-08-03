@@ -21,10 +21,10 @@ class User extends Authenticatable
         'lname',
         'email',
         'address',
-        'zip_code', 
+        'zip_code',
         'phone_prefix',
         'phone_number',
-         
+
         'is_stepper',
         'user_type',
         'avatar',

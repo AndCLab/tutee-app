@@ -56,24 +56,43 @@ new class extends Component {
         $field = $this->interests[$index];
 
         if (count($this->interests) > 3) {
-            // Remove from the interests array
-            unset($this->interests[$index]);
-            $this->interests = array_values($this->interests);
-            $this->i = count($this->interests);
+            $check_field = Fields::where('user_id', Auth::id())
+                                  ->where('field_name', $field['field_name'])->get();
 
-            // find that field in Fields and simply remove it from the database
-            Fields::where('user_id', Auth::id())
-                ->where('field_name', $field['field_name'])
-                ->delete();
+            foreach ($check_field as $value) {
+                // check if class id is null
+                if ($value->class_id == null) {
 
-            $this->notification([
-                'title' => 'Field removed!',
-                'icon' => 'success',
-                'timeout' => 3000,
-            ]);
+                    // Remove from the interests array
+                    unset($this->interests[$index]);
+                    $this->interests = array_values($this->interests);
+                    $this->i = count($this->interests);
+
+                    // simply remove it from the database
+                    $value->delete();
+
+                    $this->notification([
+                        'title' => 'Field removed!',
+                        'icon' => 'success',
+                        'timeout' => 3000,
+                    ]);
+
+                    return;
+                } else {
+                    $this->notification([
+                        'title' => 'Field stored in your classes',
+                        'description' => 'This field is used in one of your classes',
+                        'icon' => 'error',
+                        'timeout' => 3000,
+                    ]);
+
+                    return;
+                }
+            }
+
         } else{
             $this->notification([
-                'title' => 'You can\'t remove lesser than three fields',
+                'title' => 'You can\'t remove lesser than three interests',
                 'icon' => 'error',
                 'timeout' => 3000,
             ]);
@@ -85,12 +104,17 @@ new class extends Component {
 <section>
     <header>
         <h2 class="text-lg font-semibold text-gray-900">
-            {{ __('Add Fields') }}
+            {{ __('Add Interests') }}
         </h2>
 
-        <p class="mt-1 text-xs text-gray-600">
-            {{ __('Add any additional fields you want to explore or learn more about in detail.') }}
+        <p class="mt-1 mb-1 text-xs text-gray-600">
+            {{ __('Add any additional interests you want to explore or learn more about in detail.') }}
         </p>
+        <div class="inline-flex items-center">
+            <p class="mt-1 text-xs text-gray-900 italic">Note that interests are highlighted
+                <span class="text-indigo-500 font-semibold not-italic ">indigo</span>
+                if they are used in your class creation</p>
+        </div>
     </header>
 
     <div class="flex flex-wrap gap-2 my-5">
@@ -98,7 +122,10 @@ new class extends Component {
         @if (!empty($interests))
             @foreach ($interests as $index => $item)
                 <div wire:key='{{ $index }}'
-                    class="bg-[#F1F5F9] text-[#0F172A] px-2 py-1 gap-2 text-sm rounded-3xl flex items-center">
+                    @class([
+                            'bg-[#F1F5F9] text-[#0F172A] px-2 py-1 gap-2 text-sm rounded-3xl flex items-center',
+                            'bg-indigo-500 text-white' => $item['class_id'] != null
+                            ])>
                     <p>
                         {{ $item['field_name'] }}
                     </p>
@@ -120,11 +147,10 @@ new class extends Component {
 
     <form wire:submit='add_field' class="space-y-2 mt-2">
         <div class="w-full">
-            <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="input" autofocus autocomplete='off' />
+            <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="input" autofocus autocomplete='off' shadowless/>
         </div>
         <div class="grid">
             <x-secondary-button type='submit' wireTarget='add_field'>Add Field</x-secondary-button>
         </div>
     </form>
-    <x-wui-notifications position="bottom-right" />
 </section>

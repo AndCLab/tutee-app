@@ -162,9 +162,6 @@ new class extends Component
         </x-wui-card>
     </x-wui-modal>
 
-    {{-- Notification --}}
-    <x-wui-notifications position="bottom-right" />
-
     {{-- CropperJS Script --}}
     <script data-navigate-once>
         document.addEventListener('livewire:navigated', function () {
@@ -261,9 +258,7 @@ new class extends Component
                     } else {
                         uploadLabel.classList.remove('border-gray-300');
                         uploadLabel.classList.add('border-negative-300');
-                        setTimeout(() => {
-                            uploadError.classList.remove('hidden');
-                        }, 50);
+                        uploadError.classList.remove('hidden');
                     }
                 });
             }

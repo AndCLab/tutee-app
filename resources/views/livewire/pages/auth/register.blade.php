@@ -66,7 +66,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        $this->redirect(route('stepper', absolute: false), navigate: true);
     }
 }; ?>
 
@@ -87,6 +87,7 @@ new #[Layout('layouts.guest')] class extends Component {
                         autofocus
                         autocomplete="fname"
                         errorless
+                        shadowless
                     />
                 </div>
 
@@ -99,6 +100,7 @@ new #[Layout('layouts.guest')] class extends Component {
                         autofocus
                         autocomplete="lname"
                         errorless
+                        shadowless
                     />
                 </div>
             </div>
@@ -110,8 +112,8 @@ new #[Layout('layouts.guest')] class extends Component {
                     placeholder="Email"
                     wire:model="email"
                     autocomplete='username'
-                    suffix="@mail.com"
                     errorless
+                    shadowless
                 />
             </div>
 
@@ -123,6 +125,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     wire:model="address"
                     autocomplete='address'
                     errorless
+                    shadowless
                 />
             </div>
 
@@ -135,6 +138,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     wire:model="zip_code"
                     autocomplete='postal-code'
                     errorless
+                    shadowless
                 />
             </div>
 
@@ -156,6 +160,7 @@ new #[Layout('layouts.guest')] class extends Component {
                                 'config' => ['src' => 'country_image']
                             ]"
                             errorless
+                            shadowless
                         />
                     </div>
 
@@ -171,6 +176,7 @@ new #[Layout('layouts.guest')] class extends Component {
                                     '##### #######',
                                 ]"
                             errorless
+                            shadowless
                         />
                     </div>
                 </div>
@@ -184,6 +190,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     label="Password"
                     autocomplete="new-password"
                     errorless
+                    shadowless
                 />
             </div>
 
@@ -195,6 +202,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     label="Confirm Password"
                     autocomplete="new-password"
                     errorless
+                    shadowless
                 />
             </div>
 

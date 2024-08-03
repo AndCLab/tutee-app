@@ -170,7 +170,7 @@ new #[Layout('layouts.app')] class extends Component {
                 ]);
             }
 
-            return redirect()->route('dashboard');
+            return redirect()->route('tutee.discover');
         }
     }
 

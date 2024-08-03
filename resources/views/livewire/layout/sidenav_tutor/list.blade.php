@@ -1,9 +1,8 @@
 {{-- Discover --}}
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('tutor.discover') }}" wire:navigate
-        x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false"
-        :class="expanded ? 'w-fit' : 'w-full' "
-        class="inline-flex gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
+    <a href="{{ route('tutor.discover') }}" wire:navigate.hover x-on:mouseenter="tooltip = !tooltip"
+        x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
+        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-layout-dashboard">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -13,25 +12,21 @@
         <p x-show='!expanded'>
             Discover
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90"
-            >
-            Discover
-        </div>
     </a>
+    <div x-show="tooltip"
+        class="z-50 text-sm absolute top-0 left-full bg-white text-black border rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+        Discover
+    </div>
 </li>
 
 {{-- Classes --}}
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('classes') }}" wire:navigate
-        x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false"
-        :class="expanded ? 'w-fit' : 'w-full' "
-        class="inline-flex gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
+    <a href="{{ route('classes') }}" wire:navigate.hover x-on:mouseenter="tooltip = !tooltip"
+        x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
+        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-book">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -41,24 +36,20 @@
         <p x-show='!expanded'>
             Classes
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90"
-            >
-            Classes
-        </div>
     </a>
+    <div x-show="tooltip"
+        class="z-50 text-sm absolute top-0 left-full bg-white text-black border rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+        Classes
+    </div>
 </li>
 
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('tutor.schedule') }}" wire:navigate
-        x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false"
-        :class="expanded ? 'w-fit' : 'w-full' "
-        class="inline-flex gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
+    <a href="{{ route('tutor.schedule') }}" wire:navigate.hover x-on:mouseenter="tooltip = !tooltip"
+        x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
+        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-calendar">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -70,15 +61,12 @@
         <p x-show='!expanded'>
             Schedule
         </p>
-        <div x-show="tooltip" class="z-50 text-sm absolute top-0 left-full bg-white border-graphite border text-gray-600 rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90"
-            >
-            Schedule
-        </div>
     </a>
+    <div x-show="tooltip"
+        class="z-50 text-sm absolute top-0 left-full bg-white text-black border rounded-md py-1 px-2 ml-1 mt-1 text-nowrap"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+        Schedule
+    </div>
 </li>

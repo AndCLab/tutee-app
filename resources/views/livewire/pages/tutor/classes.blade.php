@@ -110,7 +110,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
 
-        Classes::create([
+        $new_class = Classes::create([
             'tutor_id' => $tutor->id,
             'class_name' => $this->class_name,
             'class_description' => $this->class_description,
@@ -122,6 +122,20 @@ new #[Layout('layouts.app')] class extends Component {
             'class_status' => 1,
             'schedule_id' => $schedule->id
         ]);
+
+        foreach ($this->class_fields as $value) {
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('field_name', $value)
+                            ->get();
+
+            foreach ($fields as $field) {
+                $field->class_id = $new_class->id;
+                $field->save();
+            }
+        }
+
+
+        $this->dispatch('new-class', isNotEmpty: 0);
 
         $this->reset(
             'class_name',
@@ -141,7 +155,6 @@ new #[Layout('layouts.app')] class extends Component {
             'timeout'     => 2500,
         ]);
 
-        $this->dispatch('new-class', isNotEmpty: 0);
     }
 
     // group class validation and creation
@@ -156,8 +169,8 @@ new #[Layout('layouts.app')] class extends Component {
             'regi_start_date' => ['required', 'date'],
             'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
 
-            'sched_start_date' => ['required', 'date', 'after:regi_start_date', 'after:regi_end_date'],
-            'sched_end_date' => ['required', 'date', 'after:regi_start_date', 'after:regi_end_date' ,'after:sched_start_date'],
+            'sched_start_date' => ['required', 'date', 'after:regi_end_date'],
+            'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
 
             'class_location' => ['string', 'max:255'],
             'class_link' => ['string', 'max:255'],
@@ -222,6 +235,8 @@ new #[Layout('layouts.app')] class extends Component {
             'registration_id' => $registration->id
         ]);
 
+        $this->dispatch('new-class', isNotEmpty: 0);
+
         $this->reset(
             'class_name',
             'class_description',
@@ -240,8 +255,6 @@ new #[Layout('layouts.app')] class extends Component {
             'icon'        => 'success',
             'timeout'     => 2500,
         ]);
-
-        $this->dispatch('new-class', isNotEmpty: 0);
     }
 
 }; ?>

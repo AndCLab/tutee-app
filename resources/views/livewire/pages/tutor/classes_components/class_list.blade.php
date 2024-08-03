@@ -63,10 +63,11 @@ new #[Layout('layouts.app')] class extends Component {
         // default value: descending
         $this->sort_by = 'desc';
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-                                    ->get();
         $this->pendingClasses = Classes::where('class_status', 1)
                                     ->orderBy('created_at', $this->sort_by)
+                                    ->get();
+
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
                                     ->get();
 
         $this->getFields = Fields::where('user_id', Auth::id())->get(['field_name'])->toArray();
@@ -81,13 +82,16 @@ new #[Layout('layouts.app')] class extends Component {
     #[On('new-class')]
     public function updateList($isNotEmpty)
     {
-        $this->isEmptyPending = $isNotEmpty;
-        $this->isEmptyAll = $isNotEmpty;
+        if (($this->isEmptyPending != $isNotEmpty) || ($this->isEmptyAll != $isNotEmpty)) {
+            $this->isEmptyPending = $isNotEmpty;
+            $this->isEmptyAll = $isNotEmpty;
+        }
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-                                    ->get();
         $this->pendingClasses = Classes::where('class_status', 1)
                                     ->orderBy('created_at', $this->sort_by)
+                                    ->get();
+
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
                                     ->get();
     }
 
@@ -153,99 +157,104 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
-    // action buttons
-    public function Validation()
+    public function editClass()
     {
-        $this->validate([
+        // Fetch the class to be edited
+        $class = Classes::find($this->editClassId);
+
+        // Define validation rules
+        $rules = [
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
-            'class_students' => ['required', 'integer', 'min:2', 'max:50'],
             'class_fields' => ['required'],
             'sched_start_date' => ['required', 'date'],
             'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
-            'class_location' => ['string', 'max:255'],
-            'class_link' => ['string', 'max:255'],
-        ]);
-    }
+            'class_location' => ['nullable', 'string', 'max:255'],
+            'class_link' => ['nullable', 'string', 'max:255'],
+        ];
 
-    public function editClass()
-    {
-        $edit = Classes::find($this->editClassId);
-
-        $this->Validation();
-
-        $edit->class_name = $this->class_name;
-        $edit->class_description = $this->class_description;
-        $edit->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
-
-
-        if ($edit->class_students) {
-            $edit->class_students =$this->class_students;
+        // Add conditional validation rules
+        if ($class->class_category == 'group' && $class->registration) {
+            $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
+            $rules['regi_start_date'] = ['required', 'date'];
+            $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
+            $rules['sched_start_date'] = ['required', 'date', 'after:regi_end_date'];
+            $rules['sched_end_date'] = ['required', 'date', 'after:sched_start_date'];
         }
 
-        if ($this->class_location && $this->class_link) {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
+        // Validate inputs
+        $this->validate($rules);
 
+        // Update class details
+        $class->class_name = $this->class_name;
+        $class->class_description = $this->class_description;
+        $class->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
+        $class->class_students = $this->class_students;
+        $class->class_fee = $this->class_fee;
+
+        // Determine class type
+        if ($this->class_location && $this->class_link) {
+            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
             return;
-        } else if ($this->class_link) {
+        } elseif ($this->class_link) {
             $this->class_type = 'virtual';
             $this->class_location = $this->class_link;
-        } else if ($this->class_location) {
+        } elseif ($this->class_location) {
             $this->class_type = 'physical';
         } else {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
-
+            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
             return;
         }
 
-        if ($edit->schedule) {
-            $edit->schedule->start_date = $this->sched_start_date;
-            $edit->schedule->end_date = $this->sched_end_date;
-            $edit->schedule->save();
+        // Update schedule
+        if ($class->schedule) {
+            $class->schedule->start_date = $this->sched_start_date;
+            $class->schedule->end_date = $this->sched_end_date;
+            $class->schedule->save();
         }
 
-        if ($edit->class_category == 'group' && $edit->registration) {
-            $edit->registration->start_date = $this->regi_start_date;
-            $edit->registration->end_date = $this->regi_end_date;
-            $edit->registration->save();
+        // Update registration dates if applicable
+        if ($class->class_category == 'group' && $class->registration) {
+            $class->registration->start_date = $this->regi_start_date;
+            $class->registration->end_date = $this->regi_end_date;
+            $class->registration->save();
         }
 
-        $edit->class_fee = $this->class_fee;
+        // Save the class
+        $class->save();
 
-        $edit->save();
-
-        $this->reset(
+        // Reset input fields
+        $this->reset([
             'class_name',
             'class_description',
             'class_fields',
             'sched_start_date',
             'sched_end_date',
+            'regi_start_date',
+            'regi_end_date',
             'class_location',
             'class_students',
             'class_fee',
             'class_link',
-        );
-
-        $this->notification([
-            'title'       => 'Fresh Class!',
-            'description' => 'Successfully updated!',
-            'icon'        => 'success',
-            'timeout'     => 2500,
         ]);
 
-        $this->showEditClassModal = false;
+        // Notify user of success
+        $this->sendNotification('Updated Class!', 'Successfully updated!', 'success');
 
+        // Close the modal and dispatch event
+        $this->showEditClassModal = false;
         $this->dispatch('new-class', isNotEmpty: 0);
+    }
+
+    // Helper method for notifications
+    private function sendNotification($title, $description, $icon, $timeout = 2500)
+    {
+        $this->notification([
+            'title' => $title,
+            'description' => $description,
+            'icon' => $icon,
+            'timeout' => $timeout,
+        ]);
     }
 
     public function resetModalState()
@@ -256,6 +265,7 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date',
             'regi_start_date', 'regi_end_date'
         ]);
+        $this->resetValidation();
     }
 
     public function editClassModal($editClass)
@@ -263,36 +273,36 @@ new #[Layout('layouts.app')] class extends Component {
         $this->showEditClassModal = true;
         $this->editClassId = $editClass;
 
-        $edit = Classes::find($editClass);
+        $class = Classes::find($editClass);
 
-        $this->class_name = $edit->class_name;
-        $this->class_description = $edit->class_description;
-        $this->class_type = $edit->class_type;
-        $this->class_category = $edit->class_category;
+        $this->class_name = $class->class_name;
+        $this->class_description = $class->class_description;
+        $this->class_type = $class->class_type;
+        $this->class_category = $class->class_category;
 
-        if ($edit->class_students) {
-            $this->class_students = $edit->class_students;
+        if ($class->class_students) {
+            $this->class_students = $class->class_students;
         }
 
-        if ($edit->class_type == 'virtual') {
-            $this->class_link = $edit->class_location;
-        } elseif ($edit->class_type == 'physical') {
-            $this->class_location = $edit->class_location;
+        if ($class->class_type == 'virtual') {
+            $this->class_link = $class->class_location;
+        } elseif ($class->class_type == 'physical') {
+            $this->class_location = $class->class_location;
         }
 
-        $this->class_fee = $edit->class_fee;
-        $this->class_fields = json_decode($edit->class_fields, true); //fields setter
+        $this->class_fee = $class->class_fee;
+        $this->class_fields = json_decode($class->class_fields, true); //fields setter
 
         // for class schedule date
-        if ($edit->schedule) {
-            $this->sched_start_date = $edit->schedule->start_date;
-            $this->sched_end_date = $edit->schedule->end_date;
+        if ($class->schedule) {
+            $this->sched_start_date = $class->schedule->start_date;
+            $this->sched_end_date = $class->schedule->end_date;
         }
 
         // for registration date
-        if ($edit->class_category == 'group' && $edit->registration !== null) {
-            $this->regi_start_date = $edit->registration->start_date;
-            $this->regi_end_date = $edit->registration->end_date;
+        if ($class->class_category == 'group' && $class->registration !== null) {
+            $this->regi_start_date = $class->registration->start_date;
+            $this->regi_end_date = $class->registration->end_date;
         }
 
     }
@@ -479,7 +489,7 @@ new #[Layout('layouts.app')] class extends Component {
         @endif
     </div>
 
-    <x-wui-modal wire:model="showEditClassModal" persistent>
+    <x-wui-modal wire:model.live="showEditClassModal" persistent>
         <x-wui-card title="Edit Class">
             @include('livewire.pages.tutor.classes_components.edit_class')
         </x-wui-card>

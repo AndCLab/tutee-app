@@ -22,7 +22,7 @@
 <body class="font-inter text-gray-900 antialiased soft-scrollbar">
     <div class="mx-10">
         <div class="grid grid-rows-1 md:grid-cols-2 h-screen md:h-full items-start md:justify-center mx-auto md:max-w-6xl">
-            @if (request()->path() == 'login')
+            @if (Route::is('login'))
                 <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
                     <img class="size-3/4" src="{{ asset('images/login_image.svg') }}" alt="">
                 </div>
@@ -30,7 +30,7 @@
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
                 </div>
-            @elseif (request()->path() == 'register')
+            @elseif (Route::is('register'))
                 <div class="my-auto py-10 md:py-32">
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
@@ -38,7 +38,7 @@
                 <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
                     <img class="size-3/4" src="{{ asset('images/register_image.svg') }}" alt="">
                 </div>
-            @elseif (request()->path() == 'forgot-password')
+            @elseif (Route::is('password.request'))
                 <div class="my-auto py-10 md:py-32">
                     <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0C3B2E] font-anton mb-4">tutee</h1>
                     {{ $slot }}
@@ -49,6 +49,7 @@
             @endif
         </div>
     </div>
+    {{-- request()->path() == 'register' --}}
 </body>
 
 </html>

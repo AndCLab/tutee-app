@@ -212,7 +212,7 @@ new #[Layout('layouts.app')] class extends Component {
             $this->upload_certificates($tutor->id);
             $this->upload_resume($tutor->id);
 
-            return redirect()->route('dashboard');
+            return redirect()->route('tutor.discover');
         }
     }
 

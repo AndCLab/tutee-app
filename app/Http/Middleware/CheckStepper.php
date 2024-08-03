@@ -27,7 +27,7 @@ class CheckStepper
             }
 
             if ($user->is_stepper == 0 && $isStepperRoute) {
-                return redirect()->route('dashboard');
+                return $user->user_type == 'tutee' ? redirect()->route('tutee.discover') : redirect()->route('tutor.discover');
             }
         }
 
