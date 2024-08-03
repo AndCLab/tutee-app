@@ -51,7 +51,12 @@
     <x-wui-modal name="cardModal" align='center' max-width='xl' persistent>
         <x-wui-card>
             <form wire:submit="submit" x-data="{ open: false }">
-
+           {{-- Be a Tutee --}}
+            @if (request()->path() == 'be-a-tutee')
+                <h2 class="text-lg font-medium text-gray-900">
+                    You are now a tutee
+                </h2>
+            @else
                 <h2 class="text-lg font-medium text-gray-900">
                     TUTEE Platform - Terms and Conditions
                 </h2>
@@ -89,6 +94,7 @@
                         </div>
                     </div>
                 </div>
+            @endif
 
                 <div>
 
