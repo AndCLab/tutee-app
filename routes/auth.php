@@ -18,7 +18,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.reset');
 });
 
-Route::middleware('auth', 'check.is_stepper')->group(function () {
+Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
     Volt::route('verify-email', 'pages.auth.verify-email')
         ->name('verification.notice');
 

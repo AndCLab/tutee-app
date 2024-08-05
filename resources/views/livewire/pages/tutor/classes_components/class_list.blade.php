@@ -14,7 +14,6 @@ use App\Models\Registration;
 use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
-
     use Actions;
 
     // class properties
@@ -63,13 +62,15 @@ new #[Layout('layouts.app')] class extends Component {
         // default value: descending
         $this->sort_by = 'desc';
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-                                    ->get();
         $this->pendingClasses = Classes::where('class_status', 1)
-                                    ->orderBy('created_at', $this->sort_by)
-                                    ->get();
+            ->orderBy('created_at', $this->sort_by)
+            ->get();
 
-        $this->getFields = Fields::where('user_id', Auth::id())->get(['field_name'])->toArray();
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+
+        $this->getFields = Fields::where('user_id', Auth::id())
+            ->get(['field_name'])
+            ->toArray();
 
         // default
         $this->classFilter = 'pending';
@@ -81,14 +82,16 @@ new #[Layout('layouts.app')] class extends Component {
     #[On('new-class')]
     public function updateList($isNotEmpty)
     {
-        $this->isEmptyPending = $isNotEmpty;
-        $this->isEmptyAll = $isNotEmpty;
+        if ($this->isEmptyPending != $isNotEmpty || $this->isEmptyAll != $isNotEmpty) {
+            $this->isEmptyPending = $isNotEmpty;
+            $this->isEmptyAll = $isNotEmpty;
+        }
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-                                    ->get();
         $this->pendingClasses = Classes::where('class_status', 1)
-                                    ->orderBy('created_at', $this->sort_by)
-                                    ->get();
+            ->orderBy('created_at', $this->sort_by)
+            ->get();
+
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
     }
 
     public function updatedSortBy()
@@ -96,29 +99,24 @@ new #[Layout('layouts.app')] class extends Component {
         $sortOrder = in_array($this->sort_by, ['asc', 'desc']) ? $this->sort_by : 'asc';
 
         if ($this->classFilter === 'all') {
-            $this->allClasses = Classes::orderBy('created_at', $sortOrder)
-                                        ->get();
+            $this->allClasses = Classes::orderBy('created_at', $sortOrder)->get();
         } elseif ($this->classFilter === 'pending') {
-            $this->pendingClasses = Classes::where('class_status', 1)
-                                        ->orderBy('created_at', $sortOrder)
-                                        ->get();
+            $this->pendingClasses = Classes::where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
         }
-
     }
 
     public function viewAll()
     {
         $this->classFilter = 'all';
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)
-        ->get();
+        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
     }
 
     public function viewPending()
     {
         $this->classFilter = 'pending';
         $this->pendingClasses = Classes::where('class_status', 1)
-                                        ->orderBy('created_at', $this->sort_by)
-                                        ->get();
+            ->orderBy('created_at', $this->sort_by)
+            ->get();
     }
 
     public function updatedSearchAll()
@@ -134,8 +132,7 @@ new #[Layout('layouts.app')] class extends Component {
     protected function searchClasses(string $filter, string $searchTerm)
     {
         if (($filter === 'all' && !$this->isEmptyAll) || ($filter === 'pending' && !$this->isEmptyPending)) {
-            $query = Classes::orderBy('created_at', $this->sort_by)
-                            ->where('class_name', 'like', '%' . $searchTerm . '%');
+            $query = Classes::orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
 
             if ($filter === 'pending') {
                 $query->where('class_status', 1);
@@ -153,109 +150,127 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
-    // action buttons
-    public function Validation()
+    public function editClass()
     {
-        $this->validate([
+        // Fetch the class to be edited
+        $class = Classes::find($this->editClassId);
+
+        // Define validation rules
+        $rules = [
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
-            'class_students' => ['required', 'integer', 'min:2', 'max:50'],
             'class_fields' => ['required'],
             'sched_start_date' => ['required', 'date'],
             'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
-            'class_location' => ['string', 'max:255'],
-            'class_link' => ['string', 'max:255'],
-        ]);
-    }
+            'class_location' => ['nullable', 'string', 'max:255'],
+            'class_link' => ['nullable', 'string', 'max:255'],
+        ];
 
-    public function editClass()
-    {
-        $edit = Classes::find($this->editClassId);
-
-        $this->Validation();
-
-        $edit->class_name = $this->class_name;
-        $edit->class_description = $this->class_description;
-        $edit->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
-
-
-        if ($edit->class_students) {
-            $edit->class_students =$this->class_students;
+        // Add conditional validation rules
+        if ($class->class_category == 'group' && $class->registration) {
+            $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
+            $rules['regi_start_date'] = ['required', 'date'];
+            $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
+            $rules['sched_start_date'] = ['required', 'date', 'after:regi_end_date'];
+            $rules['sched_end_date'] = ['required', 'date', 'after:sched_start_date'];
         }
 
-        if ($this->class_location && $this->class_link) {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
+        // Validate inputs
+        $this->validate($rules);
 
+        // Get current fields
+        $currentFields = json_decode($class->class_fields);
+
+        // Update class details
+        $class->class_name = $this->class_name;
+        $class->class_description = $this->class_description;
+        $class->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
+        $class->class_students = $this->class_students;
+        $class->class_fee = $this->class_fee;
+
+        // Determine class type
+        if ($this->class_location && $this->class_link) {
+            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
             return;
-        } else if ($this->class_link) {
+        } elseif ($this->class_link) {
             $this->class_type = 'virtual';
             $this->class_location = $this->class_link;
-        } else if ($this->class_location) {
+        } elseif ($this->class_location) {
             $this->class_type = 'physical';
         } else {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
-
+            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
             return;
         }
 
-        if ($edit->schedule) {
-            $edit->schedule->start_date = $this->sched_start_date;
-            $edit->schedule->end_date = $this->sched_end_date;
-            $edit->schedule->save();
+        // Update schedule
+        if ($class->schedule) {
+            $class->schedule->start_date = $this->sched_start_date;
+            $class->schedule->end_date = $this->sched_end_date;
+            $class->schedule->save();
         }
 
-        if ($edit->class_category == 'group' && $edit->registration) {
-            $edit->registration->start_date = $this->regi_start_date;
-            $edit->registration->end_date = $this->regi_end_date;
-            $edit->registration->save();
+        // Update registration dates if applicable
+        if ($class->class_category == 'group' && $class->registration) {
+            $class->registration->start_date = $this->regi_start_date;
+            $class->registration->end_date = $this->regi_end_date;
+            $class->registration->save();
         }
 
-        $edit->class_fee = $this->class_fee;
+        $newFields = json_decode($class->class_fields);
 
-        $edit->save();
+        // Decrement if current fields are not in the new fields
+        foreach ($currentFields as $currentField) {
+            $fields = Fields::where('user_id', Auth::id())->where('field_name', $currentField)->get();
 
-        $this->reset(
-            'class_name',
-            'class_description',
-            'class_fields',
-            'sched_start_date',
-            'sched_end_date',
-            'class_location',
-            'class_students',
-            'class_fee',
-            'class_link',
-        );
+            if (!in_array($currentField, $newFields)) {
+                foreach ($fields as $field) {
+                    $field->class_count--;
+                    $field->save();
+                }
+            }
+        }
 
-        $this->notification([
-            'title'       => 'Fresh Class!',
-            'description' => 'Successfully updated!',
-            'icon'        => 'success',
-            'timeout'     => 2500,
-        ]);
+        // Increment if new fields are not in the current fields
+        foreach ($newFields as $newField) {
+            $fields = Fields::where('user_id', Auth::id())->where('field_name', $newField)->get();
 
+            if (!in_array($newField, $currentFields)) {
+                foreach ($fields as $field) {
+                    $field->class_count++;
+                    $field->save();
+                }
+            }
+        }
+
+        // Save the class
+        $class->save();
+
+        // Reset input fields
+        $this->reset(['class_name', 'class_description', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date', 'class_location', 'class_students', 'class_fee', 'class_link']);
+
+        // Notify user of success
+        $this->sendNotification('Updated Class!', 'Successfully updated!', 'success');
+
+        // Close the modal and dispatch event
         $this->showEditClassModal = false;
-
         $this->dispatch('new-class', isNotEmpty: 0);
+    }
+
+    // Helper method for notifications
+    private function sendNotification($title, $description, $icon, $timeout = 2500)
+    {
+        $this->notification([
+            'title' => $title,
+            'description' => $description,
+            'icon' => $icon,
+            'timeout' => $timeout,
+        ]);
     }
 
     public function resetModalState()
     {
-        $this->reset([
-            'showEditClassModal', 'editClassId', 'class_name', 'class_description',
-            'class_type', 'class_category', 'class_link', 'class_students', 'class_location',
-            'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date',
-            'regi_start_date', 'regi_end_date'
-        ]);
+        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
+        $this->resetValidation();
     }
 
     public function editClassModal($editClass)
@@ -263,38 +278,37 @@ new #[Layout('layouts.app')] class extends Component {
         $this->showEditClassModal = true;
         $this->editClassId = $editClass;
 
-        $edit = Classes::find($editClass);
+        $class = Classes::find($editClass);
 
-        $this->class_name = $edit->class_name;
-        $this->class_description = $edit->class_description;
-        $this->class_type = $edit->class_type;
-        $this->class_category = $edit->class_category;
+        $this->class_name = $class->class_name;
+        $this->class_description = $class->class_description;
+        $this->class_type = $class->class_type;
+        $this->class_category = $class->class_category;
 
-        if ($edit->class_students) {
-            $this->class_students = $edit->class_students;
+        if ($class->class_students) {
+            $this->class_students = $class->class_students;
         }
 
-        if ($edit->class_type == 'virtual') {
-            $this->class_link = $edit->class_location;
-        } elseif ($edit->class_type == 'physical') {
-            $this->class_location = $edit->class_location;
+        if ($class->class_type == 'virtual') {
+            $this->class_link = $class->class_location;
+        } elseif ($class->class_type == 'physical') {
+            $this->class_location = $class->class_location;
         }
 
-        $this->class_fee = $edit->class_fee;
-        $this->class_fields = json_decode($edit->class_fields, true); //fields setter
+        $this->class_fee = $class->class_fee;
+        $this->class_fields = json_decode($class->class_fields, true); //fields setter
 
         // for class schedule date
-        if ($edit->schedule) {
-            $this->sched_start_date = $edit->schedule->start_date;
-            $this->sched_end_date = $edit->schedule->end_date;
+        if ($class->schedule) {
+            $this->sched_start_date = $class->schedule->start_date;
+            $this->sched_end_date = $class->schedule->end_date;
         }
 
         // for registration date
-        if ($edit->class_category == 'group' && $edit->registration !== null) {
-            $this->regi_start_date = $edit->registration->start_date;
-            $this->regi_end_date = $edit->registration->end_date;
+        if ($class->class_category == 'group' && $class->registration !== null) {
+            $this->regi_start_date = $class->registration->start_date;
+            $this->regi_end_date = $class->registration->end_date;
         }
-
     }
 
     // delete class
@@ -303,6 +317,17 @@ new #[Layout('layouts.app')] class extends Component {
         $class = Classes::find($this->editClassId);
         $sched = $class->schedule;
         $regi = $class->registration;
+
+        $currentFields = json_decode($class->class_fields);
+
+        foreach ($currentFields as $classField) {
+            $fields = Fields::where('user_id', Auth::id())->where('field_name', $classField)->get();
+
+            foreach ($fields as $field) {
+                $field->class_count = $field->class_count - 1;
+                $field->save();
+            }
+        }
 
         if ($sched) {
             $sched->delete();
@@ -313,10 +338,10 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         $this->notification([
-            'title'       => 'Removed',
+            'title' => 'Removed',
             'description' => 'Successfully remove class',
-            'icon'        => 'success',
-            'timeout'     => 2500,
+            'icon' => 'success',
+            'timeout' => 2500,
         ]);
 
         $this->showWithdrawClassModal = false;
@@ -328,11 +353,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->showWithdrawClassModal = true;
         $this->editClassId = $classId;
     }
-
 }; ?>
 
 @php
-    $classes = ($classFilter == 'all') ? $allClasses : $pendingClasses;
+    $classes = $classFilter == 'all' ? $allClasses : $pendingClasses;
 @endphp
 
 <section>
@@ -349,7 +373,8 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         @else
             <div class="w-full">
-                <x-wui-input wire:model.live='searchPending' placeholder='Search pending class...' icon='search' shadowless />
+                <x-wui-input wire:model.live='searchPending' placeholder='Search pending class...' icon='search'
+                    shadowless />
             </div>
         @endif
         <div class="w-fit">
@@ -386,15 +411,19 @@ new #[Layout('layouts.app')] class extends Component {
                             <x-wui-dropdown>
                                 <x-wui-dropdown.header class="font-semibold" label="Actions">
                                     @if ($class->class_status == 1)
-                                        <x-wui-dropdown.item wire:click='editClassModal({{ $class->id }})' icon='pencil-alt' label="Edit" />
-                                        <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})' icon='trash' label="Withdraw" />
+                                        <x-wui-dropdown.item wire:click='editClassModal({{ $class->id }})'
+                                            icon='pencil-alt' label="Edit" />
+                                        <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})'
+                                            icon='trash' label="Withdraw" />
                                     @endif
                                 </x-wui-dropdown.header>
                             </x-wui-dropdown>
                         </div>
                         <div class="flex gap-2 items-center text-[#64748B] text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <p>Created at {{ Carbon::create($class['created_at'])->format('l jS \\of F Y h:i A') }}</p>
                         </div>
@@ -417,7 +446,7 @@ new #[Layout('layouts.app')] class extends Component {
                             </p>
                             <p>
                                 Class Fee:
-                                @if ($class->class_fee == 0.00)
+                                @if ($class->class_fee == 0.0)
                                     Free Class
                                 @else
                                     {{ number_format($class->class_fee, 2) }}
@@ -442,16 +471,19 @@ new #[Layout('layouts.app')] class extends Component {
                                 Class Location: {{ $class->class_location }}
                             </p>
                             <p>
-                                Starts at {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
+                                Starts at
+                                {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
                             </p>
                         </div>
 
                         <div class="flex justify-end">
                             <template x-if='expanded == false' x-transition>
-                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down' flat />
+                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down'
+                                    flat />
                             </template>
                             <template x-if='expanded == true' x-transition>
-                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-up' flat />
+                                <x-wui-button @click="expanded = ! expanded" xs label='View less' icon='arrow-up'
+                                    flat />
                             </template>
                         </div>
                     </div>
@@ -479,7 +511,7 @@ new #[Layout('layouts.app')] class extends Component {
         @endif
     </div>
 
-    <x-wui-modal wire:model="showEditClassModal" persistent>
+    <x-wui-modal wire:model.live="showEditClassModal" persistent>
         <x-wui-card title="Edit Class">
             @include('livewire.pages.tutor.classes_components.edit_class')
         </x-wui-card>
@@ -490,9 +522,7 @@ new #[Layout('layouts.app')] class extends Component {
             <p class="text-gray-600">
                 Do you wanna remove this class?
                 <span class="font-semibold">
-                    {{
-                        Classes::where('id', $editClassId)->pluck('class_name')->first();
-                    }}
+                    {{ Classes::where('id', $editClassId)->pluck('class_name')->first() }}
                 </span>
             </p>
 

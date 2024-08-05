@@ -22,17 +22,15 @@ new #[Layout('layouts.guest')] class extends Component {
         Session::regenerate();
 
         if (Auth::check()) {
-            $role = Auth::user()->user_type;
-            $routes = [
-                'tutee' => route('tutee.discover', [], false),
-                'tutor' => route('tutor.discover', [], false),
-            ];
+            $user = Auth::user();
 
-            if (array_key_exists($role, $routes)) {
-                $this->redirectIntended(default: $routes[$role], navigate: true);
-            } else if (Auth::user()->is_stepper === 1) {
-                $this->redirectIntended(default: route('stepper'), navigate: true);
+            if ($user->is_stepper == 1) {
+                $route = 'stepper';
+            } else {
+                $route = $user->user_type == 'tutee' ? 'tutee.discover' : 'tutor.discover';
             }
+
+            $this->redirectIntended(route($route), navigate: true);
         }
 
 
@@ -52,13 +50,13 @@ new #[Layout('layouts.guest')] class extends Component {
             <!-- Email Address -->
             <div>
                 <x-wui-input label="Email" placeholder="Enter your email"
-                    wire:model="form.email" autocomplete='username'/>
+                    wire:model="form.email" autocomplete='username' shadowless/>
             </div>
 
             <!-- Password -->
             <div>
                 <x-wui-inputs.password placeholder='Enter your password' wire:model="form.password" label="Password"
-                    autocomplete="current-password" />
+                    autocomplete="current-password" shadowless/>
             </div>
 
             {{-- <x-wui-button type='submit' spinner='login' class="ring-[#0C3B2E] text-white bg-[#0C3B2E] hover:bg-[#0C3B2E] hover:ring-[#0C3B2E]" label='Login' /> --}}

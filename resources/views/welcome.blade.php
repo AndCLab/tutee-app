@@ -16,6 +16,11 @@
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     </head>
+    @php
+        if (Auth::check()) {
+            $route = Auth::user()->user_type == 'tutee' ? 'tutee.discover' : 'tutor.discover';
+        }
+    @endphp
     <body class="relative antialiased font-inter soft-scrollbar bg-white md:bg-[#F3F5F4]">
         {{-- Navigation --}}
         <nav class="sticky top-0 z-10 bg-background/95 backdrop-blur">
@@ -51,7 +56,7 @@
                     <span data-aos="fade-right" data-aos-duration="500" class="text-[#64748B] text-center md:text-start md:w-4/5">Enhance Learning and Efficiency with Our All-in-One Tutoring Platform.</span>
 
                     @auth
-                        <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ url('/dashboard') }}" class="sm:w-fit w-full text-center">
+                        <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ route($route) }}" class="sm:w-fit w-full text-center">
                             Dashboard
                         </x-primary-button>
                     @else

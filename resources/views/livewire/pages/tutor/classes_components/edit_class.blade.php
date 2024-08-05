@@ -5,7 +5,7 @@
             {{-- class registration --}}
             @if ($class_category == 'group')
                 <div class="grid grid-cols-2 gap-4">
-                    @if ($regi_start_date != null && $regi_end_date != null)
+                    @if ($showEditClassModal)
                         <x-wui-datetime-picker
                             label="Registration Start"
                             placeholder="January 1, 2000"
@@ -30,7 +30,7 @@
 
             {{-- class schedule --}}
             <div class="grid grid-cols-2 gap-4">
-                @if ($sched_start_date && $sched_end_date)
+                @if ($showEditClassModal)
                     <x-wui-datetime-picker
                         label="Schedule Start"
                         placeholder="January 1, 2000"

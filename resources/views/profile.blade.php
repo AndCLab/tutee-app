@@ -100,4 +100,7 @@
             </div>
         </div>
     </div>
+
+    <x-wui-notifications position="bottom-right" />
+
 </x-app-layout>
