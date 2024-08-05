@@ -14,6 +14,8 @@ new class extends Component
     public string $fname = '';
     public string $lname = '';
     public string $email = '';
+    public string $address = '';
+    public string $zip_code = '';
     public string $phone_prefix = '';
     public string $phone_number = '';
     public string $tempPhoneStorage = '';
@@ -41,6 +43,8 @@ new class extends Component
             'fname' => ['required'],
             'lname' => ['required'],
             'email' => ['required'],
+            'address' => ['required', 'string', 'max:255'],
+            'zip_code' => ['required', 'numeric'],
             'phone_prefix' => ['required'],
             'phone_number' => ['required'],
         ], [
@@ -58,6 +62,8 @@ new class extends Component
                 'fname' => ['string', 'max:255'],
                 'lname' => ['string', 'max:255'],
                 'email' => ['string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'address' => ['string', 'max:255'],
+                'zip_code' => ['string'],
                 'phone_prefix' => ['string'],
                 'phone_number' => ['string', 'phone'],
             ]);
@@ -160,6 +166,31 @@ new class extends Component
                     @endif
                 </div>
             @endif
+        </div>
+
+        <!-- Address -->
+        <div>
+            <x-wui-input
+                label="Address"
+                placeholder="Address"
+                wire:model="address"
+                autocomplete='address'
+                hint='Update your address'
+                errorless
+            />
+        </div>
+
+        <!-- Zip Code -->
+        <div>
+            <x-wui-inputs.maskable
+                label="Zip Code"
+                placeholder="1234"
+                mask="#####"
+                wire:model="zip_code"
+                autocomplete='postal-code'
+                hint='Update your zip code'
+                errorless
+            />
         </div>
 
         <!-- Phone Number -->
