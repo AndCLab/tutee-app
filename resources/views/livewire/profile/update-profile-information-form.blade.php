@@ -28,6 +28,8 @@ new class extends Component
         $this->fname = Auth::user()->fname;
         $this->lname = Auth::user()->lname;
         $this->email = Auth::user()->email;
+        $this->address = Auth::user()->address;
+        $this->zip_code = Auth::user()->zip_code;
         $this->phone_prefix = Auth::user()->phone_prefix;
         $this->phone_number = Auth::user()->phone_number;
     }
