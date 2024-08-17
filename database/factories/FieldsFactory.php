@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Fields;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Fields>
@@ -61,12 +62,38 @@ class FieldsFactory extends Factory
             'Veterinary Medicine',
             'Marine Biology',
             'Astronomy',
-            'Astronautics'
+            'Astronautics',
+            'Robotics',
+            'Artificial Intelligence',
+            'Data Science',
+            'Cybersecurity',
+            'Genetics',
+            'Environmental Engineering',
+            'Urban Planning',
+            'Agriculture',
+            'Forestry',
+            'Meteorology',
+            'Linguistics',
+            'Film Studies',
+            'Graphic Design',
+            'Interior Design',
+            'Fashion Design',
+            'Sports Science',
+            'Biomedical Engineering',
+            'Materials Science',
+            'Oceanography',
+            'Quantum Physics',
+            'Microbiology',
+            'Zoology',
+            'Ecology',
+            'Public Administration',
+            'Supply Chain Management',
+            'Hospitality Management',
+            'Tourism Studies'
         ];
 
-
         return [
-            'user_id' => $this->faker->numberBetween(1, 3),
+            'user_id' => $this->faker->numberBetween(1, 50),
             'field_name' => $this->faker->randomElement($fields)
         ];
     }

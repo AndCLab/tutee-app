@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'fname' => 'Test',
             'lname' => 'User',
-            'lname' => 'User',
+            'is_stepper' => 1,
+            'user_type' => null,
             'email' => 'test@example.com',
             'address' => 'address',
             'zip_code' => '6015',
@@ -50,8 +51,9 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '9576238479',
         ]);
 
+        $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
-        $this->call(TutorSeeder::class);
-        $this->call(TuteeSeeder::class);
+        // $this->call(TutorSeeder::class);
+        // $this->call(TuteeSeeder::class);
     }
 }
