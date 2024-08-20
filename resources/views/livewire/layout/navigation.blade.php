@@ -2,9 +2,11 @@
 
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
+use App\Models\Tutor;
 
 new class extends Component {
     public string $role = '';
+    public bool $is_applied = false;
 
     public function mount()
     {
@@ -27,6 +29,19 @@ new class extends Component {
             $user->save();
 
             $this->redirectIntended(default: route('tutee.discover', absolute: false), navigate: true);
+        }
+    }
+
+    public function beATutee(){
+        $user = Auth::user();
+        if($this->role == 'tutor'){
+            $tutor = Tutor::where('user_id', Auth::id())->first();
+            $tutor->is_applied = 1;
+            $tutor->save();
+
+            $user->user_type = 'tutee';
+            $user->save();
+            return redirect()->route('stepper.be-a-tutee');
         }
     }
 
@@ -58,16 +73,16 @@ new class extends Component {
             <div></div>
             <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6">
                 {{-- Tutor Role --}}
-                @if ($role == 'tutor' && 'is_applied'== 0) {{-- Tutor and not Tutee --}}
+                @if ($role == 'tutor' && !$is_applied) {{-- Tutor and not Tutee --}}
                     {{-- Be a Tutee --}}
                     <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical' spinner='beATutee' label='Be a Tutee' />
                     @include('livewire.layout.topnav_tutor.menu')
-                @elseif ($role == 'tutor' && 'is_applied'== 1) {{-- Tutor and applied as Tutee --}}
+                @elseif ($role == 'tutee' && "$is_applied == 1") {{-- Tutor and applied as Tutee --}}
                     {{-- Switch to Tutor --}}
                     <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='Switch to Tutor' />
                     @include('livewire.layout.topnav_tutee.menu')
                 @endif
-                
+
                 {{-- Switch role testing purposes
                 <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='switch role testing kay kapuy logout :)' />
                 --}}
