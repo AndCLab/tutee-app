@@ -45,8 +45,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
-        $this->getFields = Fields::where('user_id', Auth::id())->get(['field_name'])->toArray();
-        $this->fields = [''];
+        $this->getFields = Fields::where('user_id', Auth::id())
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])->toArray();
     }
 
     public function updatedSchedEndDate()
@@ -123,8 +124,11 @@ new #[Layout('layouts.app')] class extends Component {
             'schedule_id' => $schedule->id
         ]);
 
+
+        // find the chosen fields and increment the class_count each of them fields.
         foreach ($this->class_fields as $value) {
             $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
                             ->where('field_name', $value)
                             ->get();
 
@@ -237,6 +241,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         foreach ($this->class_fields as $value) {
             $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
                             ->where('field_name', $value)
                             ->get();
 
@@ -338,6 +343,9 @@ new #[Layout('layouts.app')] class extends Component {
                     parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    interval="30"
+                    min-time="08:00"
+                    max-time="21:40"
                     shadowless
                 />
                 <x-wui-datetime-picker
@@ -347,6 +355,9 @@ new #[Layout('layouts.app')] class extends Component {
                     parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    interval="30"
+                    min-time="08:00"
+                    max-time="21:40"
                     shadowless
                 />
             </div>
@@ -369,6 +380,9 @@ new #[Layout('layouts.app')] class extends Component {
                     parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    interval="30"
+                    min-time="08:00"
+                    max-time="21:40"
                     shadowless
                 />
                 <x-wui-datetime-picker
@@ -378,6 +392,9 @@ new #[Layout('layouts.app')] class extends Component {
                     parse-format="YYYY-MM-DD HH:mm"
                     display-format='dddd, MMMM D, YYYY h:mm A'
                     :min="now()"
+                    interval="30"
+                    min-time="08:00"
+                    max-time="21:40"
                     shadowless
                 />
             </div>

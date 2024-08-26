@@ -11,10 +11,15 @@ class Tutor extends Model
 
     protected $table = 'tutor';
 
-    protected $fillable = ['user_id', 'work'];
+    protected $fillable = ['user_id', 'bio', 'work'];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function classes()
+    {
+        return $this->hasMany(Classes::class);
     }
 }

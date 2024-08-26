@@ -23,6 +23,7 @@ class TutorFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'bio' => $this->faker->sentences(),
             'work' => $this->faker->word(),
         ];
     }

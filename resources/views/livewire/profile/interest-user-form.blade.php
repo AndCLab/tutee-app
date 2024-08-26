@@ -16,7 +16,9 @@ new class extends Component {
 
     public function mount()
     {
-        $this->fields = Fields::where('user_id', Auth::id())->get();
+        $this->fields = Fields::where('user_id', Auth::id())
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get();
         $this->interests = $this->fields->toArray();
         $this->i = count($this->interests);
     }
@@ -44,6 +46,7 @@ new class extends Component {
             Fields::create([
                 'user_id' => Auth::id(),
                 'field_name' => $this->input,
+                'active_in' => Auth::user()->user_type,
                 'class_count' => 0,
             ]);
 
@@ -75,6 +78,7 @@ new class extends Component {
 
         if (count($this->interests) > 3) {
             $check_field = Fields::where('user_id', Auth::id())
+                                  ->where('active_in', Auth::user()->user_type)
                                   ->where('field_name', $field['field_name'])->get();
 
             foreach ($check_field as $value) {
@@ -128,11 +132,13 @@ new class extends Component {
         <p class="mt-1 mb-1 text-xs text-gray-600">
             {{ __('Add any additional fields you want to explore or learn more about in detail.') }}
         </p>
-        <div class="inline-flex items-center">
-            <p class="mt-1 text-xs text-gray-900 italic">Note that interests are highlighted
-                <span class="text-indigo-500 font-semibold not-italic ">indigo</span>
-                if they are used in your class creation</p>
-        </div>
+        @if (Auth::user()->user_type === 'tutor')
+            <div class="inline-flex items-center">
+                <p class="mt-1 text-xs text-gray-900 italic">Note that interests are highlighted
+                    <span class="text-indigo-500 font-semibold not-italic ">indigo</span>
+                    if they are used in your class creation</p>
+            </div>
+        @endif
     </header>
 
     <div class="flex flex-wrap gap-2 my-5">

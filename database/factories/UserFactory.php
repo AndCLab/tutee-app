@@ -54,6 +54,7 @@ class UserFactory extends Factory
             } elseif ($user->user_type == 'tutor') {
                 $user->tutors()->create([
                     'user_id' => $user->id,
+                    'bio' => fake()->paragraph(2),
                     'work' => fake()->word(),
                 ]);
             }

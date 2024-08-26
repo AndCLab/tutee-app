@@ -16,6 +16,9 @@ use App\Models\Fields;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    // get auth tutor
+    public $tutor;
+
     // class properties
     public string $class_name = '';
     public string $class_description = '';
@@ -61,16 +64,19 @@ new #[Layout('layouts.app')] class extends Component {
     {
         // default value: descending
         $this->sort_by = 'desc';
+        $this->tutor = Tutor::where('user_id', Auth::id())->first();
 
-        $this->pendingClasses = Classes::where('class_status', 1)
+        $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
+            ->where('class_status', 1)
             ->orderBy('created_at', $this->sort_by)
             ->get();
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->get();
 
         $this->getFields = Fields::where('user_id', Auth::id())
-            ->get(['field_name'])
-            ->toArray();
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
 
         // default
         $this->classFilter = 'pending';
@@ -87,11 +93,12 @@ new #[Layout('layouts.app')] class extends Component {
             $this->isEmptyAll = $isNotEmpty;
         }
 
-        $this->pendingClasses = Classes::where('class_status', 1)
+        $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
+            ->where('class_status', 1)
             ->orderBy('created_at', $this->sort_by)
             ->get();
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->get();
     }
 
     public function updatedSortBy()
@@ -99,22 +106,22 @@ new #[Layout('layouts.app')] class extends Component {
         $sortOrder = in_array($this->sort_by, ['asc', 'desc']) ? $this->sort_by : 'asc';
 
         if ($this->classFilter === 'all') {
-            $this->allClasses = Classes::orderBy('created_at', $sortOrder)->get();
+            $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $sortOrder)->get();
         } elseif ($this->classFilter === 'pending') {
-            $this->pendingClasses = Classes::where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
+            $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)->where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
         }
     }
 
     public function viewAll()
     {
         $this->classFilter = 'all';
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->get();
     }
 
     public function viewPending()
     {
         $this->classFilter = 'pending';
-        $this->pendingClasses = Classes::where('class_status', 1)
+        $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)->where('class_status', 1)
             ->orderBy('created_at', $this->sort_by)
             ->get();
     }
@@ -132,7 +139,7 @@ new #[Layout('layouts.app')] class extends Component {
     protected function searchClasses(string $filter, string $searchTerm)
     {
         if (($filter === 'all' && !$this->isEmptyAll) || ($filter === 'pending' && !$this->isEmptyPending)) {
-            $query = Classes::orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
+            $query = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
 
             if ($filter === 'pending') {
                 $query->where('class_status', 1);
@@ -220,7 +227,10 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Decrement if current fields are not in the new fields
         foreach ($currentFields as $currentField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $currentField)->get();
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $currentField)
+                            ->get();
 
             if (!in_array($currentField, $newFields)) {
                 foreach ($fields as $field) {
@@ -232,7 +242,10 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Increment if new fields are not in the current fields
         foreach ($newFields as $newField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $newField)->get();
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $newField)
+                            ->get();
 
             if (!in_array($newField, $currentFields)) {
                 foreach ($fields as $field) {
@@ -321,7 +334,10 @@ new #[Layout('layouts.app')] class extends Component {
         $currentFields = json_decode($class->class_fields);
 
         foreach ($currentFields as $classField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $classField)->get();
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $classField)
+                            ->get();
 
             foreach ($fields as $field) {
                 $field->class_count = $field->class_count - 1;
