@@ -247,7 +247,11 @@ new #[Layout('layouts.app')] class extends Component {
                         <div class="space-y-2">
                             @foreach ($fields = Fields::where('user_id', $tutor->user->id)->get() as $index => $item)
                                 @if ($index != 3)
-                                    <x-wui-badge flat slate label="{{ $item->field_name }}" />
+                                    @if (in_array($item->field_name, $class_fields))
+                                        <x-wui-badge flat rose label="{{ $item->field_name }}" />
+                                    @else
+                                        <x-wui-badge flat slate label="{{ $item->field_name }}" />
+                                    @endif
                                 @else
                                     @break
                                 @endif
@@ -329,7 +333,11 @@ new #[Layout('layouts.app')] class extends Component {
                             <h2 class="text-lg font-semibold">{{ $selectedTutor->user->fname }}'s Fields</h2>
 
                             @foreach ($fields = Fields::where('user_id', $selectedTutor->user->id)->get() as $index => $item)
-                                <x-wui-badge flat slate label="{{ $item->field_name }}" />
+                                @if (in_array($item->field_name, $class_fields))
+                                    <x-wui-badge flat rose label="{{ $item->field_name }}" />
+                                @else
+                                    <x-wui-badge flat slate label="{{ $item->field_name }}" />
+                                @endif
                             @endforeach
                         </div>
 

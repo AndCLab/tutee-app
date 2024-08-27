@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Classes;
+use App\Models\Registration;
+use App\Models\Schedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -12,6 +15,7 @@ use App\Models\User;
  */
 class UserFactory extends Factory
 {
+    // 'class_fields' => json_encode(Field::inRandomOrder()->limit(3)->pluck('field_name')->toArray())
     /**
      * The current password being used by the factory.
      */

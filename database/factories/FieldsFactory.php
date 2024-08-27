@@ -41,9 +41,20 @@ class FieldsFactory extends Factory
             'Hospitality Management', 'Tourism Studies'
         ];
 
+        $fieldCount = 3; // Number of unique fields to select
+
+        // ensure we don't exceed the number of available fields
+        $fieldCount = min($fieldCount, count($fields));
+
+        // shuffle the array to ensure randomness
+        shuffle($fields);
+
+        // get the first $fieldCount elements
+        $selectedFields = array_slice($fields, 0, $fieldCount);
+
         return [
             'user_id' => $this->faker->numberBetween(1, 50),
-            'field_name' => $this->faker->randomElement($fields),
+            'field_name' => $this->faker->randomElement($selectedFields),
             'active_in' => $this->faker->randomElement(['tutor', 'tutee'])
         ];
     }

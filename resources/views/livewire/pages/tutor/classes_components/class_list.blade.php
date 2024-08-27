@@ -67,11 +67,13 @@ new #[Layout('layouts.app')] class extends Component {
         $this->tutor = Tutor::where('user_id', Auth::id())->first();
 
         $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
-            ->where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
+                                        ->where('class_status', 1)
+                                        ->orderBy('created_at', $this->sort_by)
+                                        ->get();
 
-        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
 
         $this->getFields = Fields::where('user_id', Auth::id())
                                 ->where('active_in', Auth::user()->user_type)
@@ -81,9 +83,12 @@ new #[Layout('layouts.app')] class extends Component {
         // default
         $this->classFilter = 'pending';
 
+        // boolean for checking if the collection is empty
         $this->isEmptyAll = $this->allClasses->isEmpty();
         $this->isEmptyPending = $this->pendingClasses->isEmpty();
     }
+
+    /* start filter functions */
 
     #[On('new-class')]
     public function updateList($isNotEmpty)
@@ -94,11 +99,13 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
-            ->where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
+                                        ->where('class_status', 1)
+                                        ->orderBy('created_at', $this->sort_by)
+                                        ->get();
 
-        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
     }
 
     public function updatedSortBy()
@@ -106,24 +113,31 @@ new #[Layout('layouts.app')] class extends Component {
         $sortOrder = in_array($this->sort_by, ['asc', 'desc']) ? $this->sort_by : 'asc';
 
         if ($this->classFilter === 'all') {
-            $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $sortOrder)->get();
+            $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                        ->orderBy('created_at', $sortOrder)
+                                        ->get();
         } elseif ($this->classFilter === 'pending') {
-            $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)->where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
+            $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
+                                            ->where('class_status', 1)
+                                            ->orderBy('created_at', $sortOrder)
+                                            ->get();
         }
     }
 
     public function viewAll()
     {
         $this->classFilter = 'all';
-        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
     }
 
     public function viewPending()
     {
         $this->classFilter = 'pending';
         $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)->where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
+                                        ->orderBy('created_at', $this->sort_by)
+                                        ->get();
     }
 
     public function updatedSearchAll()
@@ -139,7 +153,9 @@ new #[Layout('layouts.app')] class extends Component {
     protected function searchClasses(string $filter, string $searchTerm)
     {
         if (($filter === 'all' && !$this->isEmptyAll) || ($filter === 'pending' && !$this->isEmptyPending)) {
-            $query = Classes::where('tutor_id', $this->tutor->id)->orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
+            $query = Classes::where('tutor_id', $this->tutor->id)
+                            ->orderBy('created_at', $this->sort_by)
+                            ->where('class_name', 'like', "%{$searchTerm}%");
 
             if ($filter === 'pending') {
                 $query->where('class_status', 1);
@@ -157,6 +173,27 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
+    /* end filter functions */
+
+    // helper method for notifications
+    private function sendNotification($title, $description, $icon, $timeout = 2500)
+    {
+        $this->notification([
+            'title' => $title,
+            'description' => $description,
+            'icon' => $icon,
+            'timeout' => $timeout,
+        ]);
+    }
+
+    // reset input fields
+    public function resetModalState()
+    {
+        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
+        $this->resetValidation();
+    }
+
+    // edit class
     public function editClass()
     {
         // Fetch the class to be edited
@@ -269,61 +306,6 @@ new #[Layout('layouts.app')] class extends Component {
         $this->dispatch('new-class', isNotEmpty: 0);
     }
 
-    // Helper method for notifications
-    private function sendNotification($title, $description, $icon, $timeout = 2500)
-    {
-        $this->notification([
-            'title' => $title,
-            'description' => $description,
-            'icon' => $icon,
-            'timeout' => $timeout,
-        ]);
-    }
-
-    public function resetModalState()
-    {
-        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
-        $this->resetValidation();
-    }
-
-    public function editClassModal($editClass)
-    {
-        $this->showEditClassModal = true;
-        $this->editClassId = $editClass;
-
-        $class = Classes::find($editClass);
-
-        $this->class_name = $class->class_name;
-        $this->class_description = $class->class_description;
-        $this->class_type = $class->class_type;
-        $this->class_category = $class->class_category;
-
-        if ($class->class_students) {
-            $this->class_students = $class->class_students;
-        }
-
-        if ($class->class_type == 'virtual') {
-            $this->class_link = $class->class_location;
-        } elseif ($class->class_type == 'physical') {
-            $this->class_location = $class->class_location;
-        }
-
-        $this->class_fee = $class->class_fee;
-        $this->class_fields = json_decode($class->class_fields, true); //fields setter
-
-        // for class schedule date
-        if ($class->schedule) {
-            $this->sched_start_date = $class->schedule->start_date;
-            $this->sched_end_date = $class->schedule->end_date;
-        }
-
-        // for registration date
-        if ($class->class_category == 'group' && $class->registration !== null) {
-            $this->regi_start_date = $class->registration->start_date;
-            $this->regi_end_date = $class->registration->end_date;
-        }
-    }
-
     // delete class
     public function withdrawClass()
     {
@@ -364,6 +346,46 @@ new #[Layout('layouts.app')] class extends Component {
         $this->mount();
     }
 
+    // trigger edit class modal
+    public function editClassModal($editClass)
+    {
+        $this->showEditClassModal = true;
+        $this->editClassId = $editClass;
+
+        $class = Classes::find($editClass);
+
+        $this->class_name = $class->class_name;
+        $this->class_description = $class->class_description;
+        $this->class_type = $class->class_type;
+        $this->class_category = $class->class_category;
+
+        if ($class->class_students) {
+            $this->class_students = $class->class_students;
+        }
+
+        if ($class->class_type == 'virtual') {
+            $this->class_link = $class->class_location;
+        } elseif ($class->class_type == 'physical') {
+            $this->class_location = $class->class_location;
+        }
+
+        $this->class_fee = $class->class_fee;
+        $this->class_fields = json_decode($class->class_fields, true); //fields setter
+
+        // for class schedule date
+        if ($class->schedule) {
+            $this->sched_start_date = $class->schedule->start_date;
+            $this->sched_end_date = $class->schedule->end_date;
+        }
+
+        // for registration date
+        if ($class->class_category == 'group' && $class->registration !== null) {
+            $this->regi_start_date = $class->registration->start_date;
+            $this->regi_end_date = $class->registration->end_date;
+        }
+    }
+
+    // trigger withdraw class modal
     public function withdrawClassModal($classId)
     {
         $this->showWithdrawClassModal = true;
