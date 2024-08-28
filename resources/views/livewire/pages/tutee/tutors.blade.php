@@ -246,14 +246,11 @@ new #[Layout('layouts.app')] class extends Component {
                         {{-- tutor class fields --}}
                         <div class="space-y-2">
                             @foreach ($fields = Fields::where('user_id', $tutor->user->id)->get() as $index => $item)
-                                @if ($index != 3)
-                                    @if (in_array($item->field_name, $class_fields))
-                                        <x-wui-badge flat rose label="{{ $item->field_name }}" />
-                                    @else
-                                        <x-wui-badge flat slate label="{{ $item->field_name }}" />
-                                    @endif
+                                @break ($index === 3)
+                                @if (in_array($item->field_name, $class_fields))
+                                    <x-wui-badge flat rose label="{{ $item->field_name }}" />
                                 @else
-                                    @break
+                                    <x-wui-badge flat slate label="{{ $item->field_name }}" />
                                 @endif
                             @endforeach
                         </div>
@@ -344,53 +341,51 @@ new #[Layout('layouts.app')] class extends Component {
                         {{-- schedule card --}}
                         <div class="space-y-2 mt-4">
                             <h2 class="text-lg font-semibold">{{ $selectedTutor->user->fname }}'s Schedule</h2>
+                            @forelse ($selectedClass as $count => $class)
+                                @break($count === 3)
+                                <div class="flex justify-between items-start gap-4 p-4 rounded border">
 
-                            @if ($selectedClass->isNotEmpty())
-                                @foreach ($selectedClass as $class)
-                                    <div class="flex justify-between items-start gap-4 p-4 rounded border">
+                                    {{-- parent div --}}
+                                        <x-wui-icon name='calendar' class="size-6 text-[#0C3B2E]" solid />
+                                        <div class="space-y-1 w-full">
+                                            {{-- child 1 --}}
+                                            <div class="inline-flex items-center gap-2">
+                                                <p class="text-[#8F8F8F] font-medium">
+                                                    {{ $class->class_name }}
+                                                </p>
+                                                @if ($class->class_category == 'group')
+                                                    <x-wui-badge flat warning
+                                                        label="{{ $class->class_category }}" />
+                                                @else
+                                                    <x-wui-badge flat purple
+                                                        label="{{ $class->class_category }}" />
+                                                @endif
+                                            </div>
 
-                                        {{-- parent div --}}
-                                            <x-wui-icon name='calendar' class="size-6 text-[#0C3B2E]" solid />
-                                            <div class="space-y-1 w-full">
-                                                {{-- child 1 --}}
-                                                <div class="inline-flex items-center gap-2">
-                                                    <p class="text-[#8F8F8F] font-medium">
-                                                        {{ $class->class_name }}
+                                            {{-- child 2 --}}
+                                            <div class="line-clamp-2">
+                                                {{ $class->class_description }}
+                                            </div>
+
+                                            {{-- child 3 --}}
+                                            <div class="flex justify-between items-center">
+                                                <div class="text-[#64748B] inline-flex gap-2 items-center">
+                                                    <x-wui-icon name='calendar' class="size-5" />
+                                                    <p class="font-light text-sm">
+                                                        {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
                                                     </p>
-                                                    @if ($class->class_category == 'group')
-                                                        <x-wui-badge flat warning
-                                                            label="{{ $class->class_category }}" />
-                                                    @else
-                                                        <x-wui-badge flat purple
-                                                            label="{{ $class->class_category }}" />
-                                                    @endif
                                                 </div>
-
-                                                {{-- child 2 --}}
-                                                <div class="line-clamp-2">
-                                                    {{ $class->class_description }}
-                                                </div>
-
-                                                {{-- child 3 --}}
-                                                <div class="flex justify-between items-center">
-                                                    <div class="text-[#64748B] inline-flex gap-2 items-center">
-                                                        <x-wui-icon name='calendar' class="size-5" />
-                                                        <p class="font-light text-sm">
-                                                            {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <x-secondary-button>Join Class</x-secondary-button>
-                                                    </div>
+                                                <div>
+                                                    <x-secondary-button>Join Class</x-secondary-button>
                                                 </div>
                                             </div>
-                                    </div>
-                                @endforeach
-                            @else
+                                        </div>
+                                </div>
+                            @empty
                                 <div class="flex justify-between items-end p-4 rounded border">
                                     No Schedule Yet
                                 </div>
-                            @endif
+                            @endforelse
                         </div>
 
                         {{-- reviews --}}

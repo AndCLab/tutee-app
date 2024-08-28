@@ -21,9 +21,15 @@ class ScheduleFactory extends Factory
 
     public function definition(): array
     {
+        // random start date within the next month
+        $start_date = Carbon::now()->addDays(fake()->numberBetween(1, 30));
+
+        // random end date after the start date, within the next two months
+        $end_date = (clone $start_date)->addDays(fake()->numberBetween(1, 30));
+
         return [
-            'start_date' => Carbon::now()->addMonth(),
-            'end_date' => Carbon::now()->addMonth()->addWeek(),
+            'start_date' => $start_date,
+            'end_date' => $end_date,
         ];
     }
 }
