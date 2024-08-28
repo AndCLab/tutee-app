@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')
                 ->onDelete('cascade');
             $table->string('work');
-            $table->boolean('is_applied')->default(0);
             $table->timestamps();
         });
     }

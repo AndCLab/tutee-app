@@ -33,6 +33,7 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
     Volt::route('stepper/tutee', 'pages.stepper.tutee.main')->name('stepper.tutee');
     Volt::route('stepper/tutor', 'pages.stepper.tutor.main')->name('stepper.tutor');
     Volt::route('stepper/be-a-tutee', 'pages.stepper.tutee.main')->name('stepper.be-a-tutee');
+    Volt::route('stepper/apply-as-tutor', 'pages.stepper.tutor.main')->name('stepper.apply-as-tutor');
 
     // Add tutee routes here
     Route::middleware('checkUserType:tutee')->group(function () {
