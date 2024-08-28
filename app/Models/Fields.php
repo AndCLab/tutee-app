@@ -13,15 +13,10 @@ class Fields extends Model
 
     protected $table = 'fields';
 
-    protected $fillable = ['user_id', 'field_name', 'class_count'];
+    protected $fillable = ['user_id', 'field_name', 'active_in', 'class_count'];
 
-    /**
-     * Get all of the comments for the Fields
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function fields(): HasMany
+    public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

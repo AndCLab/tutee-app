@@ -1,6 +1,8 @@
 <?php
 
 namespace Database\Seeders;
+
+use App\Models\Fields;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,16 +17,23 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         //dummy record for stepper testing
-        User::factory()->create([
-            'fname' => 'Test',
-            'lname' => 'User',
-            'lname' => 'User',
-            'email' => 'test@example.com',
-            'address' => 'address',
-            'zip_code' => '6015',
-            'phone_prefix' => '+63',
-            'phone_number' => '9582938479',
-        ]);
+        // $user = User::factory()->create([
+        //     'fname' => 'Test',
+        //     'lname' => 'User',
+        //     'is_stepper' => 1,
+        //     'user_type' => null,
+        //     'email' => 'test@example.com',
+        //     'address' => 'address',
+        //     'zip_code' => '6015',
+        //     'phone_prefix' => '+63',
+        //     'phone_number' => '9582938479',
+        // ]);
+
+        // Fields::factory()->create([
+        //     'user_id' => $user->id,
+        //     'field_name' => fake()->randomElement($fields),
+        //     'active_in' => $user->user_type
+        // ]);
 
         User::factory()->create([
             'fname' => 'Tutee',
@@ -50,8 +59,10 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '9576238479',
         ]);
 
+        $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
-        $this->call(TutorSeeder::class);
-        $this->call(TuteeSeeder::class);
+        $this->call(ClassesSeeder::class);
+        // $this->call(TutorSeeder::class);
+        // $this->call(TuteeSeeder::class);
     }
 }

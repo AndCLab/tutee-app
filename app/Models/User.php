@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tutee::class);
     }
+
+    public function fields()
+    {
+        return $this->hasMany(Fields::class);
+    }
 }

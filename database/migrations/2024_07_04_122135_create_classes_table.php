@@ -34,7 +34,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
-                $table->foreignId('registration_id')
+            $table->foreignId('registration_id')
                 ->nullable()
                 ->constrained('registrations')
                 ->onUpdate('cascade')

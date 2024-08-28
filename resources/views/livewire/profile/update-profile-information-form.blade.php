@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Tutor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
@@ -11,8 +12,10 @@ new class extends Component
 {
     use Actions;
 
+    public $tutor;
     public string $fname = '';
     public string $lname = '';
+    public string $bio = '';
     public string $email = '';
     public string $address = '';
     public string $zip_code = '';
@@ -25,6 +28,13 @@ new class extends Component
      */
     public function mount(): void
     {
+        if (Auth::user()->user_type === 'tutor') {
+            $this->tutor = Tutor::where('user_id', Auth::id())->first();
+            if ($this->tutor && $this->tutor->bio != null) {
+                $this->bio = $this->tutor->bio;
+            }
+        }
+
         $this->fname = Auth::user()->fname;
         $this->lname = Auth::user()->lname;
         $this->email = Auth::user()->email;
@@ -63,6 +73,7 @@ new class extends Component
             $validated = $this->validate([
                 'fname' => ['string', 'max:255'],
                 'lname' => ['string', 'max:255'],
+                'bio' => ['string', 'max:255'],
                 'email' => ['string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
                 'address' => ['string', 'max:255'],
                 'zip_code' => ['string'],
@@ -78,6 +89,9 @@ new class extends Component
         $this->phone_number = $this->tempPhoneStorage;
 
         $user->fill($validated);
+
+        $this->tutor->bio = $this->bio;
+        $this->tutor->save();
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -136,14 +150,21 @@ new class extends Component
             <x-wui-errors />
         </div>
 
+        {{-- bio --}}
+        @if (Auth::user()->user_type === 'tutor')
+            <div>
+                <x-wui-textarea wire:model='bio' label="Bio" rows='3' class="resize-none soft-scrollbar" placeholder='Update your bio' shadowless/>
+            </div>
+        @endif
+
         <div class="flex flex-col md:flex-row md:items-center gap-2">
             <!-- First Name -->
-            <x-wui-input label="First Name" placeholder="First Name" wire:model="fname" autofocus
-                autocomplete="fname" hint='Update your first name' errorless shadowless/>
+            <x-wui-input label="First Name" placeholder="First Name" wire:model="fname"
+                autocomplete="fname" hint='Update your first name' errorless shadowless autofocus/>
 
             {{-- Last Name --}}
-            <x-wui-input label="Last Name" placeholder="Last Name" wire:model="lname" autofocus
-                autocomplete="lname" hint='Update your last name' errorless shadowless/>
+            <x-wui-input label="Last Name" placeholder="Last Name" wire:model="lname"
+                autocomplete="lname" hint='Update your last name' errorless shadowless autofocus/>
         </div>
 
         <div>

@@ -30,7 +30,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 $route = $user->user_type == 'tutee' ? 'tutee.discover' : 'tutor.discover';
             }
 
-            $this->redirectIntended(route($route), navigate: true);
+            $this->redirect(route($route), navigate: true);
         }
 
 

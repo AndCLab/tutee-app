@@ -16,6 +16,9 @@ use App\Models\Fields;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    // get auth tutor
+    public $tutor;
+
     // class properties
     public string $class_name = '';
     public string $class_description = '';
@@ -61,23 +64,31 @@ new #[Layout('layouts.app')] class extends Component {
     {
         // default value: descending
         $this->sort_by = 'desc';
+        $this->tutor = Tutor::where('user_id', Auth::id())->first();
 
-        $this->pendingClasses = Classes::where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
+        $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
+                                        ->where('class_status', 1)
+                                        ->orderBy('created_at', $this->sort_by)
+                                        ->get();
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
 
         $this->getFields = Fields::where('user_id', Auth::id())
-            ->get(['field_name'])
-            ->toArray();
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
 
         // default
         $this->classFilter = 'pending';
 
+        // boolean for checking if the collection is empty
         $this->isEmptyAll = $this->allClasses->isEmpty();
         $this->isEmptyPending = $this->pendingClasses->isEmpty();
     }
+
+    /* start filter functions */
 
     #[On('new-class')]
     public function updateList($isNotEmpty)
@@ -87,11 +98,14 @@ new #[Layout('layouts.app')] class extends Component {
             $this->isEmptyAll = $isNotEmpty;
         }
 
-        $this->pendingClasses = Classes::where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
+        $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
+                                        ->where('class_status', 1)
+                                        ->orderBy('created_at', $this->sort_by)
+                                        ->get();
 
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
     }
 
     public function updatedSortBy()
@@ -99,24 +113,31 @@ new #[Layout('layouts.app')] class extends Component {
         $sortOrder = in_array($this->sort_by, ['asc', 'desc']) ? $this->sort_by : 'asc';
 
         if ($this->classFilter === 'all') {
-            $this->allClasses = Classes::orderBy('created_at', $sortOrder)->get();
+            $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                        ->orderBy('created_at', $sortOrder)
+                                        ->get();
         } elseif ($this->classFilter === 'pending') {
-            $this->pendingClasses = Classes::where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
+            $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)
+                                            ->where('class_status', 1)
+                                            ->orderBy('created_at', $sortOrder)
+                                            ->get();
         }
     }
 
     public function viewAll()
     {
         $this->classFilter = 'all';
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
+        $this->allClasses = Classes::where('tutor_id', $this->tutor->id)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
     }
 
     public function viewPending()
     {
         $this->classFilter = 'pending';
-        $this->pendingClasses = Classes::where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
+        $this->pendingClasses = Classes::where('tutor_id', $this->tutor->id)->where('class_status', 1)
+                                        ->orderBy('created_at', $this->sort_by)
+                                        ->get();
     }
 
     public function updatedSearchAll()
@@ -132,7 +153,9 @@ new #[Layout('layouts.app')] class extends Component {
     protected function searchClasses(string $filter, string $searchTerm)
     {
         if (($filter === 'all' && !$this->isEmptyAll) || ($filter === 'pending' && !$this->isEmptyPending)) {
-            $query = Classes::orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
+            $query = Classes::where('tutor_id', $this->tutor->id)
+                            ->orderBy('created_at', $this->sort_by)
+                            ->where('class_name', 'like', "%{$searchTerm}%");
 
             if ($filter === 'pending') {
                 $query->where('class_status', 1);
@@ -150,6 +173,27 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
+    /* end filter functions */
+
+    // helper method for notifications
+    private function sendNotification($title, $description, $icon, $timeout = 2500)
+    {
+        $this->notification([
+            'title' => $title,
+            'description' => $description,
+            'icon' => $icon,
+            'timeout' => $timeout,
+        ]);
+    }
+
+    // reset input fields
+    public function resetModalState()
+    {
+        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
+        $this->resetValidation();
+    }
+
+    // edit class
     public function editClass()
     {
         // Fetch the class to be edited
@@ -220,7 +264,10 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Decrement if current fields are not in the new fields
         foreach ($currentFields as $currentField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $currentField)->get();
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $currentField)
+                            ->get();
 
             if (!in_array($currentField, $newFields)) {
                 foreach ($fields as $field) {
@@ -232,7 +279,10 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Increment if new fields are not in the current fields
         foreach ($newFields as $newField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $newField)->get();
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $newField)
+                            ->get();
 
             if (!in_array($newField, $currentFields)) {
                 foreach ($fields as $field) {
@@ -256,23 +306,47 @@ new #[Layout('layouts.app')] class extends Component {
         $this->dispatch('new-class', isNotEmpty: 0);
     }
 
-    // Helper method for notifications
-    private function sendNotification($title, $description, $icon, $timeout = 2500)
+    // delete class
+    public function withdrawClass()
     {
+        $class = Classes::find($this->editClassId);
+        $sched = $class->schedule;
+        $regi = $class->registration;
+
+        $currentFields = json_decode($class->class_fields);
+
+        foreach ($currentFields as $classField) {
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $classField)
+                            ->get();
+
+            foreach ($fields as $field) {
+                $field->class_count = $field->class_count - 1;
+                $field->save();
+            }
+        }
+
+        if ($sched) {
+            $sched->delete();
+        }
+
+        if ($regi) {
+            $regi->delete();
+        }
+
         $this->notification([
-            'title' => $title,
-            'description' => $description,
-            'icon' => $icon,
-            'timeout' => $timeout,
+            'title' => 'Removed',
+            'description' => 'Successfully remove class',
+            'icon' => 'success',
+            'timeout' => 2500,
         ]);
+
+        $this->showWithdrawClassModal = false;
+        $this->mount();
     }
 
-    public function resetModalState()
-    {
-        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
-        $this->resetValidation();
-    }
-
+    // trigger edit class modal
     public function editClassModal($editClass)
     {
         $this->showEditClassModal = true;
@@ -311,43 +385,7 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
-    // delete class
-    public function withdrawClass()
-    {
-        $class = Classes::find($this->editClassId);
-        $sched = $class->schedule;
-        $regi = $class->registration;
-
-        $currentFields = json_decode($class->class_fields);
-
-        foreach ($currentFields as $classField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $classField)->get();
-
-            foreach ($fields as $field) {
-                $field->class_count = $field->class_count - 1;
-                $field->save();
-            }
-        }
-
-        if ($sched) {
-            $sched->delete();
-        }
-
-        if ($regi) {
-            $regi->delete();
-        }
-
-        $this->notification([
-            'title' => 'Removed',
-            'description' => 'Successfully remove class',
-            'icon' => 'success',
-            'timeout' => 2500,
-        ]);
-
-        $this->showWithdrawClassModal = false;
-        $this->mount();
-    }
-
+    // trigger withdraw class modal
     public function withdrawClassModal($classId)
     {
         $this->showWithdrawClassModal = true;
