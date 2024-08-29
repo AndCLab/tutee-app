@@ -183,11 +183,15 @@ new #[Layout('layouts.app')] class extends Component {
     public function submit()
     {
         $user = User::find(Auth::id());
-        $user->user_type = $this->user_type;
+
+        if ($user->user_type == 'tutee') {
+            $user->is_applied = 1;
+        }
+
+        $user->user_type = 'tutor';
         $user->is_stepper = 0;
         $user->save();
 
-        if ($user && $this->user_type === 'tutor') {
             $tutor = Tutor::create([
                 'user_id' => $user->id,
                 'work' => json_encode($this->work),
@@ -213,7 +217,6 @@ new #[Layout('layouts.app')] class extends Component {
             $this->upload_resume($tutor->id);
 
             return redirect()->route('tutor.discover');
-        }
     }
 
     public function logout(Logout $logout): void

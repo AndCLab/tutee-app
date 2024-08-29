@@ -32,19 +32,13 @@ new class extends Component {
     }
 
     public function beATutee(){
-        if($this->role == 'tutor'){
-            $this->user->is_applied = 1;
-            $this->user->user_type = 'tutee';
-            $this->user->save();
+        if($this->user->user_type == 'tutor' && $this->user->is_applied == 0) {
             return redirect()->route('stepper.be-a-tutee');
         }
     }
 
     public function applyAsTutor(){
-        if($this->role == 'tutee'){
-            $this->user->is_applied = 1;
-            $this->user->user_type = 'tutor';
-            $this->user->save();
+        if($this->user->user_type == 'tutee' && $this->user->is_applied == 0) {
             return redirect()->route('stepper.apply-as-tutor');
         }
     }
