@@ -45,7 +45,7 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
         Volt::route('tutor/discover', 'pages.tutor.discover')->name('tutor.discover');
         Volt::route('classes', 'pages.tutor.classes')->name('classes');
         Volt::route('tutor/schedule', 'pages.tutor.schedule.schedule')->name('tutor.schedule');
-        Volt::route('view-students', 'pages.tutor.schedule.view-students')->name('view-students');
+        Volt::route('view-students/{id}', 'pages.tutor.schedule.view-students')->name('view-students');
     });
 
     Route::view('/forbidden-access', 'forbidden-page');
