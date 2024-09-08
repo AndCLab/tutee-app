@@ -2,7 +2,7 @@
 <li x-data="{ tooltip: false }" class="relative">
     <a href="{{ route('tutee.discover') }}" wire:navigate x-on:mouseenter="tooltip = !tooltip"
         x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
-        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#FECE4D] py-2 px-2 rounded-md">
+        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#E4E6E9] py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-layout-dashboard">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -26,7 +26,7 @@
 <li x-data="{ tooltip: false }" class="relative">
     <a href="{{ route('tutors') }}" wire:navigate x-on:mouseenter="tooltip = !tooltip"
         x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
-        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#FECE4D] py-2 px-2 rounded-md">
+        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#E4E6E9] py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-ballpen">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -50,7 +50,7 @@
 <li x-data="{ tooltip: false }" class="relative">
     <a href="{{ route('tutee.schedule') }}" wire:navigate x-on:mouseenter="tooltip = !tooltip"
         x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
-        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#FECE4D] py-2 px-2 rounded-md">
+        class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#E4E6E9] py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
             class="icon icon-tabler icons-tabler-filled icon-tabler-calendar">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />

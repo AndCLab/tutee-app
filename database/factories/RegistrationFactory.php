@@ -21,9 +21,15 @@ class RegistrationFactory extends Factory
 
     public function definition(): array
     {
+        // random start date within the next 1 to 4 weeks
+        $start_date = Carbon::now()->addWeeks(fake()->numberBetween(1, 4));
+
+        // random end date after the start date, within the same week as the start date
+        $end_date = (clone $start_date)->addDays(fake()->numberBetween(1, 6));
+
         return [
-            'start_date' => Carbon::now()->addWeek(),
-            'end_date' => Carbon::now()->addWeek()->addDay(),
+            'start_date' => $start_date,
+            'end_date' => $end_date,
         ];
     }
 }

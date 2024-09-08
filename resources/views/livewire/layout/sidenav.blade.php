@@ -55,12 +55,12 @@ new class extends Component {
 
 --}}
 
-<div class="hidden md:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
+<div class="hidden sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
 
     {{-- sidenav container --}}
     <div @class([
         'flex h-screen flex-col sticky top-0 justify-between border-e ',
-        'bg-[#FFBA00]' => $role == 'tutee',
+        'bg-[#F9F9F9]' => $role == 'tutee',
         'bg-[#0C3B2E]' => $role == 'tutor',
     ])>
         <div class="px-4 py-6">
@@ -100,7 +100,7 @@ new class extends Component {
             <div x-data="{ tooltip: false }" class="relative">
             <a href="{{ route('profile') }}" wire:navigate @class([
                     'flex items-center gap-2 px-2 py-2 rounded-md w-full',
-                    'hover:bg-[#FECE4D]' => $role == 'tutee',
+                    'hover:bg-[#E4E6E9]' => $role == 'tutee',
                     'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
                 ])
                     x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false">
@@ -140,7 +140,7 @@ new class extends Component {
             <div x-data="{ tooltip: false }" class="relative">
                 <button wire:click='logout' :class="expanded ? 'w-fit' : 'w-full'" @class([
                     'inline-flex gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md',
-                    'text-[#0F172A] hover:bg-[#FECE4D]' => $role == 'tutee',
+                    'text-[#0F172A] hover:bg-[#E4E6E9]' => $role == 'tutee',
                     'text-[#D9D9D9] hover:bg-[#F2F2F2]/10' => $role == 'tutor',
                 ])
                     x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = !tooltip">
