@@ -42,6 +42,32 @@
         </div>
     </div>
 
+{{-- Application confirmation modal Class --}}
+    <x-wui-modal name="applicationModal" align='center' max-width='xl' persistent>
+        <x-wui-card>
+            @if (Auth::user()->user_type == 'tutor')
+                <h2 class="text-lg font-medium text-gray-900">
+                    You are applying as Tutee.
+                </h2>
+            @else
+                <h2 class="text-lg font-medium text-gray-900">
+                    You are applying as Tutor.
+                </h2>
+            @endif
+                <div>
+                    <div class="mt-6 flex justify-end">
+                        <x-secondary-button x-on:click='close'>
+                            {{ __('Cancel') }}
+                        </x-secondary-button>
+
+                        <x-primary-button class="ms-3" wire:click="submit" x-bind:disabled="!open">
+                            {{ __('Continue') }}
+                        </x-primary-button>
+                    </div>
+                </div>
+        </x-wui-card>
+    </x-wui-modal>
+
     <div class="my-2 text-pretty text-sm md:text-center">
         <p>By using this website, you agree to our <span class="underline cursor-pointer"
             onclick="$openModal('cardModal')">Terms and Condition</span></p>

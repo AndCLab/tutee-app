@@ -143,15 +143,11 @@ new #[Layout('layouts.app')] class extends Component {
     public function submit()
     {
         $user = User::find(Auth::id());
-
-        if ($user->user_type == 'tutor') {
-            $user->is_applied = 1;
-        }
-
-        $user->user_type = 'tutee';
+        $user->user_type = $this->user_type;
         $user->is_stepper = 0;
         $user->save();
 
+        if ($user && $this->user_type === 'tutee') {
             $tutee = Tutee::create([
                 'user_id' => $user->id,
                 'grade_level' => $this->grade_level,
@@ -174,7 +170,7 @@ new #[Layout('layouts.app')] class extends Component {
             }
 
             return redirect()->route('tutee.discover');
-
+        }
     }
 
     public function logout(Logout $logout): void
