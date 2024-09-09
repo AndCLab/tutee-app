@@ -79,7 +79,13 @@ new class extends Component {
                 'text-[#6D9773]' => $role == 'tutor',
             ]) x-show='!expanded'>tutee</h1>
 
-            <div class="w-full h-[0.063rem] bg-[#0C3B2E]"></div>
+            <div
+                @class([
+                    'w-full h-[0.063rem]',
+                    'bg-[#0C3B2E]' => $role,
+                    'bg-[#6D9773]' => $role
+                ])
+            ></div>
 
             {{-- tutee and tutor list --}}
             <ul @class([
@@ -96,7 +102,7 @@ new class extends Component {
         </div>
 
         {{-- profile and logout --}}
-        <div class="sticky inset-x-0 bottom-0 px-4">
+        <div class="px-4">
             <div x-data="{ tooltip: false }" class="relative">
             <a href="{{ route('profile') }}" wire:navigate @class([
                     'flex items-center gap-2 px-2 py-2 rounded-md w-full',
