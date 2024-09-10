@@ -65,6 +65,17 @@ new #[Layout('layouts.app')] class extends Component {
         if ($this->frequency === 'once') {
             $this->generatedDates[] = $startDate->format('Y-m-d H:i:s');
         } else {
+            $this->validate([
+                // schedules
+                'sched_initial_date' => ['required', 'date'],
+                'start_time' => ['required', 'date_format:H:i'],
+                'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+
+                // recurrence and interval
+                'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
+                'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
+                'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+            ]);
             for ($i = 0; $i < $this->occurrences; $i++) {
                 $this->generatedDates[] = $startDate->copy()->format('Y-m-d H:i:s');
                 $startDate->add($this->interval, $this->interval_unit);
@@ -82,16 +93,6 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fields' => ['required'],
             'class_location' => ['string', 'max:255'],
             'class_link' => ['string', 'max:255'],
-
-            // schedules
-            'sched_initial_date' => ['required', 'date'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-
-            // recurrence and interval
-            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
-            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
-            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
         ]);
     }
 
@@ -222,16 +223,6 @@ new #[Layout('layouts.app')] class extends Component {
             // registration
             'regi_start_date' => ['required', 'date'],
             'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
-
-            // schedules
-            'sched_initial_date' => ['required', 'date', 'after:regi_end_date'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-
-            // recurrence and interval
-            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
-            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
-            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
         ]);
     }
 

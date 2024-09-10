@@ -74,7 +74,7 @@
                             class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
                             x-on:click.prevent="tab='#virtual'"> Virtual Class </a>
                     </li>
-                    <li class="w-full">
+                    <li class="w-full text-center">
                         <a :class="tab !== '#physical' ? '' : 'bg-white'"
                             class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
                             x-on:click.prevent="tab='#physical'"> Physical Class </a>

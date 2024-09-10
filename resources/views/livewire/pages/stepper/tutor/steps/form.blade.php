@@ -13,21 +13,21 @@
             <div @class([
                 'hidden' => count($input_work) === 1,
                 'block' => count($input_work) >= 1
-                ])>
+            ])>
                 <p class="font-medium text-sm pb-3">Work Experience {{ $index + 1 }}</p>
             </div>
             <div class="md:flex md:items-start md:gap-3 space-y-3 md:space-y-0 pb-3">
                     <div class="space-y-3">
                         <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">
                             {{-- From --}}
-                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}" errorless>
+                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}" errorless shadowless>
                                 @foreach ($dates as $year)
                                     <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
                                 @endforeach
                             </x-wui-select>
 
                             {{-- To --}}
-                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}" errorless>
+                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}" errorless shadowless>
                                 @foreach ($dates as $year)
                                     <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
                                 @endforeach
@@ -36,7 +36,7 @@
 
                         {{-- Input Work Experience --}}
                         <x-wui-input class="w-full" id="work.{{ $index }}" name="work.{{ $index }}"
-                            placeholder="Work Experience" wire:model='work.{{ $index }}' errorless/>
+                            placeholder="Work Experience" wire:model='work.{{ $index }}' errorless shadowless/>
                     </div>
                     <div>
                         {{-- Remove Work --}}
@@ -72,7 +72,7 @@
                     <div class="flex gap-x-3 items-center pb-3">
                         <div class="w-full">
                             <x-wui-input wire:model="certificates.{{ $index }}" type="file" accept=".pdf,.png,.jpg,.jpeg"
-                            class="p-0 text-gray-500 font-medium text-sm border-none shadow-none bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-[#0F172A] file:hover:bg-[#0F172A]/90 file:text-white rounded" 
+                            class="p-0 text-gray-500 font-medium text-sm border-none shadow-none bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-[#0F172A] file:hover:bg-[#0F172A]/90 file:text-white rounded"
                             errorless />
                         </div>
                         <div @class([
@@ -151,6 +151,6 @@
     </div>
 
     <x-wui-notifications />
-    
+
     <x-wui-errors />
 </div>

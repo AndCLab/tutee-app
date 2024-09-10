@@ -11,14 +11,21 @@ use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
 
-    public $schedules;
+    public $classes;
 
     public function mount()
     {
         $user = Auth::user();
         $tutor = Tutor::where('user_id', $user->id)->first();
 
-        $this->schedules = Classes::where('tutor_id', $tutor->id)->get();
+        $this->classes = Classes::where('tutor_id', $tutor->id)->get();
+
+        // foreach ($this->classes as $value) {
+        //     foreach ($value->schedule->recurring_schedule as $recurring) {
+        //         dd($recurring->dates);
+        //     }
+        // }
+
     }
 
 
@@ -31,12 +38,12 @@ new #[Layout('layouts.app')] class extends Component {
     <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
 
         <div class="md:grid md:grid-row items-start gap-5 pb-3">
-            <p class="capitalize font-semibold text-xl">Schedules</p>
+            <p class="capitalize font-semibold text-xl">classes</p>
         </div>
 
         {{-- schedule card --}}
         <div class="space-y-2 mt-4">
-            @forelse ($schedules as $count => $class)
+            @forelse ($classes as $count => $class)
                 @break($count === 3)
                 <div class="flex justify-between items-start gap-4 p-4 rounded border">
 
@@ -67,7 +74,9 @@ new #[Layout('layouts.app')] class extends Component {
                             <div class="text-[#64748B] inline-flex gap-2 items-center">
                                 <x-wui-icon name='calendar' class="size-5" />
                                 <p class="font-light text-sm line-clamp-1">
-                                    {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
+                                    @foreach ($class->schedule->recurring_schedule as $recurring)
+                                        {{ Carbon::create($recurring->dates)->format('l jS \\of F Y h:i A') }}
+                                    @endforeach
                                 </p>
                             </div>
                             @if ($class->class_category == 'group')

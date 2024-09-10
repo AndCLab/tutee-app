@@ -1,3 +1,7 @@
+@php
+    use Carbon\Carbon;
+@endphp
+
 {{-- class schedule modal --}}
 {{--
     logic:
@@ -70,7 +74,6 @@
                                 mask="##"
                                 shadowless
                                 errorless
-                                :disabled="$start_time == null && $end_time == null"
                             />
                             <x-wui-select
                                 wire:model.live='interval_unit'
@@ -79,7 +82,6 @@
                                 wire:model.defer="model"
                                 shadowless
                                 errorless
-                                :disabled="$interval == null"
                             >
                                 <x-wui-select.option label="Day/s" value="days" />
                                 <x-wui-select.option label="Week/s" value="weeks" />
@@ -94,7 +96,6 @@
                                 placeholder='occurrences'
                                 shadowless
                                 errorless
-                                :disabled="$interval == null && $interval_unit == null"
                             />
                         </div>
                         @if ($interval && $interval_unit && $occurrences && $occurrences > $interval)

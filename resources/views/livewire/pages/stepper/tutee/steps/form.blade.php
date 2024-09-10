@@ -20,14 +20,14 @@
                     <div class="space-y-3">
                         <div class="md:inline-flex w-full gap-2 space-y-3 md:space-y-0">
                             {{-- From --}}
-                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}" errorless>
+                            <x-wui-select placeholder="From" wire:model="from.{{ $index }}" errorless shadowless>
                                 @foreach ($dates as $year)
                                     <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
                                 @endforeach
                             </x-wui-select>
 
                             {{-- To --}}
-                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}" errorless>
+                            <x-wui-select placeholder="To" wire:model="to.{{ $index }}" errorless shadowless>
                                 @foreach ($dates as $year)
                                     <x-wui-select.option label="{{ $year }}" value="{{ $year }}-01-01" :searchable='false'/>
                                 @endforeach
@@ -36,7 +36,7 @@
 
                         <x-wui-input class="w-full" id="institute.{{ $index }}"
                             name="institute.{{ $index }}" placeholder="Institute"
-                            wire:model='institute.{{ $index }}' errorless/>
+                            wire:model='institute.{{ $index }}' errorless shadowless/>
                     </div>
                     {{-- Remove Institute --}}
                     <div class="hidden md:block">
@@ -58,7 +58,7 @@
         <p class="font-semibold pb-3 md:pb">School Grade</p>
         <div class="md:col-span-3">
             <x-wui-select class="w-full" placeholder="Select school level" wire:model.live="grade_level"
-                autocomplete="off" errorless>
+                autocomplete="off" errorless shadowless>
                 @foreach ($gradeLevelList as $item)
                     <x-wui-select.option label="{{ $item }}" value="{{ $item }}"/>
                 @endforeach
