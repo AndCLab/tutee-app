@@ -65,21 +65,16 @@ new class extends Component {
     ])>
         <div class="px-4 py-6">
 
-            {{-- temporary Logo --}}
+        <!-- TUTEE LOGO and header -->
+        <div class="flex items-center mb-4">
+            <img src="{{ asset('images/tutee-logo.png') }}" alt="Tutee Logo" class="h-10 w-10 mr-2"> <!-- Adjust size as needed -->
             <h1 @class([
-                'uppercase font-bold text-center text-4xl px-2 font-anton mb-4',
-                'text-[#0C3B2E]' => $role == 'tutee',
-                'text-[#6D9773]' => $role == 'tutor',
-            ]) x-show='expanded'>t</h1>
-
-            {{-- tutee header --}}
-            <h1 @class([
-                'uppercase font-bold text-4xl px-2 font-anton mb-4',
+                'uppercase font-bold text-4xl px-2 font-anton',
                 'text-[#0C3B2E]' => $role == 'tutee',
                 'text-[#6D9773]' => $role == 'tutor',
             ]) x-show='!expanded'>tutee</h1>
+        </div>
 
-            <div class="w-full h-[0.063rem] bg-[#8F8F8F]"></div>
 
             {{-- tutee and tutor list --}}
             <ul @class([

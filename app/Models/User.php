@@ -29,6 +29,8 @@ class User extends Authenticatable
         'user_type',
         'avatar',
         'password',
+        'google_id',
+        'facebook_id',
     ];
 
     /**
@@ -63,4 +65,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tutee::class);
     }
+    
 }

@@ -91,5 +91,21 @@ new #[Layout('layouts.guest')] class extends Component {
                 </a>
             @endif
         </div>
+
+        <div class="flex flex-col items-center gap-2">
+            <!-- "OR CONTINUE WITH" Text -->
+            <p class="text-sm font-bold text-gray-600 mb-4 mt-4">OR CONTINUE WITH</p>
+
+            <!-- Google Login Button -->
+            <a id="google-login-btn" href="{{ route('google.login') }}" class="flex items-center justify-center w-full py-2 px-4 border border-gray-300 text-gray-700 text-base font-bold rounded hover:border-gray-400">
+                <i class="fab fa-google mr-2"></i> {{ __('Login with Google') }}
+            </a>
+
+            <!-- Facebook Login Button -->
+            <a id="facebook-login-btn" href="{{ route('facebook.login') }}" class="flex items-center justify-center w-full py-2 px-4 border border-gray-300 text-gray-700 text-base font-bold rounded hover:border-gray-400">
+                <i class="fab fa-facebook mr-2"></i> {{ __('Login with Facebook') }}
+            </a>
+        </div>
+        
     </form>
 </div>

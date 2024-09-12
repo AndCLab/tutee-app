@@ -75,7 +75,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## Pull:
 
-2. `git pull origin main`
+1. `git pull origin main`
 
 ## Push:
 
@@ -116,10 +116,11 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 1. `composer install`
 2. `npm install`
-3. Copy `.env.example` and rename it to `.env`
-4. `php artisan key:generate`
-5. `php artisan migrate`
-6. `npm run build`
+3. `composer require laravel/socialite`
+4. Copy `.env.example` and rename it to `.env`
+5. `php artisan key:generate`
+6. `php artisan migrate`
+7. `npm run build`
 
 ## Run the project: separate terminal
 

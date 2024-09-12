@@ -53,5 +53,10 @@ class DatabaseSeeder extends Seeder
         $this->call(FieldsSeeder::class);
         $this->call(TutorSeeder::class);
         $this->call(TuteeSeeder::class);
+
+        // Adding the Tutor and Tutee Notification seeders
+        $this->call(TutorNotificationsSeeder::class);
+        $this->call(TuteeNotificationsSeeder::class);
+        
     }
 }

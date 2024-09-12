@@ -1,4 +1,6 @@
-<div class="relative inline-block text-left"
+
+{{-- original code --}}
+{{-- <div class="relative inline-block text-left"
     x-data="wireui_dropdown"
     x-on:click.outside="close"
     x-on:keydown.escape.window="close"
@@ -35,4 +37,98 @@
             {{ $slot }}
         </div>
     </div>
+</div> --}}
+
+<div class="relative inline-block text-left"
+    x-data="wireui_dropdown"
+    x-on:click.outside="close"
+    x-on:keydown.escape.window="close"
+    {{ $attributes->only('wire:key') }}>
+    <div class="cursor-pointer focus:outline-none" x-on:click="toggle">
+        @if (isset($trigger))
+            {{ $trigger }}
+        @else
+            <x-dynamic-component
+                :component="WireUi::component('icon')"
+                class="w-4 h-4 text-secondary-500 hover:text-secondary-700
+                     dark:hover:text-secondary-600 transition duration-150 ease-in-out"
+                name="dots-vertical"
+            />
+        @endif
+    </div>
+
+    <div x-show="status"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-95"
+        {{ $attributes->except('wire:key')->class([
+            $getAlign(),
+            // $width,
+            'z-30 absolute mt-2 max-w-md'
+        ]) }}
+        style="display: none;"
+        @unless($persistent) x-on:click="toggleDropdown"@endunless> <!-- Custom function for toggling -->
+        {{-- <div class="relative {{ $height }} soft-scrollbar overflow-auto border border-secondary-200
+                    rounded-lg shadow-lg p-1 bg-white dark:bg-secondary-800 dark:border-secondary-600">
+            {{ $slot }} --}}
+
+            {{-- for notifs to show a long length of notifications --}}
+        {{-- <div class="relative soft-scrollbar overflow-auto border border-secondary-200
+                    rounded-lg shadow-lg p-1 bg-white dark:bg-secondary-800 dark:border-secondary-600"
+            style="max-height: 1000px;">
+            {{ $slot }}
+        </div> --}}
+
+        <div class="relative soft-scrollbar overflow-auto border border-secondary-200
+            rounded-lg shadow-lg p-1 bg-white dark:bg-secondary-800 dark:border-secondary-600"
+            style="max-height: 80vh;"> <!-- Set to the height of the viewport -->
+            {{ $slot }}
+        </div>
+
+    </div>
 </div>
+
+
+
+{{-- <div class="relative inline-block text-left w-full max-w-md"
+    x-data="wireui_dropdown"
+    x-on:click.outside="close"
+    x-on:keydown.escape.window="close"
+    {{ $attributes->only('wire:key') }}>
+
+    <div class="cursor-pointer focus:outline-none" x-on:click="toggle">
+        @if (isset($trigger))
+            {{ $trigger }}
+        @else
+            <x-dynamic-component
+                :component="WireUi::component('icon')"
+                class="w-4 h-4 text-secondary-500 hover:text-secondary-700
+                     dark:hover:text-secondary-600 transition duration-150 ease-in-out"
+                name="dots-vertical"
+            />
+        @endif
+    </div>
+
+    <div x-show="status"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-95"
+        {{ $attributes->except('wire:key')->class([
+            $getAlign(),
+            'z-30 absolute mt-2'  // Added 'max-w-md' to set max width
+        ]) }}
+        style="display: none;"
+        @unless($persistent) x-on:click="toggleDropdown" @endunless> <!-- Custom function for toggling -->
+        <div class="relative {{ $height }} soft-scrollbar overflow-auto border border-secondary-200
+                    rounded-lg shadow-lg p-1 bg-white dark:bg-secondary-800 dark:border-secondary-600">
+            {{ $slot }}
+        </div>
+    </div>
+</div> --}}
+

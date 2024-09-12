@@ -88,4 +88,5 @@ new class extends Component
             </x-action-message>
         </div>
     </form>
+    <x-wui-notifications position="bottom-right" />
 </section>

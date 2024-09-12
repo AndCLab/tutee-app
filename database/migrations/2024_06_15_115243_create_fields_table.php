@@ -17,6 +17,12 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('field_name');
             $table->unsignedInteger('class_count')->default(0);
+            
+            //from Lorins
+            $table->foreignId('class_id')->nullable()->constrained('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }
