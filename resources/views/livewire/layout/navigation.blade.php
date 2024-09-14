@@ -2,10 +2,12 @@
 
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
+use App\Models\Tutor;
 
 new class extends Component {
     public string $role = '';
     public $user;
+    public $tutor;
 
     public function mount()
     {
@@ -13,6 +15,7 @@ new class extends Component {
         if ($this->user->user_type != null) {
             $this->role = $this->user->user_type;
         }
+        $this->tutor = Tutor::where('user_id', Auth::id())->first();
     }
 
     // Testing purposes
@@ -47,6 +50,13 @@ new class extends Component {
         }
     }
 
+    public function verifyTutor(){
+        if ($this->tutor) {
+            $this->tutor->verify_status = 'pending';
+            $this->tutor->save();
+        }
+    }
+
     /**
      * Log the current user out of the application.
      */
@@ -63,16 +73,34 @@ new class extends Component {
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between min-h-fit py-3">
-            <div></div>
+            <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6"></div>
             <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6">
                 {{-- Be a Tutee (Tutor and not yet Tutee) --}}
                 @if ($role == 'tutor' && !$user->is_applied)
+                    @if ($tutor->verify_status === 'not_verified')
+                        <x-wui-button sm wire:click='verifyTutor' flat primary icon='badge-check'
+                        spinner='verifyTutor' label='Verify Tutor Account' />
+                    @elseif ($tutor->verify_status === 'pending')
+                        <p>Verification pending.</p>
+                    @else
+                        <p>Your Tutor account has been verified.</p>
+                    @endif
+
                     <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical'
                     spinner='beATutee' label='Be a Tutee' />
                     @include('livewire.layout.topnav_tutor.menu')
 
                 {{-- Switch to Tutee (Tutee and applied as Tutor) --}}
                 @elseif ($role == 'tutor' && $user->is_applied)
+                    @if ($tutor->verify_status === 'not_verified')
+                        <x-wui-button sm wire:click='verifyTutor' flat primary icon='badge-check'
+                        spinner='verifyTutor' label='Verify Tutor Account' />
+                    @elseif ($tutor->verify_status === 'pending')
+                        <p>Verification pending.</p>
+                    @else
+                        <p>Your Tutor account has been verified.</p>
+                    @endif
+
                     <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
                     spinner='switchRole' label='Switch to Tutee' />
                     @include('livewire.layout.topnav_tutor.menu')
