@@ -63,7 +63,7 @@ new #[Layout('layouts.app')] class extends Component {
         $startDate = Carbon::parse($this->sched_initial_date);
 
         if ($this->frequency === 'once') {
-            $this->generatedDates[] = $startDate->format('Y-m-d H:i:s');
+            $this->generatedDates[] = $startDate->format('Y-m-d');
         } else {
             $this->validate([
                 // schedules
@@ -77,7 +77,7 @@ new #[Layout('layouts.app')] class extends Component {
                 'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
             ]);
             for ($i = 0; $i < $this->occurrences; $i++) {
-                $this->generatedDates[] = $startDate->copy()->format('Y-m-d H:i:s');
+                $this->generatedDates[] = $startDate->copy()->format('Y-m-d');
                 $startDate->add($this->interval, $this->interval_unit);
             }
         }
@@ -88,7 +88,7 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->validate([
             // class details
-            'class_name' => ['required', 'string', 'max:255'],
+            'class_name' => ['required', 'string', 'max:255', 'unique:classes,class_name'],
             'class_description' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
             'class_location' => ['string', 'max:255'],
@@ -127,6 +127,7 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
+        // schedule
         $scheduleData = [
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
@@ -139,13 +140,32 @@ new #[Layout('layouts.app')] class extends Component {
             $scheduleData['occurrences'] = $this->occurrences;
         }
 
-        $schedule = Schedule::create($scheduleData);
+        // check if the schedule already exists
+        $scheduleExists = Schedule::whereTime('start_time', '<=', $this->end_time)
+                                    ->whereTime('end_time', '>', $this->start_time)
+                                    ->exists();
 
-        foreach ($this->generatedDates as $date) {
-            RecurringSchedule::create([
-                'schedule_id' => $schedule->id,
-                'dates' => $date
+        if (!$scheduleExists) {
+            // create the schedule
+            $schedule = Schedule::create($scheduleData);
+
+            // add recurring dates
+            foreach ($this->generatedDates as $date) {
+                RecurringSchedule::create([
+                    'schedule_id' => $schedule->id,
+                    'dates' => $date
+                ]);
+            }
+        } else {
+            // notify the user that the schedule already exists
+            $this->notification([
+                'title'       => 'Schedule must be unique',
+                'description' => 'You have chosen this schedule from one of your classes',
+                'icon'        => 'error',
+                'timeout'     => 2500,
             ]);
+
+            return;
         }
 
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
@@ -208,8 +228,8 @@ new #[Layout('layouts.app')] class extends Component {
 
     }
 
-     // group class validation and creation
-     public function GroupValidation()
+    // group class validation and creation
+    public function GroupValidation()
     {
         $this->validate([
             // class details
@@ -257,6 +277,7 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
+        // schedule
         $scheduleData = [
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
@@ -269,13 +290,32 @@ new #[Layout('layouts.app')] class extends Component {
             $scheduleData['occurrences'] = $this->occurrences;
         }
 
-        $schedule = Schedule::create($scheduleData);
+        // check if the schedule already exists
+        $scheduleExists = Schedule::whereTime('start_time', '<=', $this->end_time)
+                                    ->whereTime('end_time', '>', $this->start_time)
+                                    ->exists();
 
-        foreach ($this->generatedDates as $date) {
-            RecurringSchedule::create([
-                'schedule_id' => $schedule->id,
-                'dates' => $date
+        if (!$scheduleExists) {
+            // create the schedule
+            $schedule = Schedule::create($scheduleData);
+
+            // add recurring dates
+            foreach ($this->generatedDates as $date) {
+                RecurringSchedule::create([
+                    'schedule_id' => $schedule->id,
+                    'dates' => $date
+                ]);
+            }
+        } else {
+            // notify the user that the schedule already exists
+            $this->notification([
+                'title'       => 'Schedule must be unique',
+                'description' => 'You have chosen this schedule from one of your classes',
+                'icon'        => 'error',
+                'timeout'     => 2500,
             ]);
+
+            return;
         }
 
         $registration = Registration::create([

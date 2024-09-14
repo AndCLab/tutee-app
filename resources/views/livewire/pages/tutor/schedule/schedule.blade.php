@@ -75,7 +75,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-wui-icon name='calendar' class="size-5" />
                                 <p class="font-light text-sm line-clamp-1">
                                     @foreach ($class->schedule->recurring_schedule as $recurring)
-                                        {{ Carbon::create($recurring->dates)->format('l jS \\of F Y h:i A') }}
+                                        {{ Carbon::create($recurring->dates)->format('l jS \\of F Y g:i A') }}
                                     @endforeach
                                 </p>
                             </div>

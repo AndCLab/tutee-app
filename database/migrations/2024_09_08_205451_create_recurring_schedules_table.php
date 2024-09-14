@@ -17,7 +17,7 @@ return new class extends Migration
                 ->constrained('schedules')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->dateTime('dates');
+            $table->date('dates');
             $table->timestamps();
         });
     }
