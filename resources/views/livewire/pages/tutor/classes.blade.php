@@ -9,6 +9,7 @@ use WireUi\Traits\Actions;
 use App\Models\Tutor;
 use App\Models\Classes;
 use App\Models\Schedule;
+use App\Models\RecurringSchedule;
 use App\Models\Registration;
 use App\Models\Fields;
 
@@ -30,8 +31,14 @@ new #[Layout('layouts.app')] class extends Component {
     public $getFields = []; // fields getter
 
     // for class schedule date
-    public $sched_start_date;
-    public $sched_end_date;
+    public $sched_initial_date;
+    public $start_time;
+    public $end_time;
+    public int $interval;
+    public $interval_unit;
+    public $occurrences;
+    public $frequency = 'once';
+    public $generatedDates = [];
 
     // for registration date
     public $regi_start_date;
@@ -50,12 +57,29 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->get(['field_name'])->toArray();
     }
 
-    public function updatedSchedEndDate()
+    public function updated()
     {
-        if ($this->sched_start_date) {
-            $this->validateOnly(
-                'sched_end_date', ['sched_end_date' => ['after:sched_start_date']]
-            );
+        $this->generatedDates = [];
+        $startDate = Carbon::parse($this->sched_initial_date);
+
+        if ($this->frequency === 'once') {
+            $this->generatedDates[] = $startDate->format('Y-m-d H:i:s');
+        } else {
+            $this->validate([
+                // schedules
+                'sched_initial_date' => ['required', 'date'],
+                'start_time' => ['required', 'date_format:H:i'],
+                'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+
+                // recurrence and interval
+                'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
+                'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
+                'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+            ]);
+            for ($i = 0; $i < $this->occurrences; $i++) {
+                $this->generatedDates[] = $startDate->copy()->format('Y-m-d H:i:s');
+                $startDate->add($this->interval, $this->interval_unit);
+            }
         }
     }
 
@@ -63,11 +87,10 @@ new #[Layout('layouts.app')] class extends Component {
     public function IndividualValidation()
     {
         $this->validate([
+            // class details
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
-            'sched_start_date' => ['required', 'date'],
-            'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
             'class_location' => ['string', 'max:255'],
             'class_link' => ['string', 'max:255'],
         ]);
@@ -104,10 +127,26 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
-        $schedule = Schedule::create([
-            'start_date' => $this->sched_start_date,
-            'end_date' => $this->sched_end_date
-        ]);
+        $scheduleData = [
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'frequency' => $this->frequency,
+        ];
+
+        if ($this->frequency != 'once') {
+            $scheduleData['interval'] = $this->interval;
+            $scheduleData['interval_unit'] = $this->interval_unit;
+            $scheduleData['occurrences'] = $this->occurrences;
+        }
+
+        $schedule = Schedule::create($scheduleData);
+
+        foreach ($this->generatedDates as $date) {
+            RecurringSchedule::create([
+                'schedule_id' => $schedule->id,
+                'dates' => $date
+            ]);
+        }
 
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
 
@@ -138,18 +177,26 @@ new #[Layout('layouts.app')] class extends Component {
             }
         }
 
-
         $this->dispatch('new-class', isNotEmpty: 0);
 
         $this->reset(
             'class_name',
             'class_description',
             'class_fields',
-            'sched_start_date',
-            'sched_end_date',
             'class_location',
+            'class_students',
             'class_fee',
             'class_link',
+
+            'sched_initial_date',
+            'start_time',
+            'end_time',
+            'interval',
+            'interval_unit',
+            'occurrences',
+
+            'regi_start_date',
+            'regi_end_date',
         );
 
         $this->notification([
@@ -161,23 +208,21 @@ new #[Layout('layouts.app')] class extends Component {
 
     }
 
-    // group class validation and creation
-    public function GroupValidation()
+     // group class validation and creation
+     public function GroupValidation()
     {
         $this->validate([
+            // class details
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
-            'class_students' => ['required', 'integer', 'min:2', 'max:50'],
             'class_fields' => ['required'],
-
-            'regi_start_date' => ['required', 'date'],
-            'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
-
-            'sched_start_date' => ['required', 'date', 'after:regi_end_date'],
-            'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
-
             'class_location' => ['string', 'max:255'],
             'class_link' => ['string', 'max:255'],
+            'class_students' => ['required', 'lt:40', 'gt:2'],
+
+            // registration
+            'regi_start_date' => ['required', 'date'],
+            'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
         ]);
     }
 
@@ -212,14 +257,30 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
-        $schedule = Schedule::create([
-            'start_date' => $this->sched_start_date,
-            'end_date' => $this->sched_end_date
-        ]);
+        $scheduleData = [
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'frequency' => $this->frequency,
+        ];
+
+        if ($this->frequency != 'once') {
+            $scheduleData['interval'] = $this->interval;
+            $scheduleData['interval_unit'] = $this->interval_unit;
+            $scheduleData['occurrences'] = $this->occurrences;
+        }
+
+        $schedule = Schedule::create($scheduleData);
+
+        foreach ($this->generatedDates as $date) {
+            RecurringSchedule::create([
+                'schedule_id' => $schedule->id,
+                'dates' => $date
+            ]);
+        }
 
         $registration = Registration::create([
             'start_date' => $this->regi_start_date,
-            'end_date' => $this->regi_end_date
+            'end_date' => $this->regi_end_date,
         ]);
 
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
@@ -257,12 +318,20 @@ new #[Layout('layouts.app')] class extends Component {
             'class_name',
             'class_description',
             'class_fields',
-            'sched_start_date',
-            'sched_end_date',
             'class_location',
             'class_students',
             'class_fee',
             'class_link',
+
+            'sched_initial_date',
+            'start_time',
+            'end_time',
+            'interval',
+            'interval_unit',
+            'occurrences',
+
+            'regi_start_date',
+            'regi_end_date',
         );
 
         $this->notification([
@@ -332,79 +401,8 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     </div>
 
-    {{-- class schedule modal --}}
-    <x-wui-modal wire:model="showClassSchedule" max-width='md' persistent>
-        <x-wui-card title='Class Schedule'>
-            <div class="grid grid-cols-1 gap-4">
-                <x-wui-datetime-picker
-                    label="Start Date Time"
-                    placeholder="January 1, 2000"
-                    wire:model.blur="sched_start_date"
-                    parse-format="YYYY-MM-DD HH:mm"
-                    display-format='dddd, MMMM D, YYYY h:mm A'
-                    :min="now()"
-                    interval="30"
-                    min-time="08:00"
-                    max-time="21:40"
-                    shadowless
-                />
-                <x-wui-datetime-picker
-                    label="End Date Time"
-                    placeholder="December 1, 2000"
-                    wire:model.live="sched_end_date"
-                    parse-format="YYYY-MM-DD HH:mm"
-                    display-format='dddd, MMMM D, YYYY h:mm A'
-                    :min="now()"
-                    interval="30"
-                    min-time="08:00"
-                    max-time="21:40"
-                    shadowless
-                />
-            </div>
-            <x-slot name="footer">
-                <div class="flex justify-end gap-x-4">
-                    <x-wui-button primary label="Done" spinner='showClassSchedule' x-on:click='close' />
-                </div>
-            </x-slot>
-        </x-wui-card>
-    </x-wui-modal>
-
-    {{-- class registration modal --}}
-    <x-wui-modal wire:model="showRegistrationDate" max-width='md' persistent>
-        <x-wui-card title='Class Registration Date'>
-            <div class="grid grid-cols-1 gap-4">
-                <x-wui-datetime-picker
-                    label="Start Date Time"
-                    placeholder="January 1, 2000"
-                    wire:model.blur="regi_start_date"
-                    parse-format="YYYY-MM-DD HH:mm"
-                    display-format='dddd, MMMM D, YYYY h:mm A'
-                    :min="now()"
-                    interval="30"
-                    min-time="08:00"
-                    max-time="21:40"
-                    shadowless
-                />
-                <x-wui-datetime-picker
-                    label="End Date Time"
-                    placeholder="December 1, 2000"
-                    wire:model.blur="regi_end_date"
-                    parse-format="YYYY-MM-DD HH:mm"
-                    display-format='dddd, MMMM D, YYYY h:mm A'
-                    :min="now()"
-                    interval="30"
-                    min-time="08:00"
-                    max-time="21:40"
-                    shadowless
-                />
-            </div>
-            <x-slot name="footer">
-                <div class="flex justify-end gap-x-4">
-                    <x-wui-button primary label="Done" spinner='showClassSchedule' x-on:click='close' />
-                </div>
-            </x-slot>
-        </x-wui-card>
-    </x-wui-modal>
+    @include('livewire.pages.tutor.classes_components.schedule_modal')
+    @include('livewire.pages.tutor.classes_components.register_modal')
 
     <x-wui-notifications position="bottom-right" />
 </section>

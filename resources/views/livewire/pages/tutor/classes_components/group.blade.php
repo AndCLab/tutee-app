@@ -11,48 +11,27 @@
                 <x-wui-textarea wire:model='class_description' label="Class Description" class="resize-none" placeholder='Enter class description' shadowless/>
             </div>
 
-            {{-- class registration --}}
-            <div>
-                <div class="flex flex-col justify-between items-start mb-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Class Registration Date
-                    </label>
-                    <button
-                        type='button'
-                        class="text-secondary-400 text-start border border-secondary-300 focus:ring-primary-500 focus:border-primary-500 form-input block w-full sm:text-sm rounded-md transition ease-in-out duration-100 focus:outline-none"
-                        wire:click="$set('showRegistrationDate', true)"
-                    >
-                    @if ($regi_start_date && $regi_end_date)
-                        <span class="text-black">
-                            Filled
-                        </span>
-                    @else
-                        Class Registration Date
-                    @endif
-                    </button>
-                </div>
-            </div>
+            <div class="flex gap-2 items-center">
+                {{-- class registration --}}
+                <x-wui-button label="Class Registration"
+                    flat
+                    :negative="$errors->any()"
+                    :emerald="!$errors->any()"
+                    xs
+                    icon="calendar"
+                    wire:click="$set('showRegistrationDate', true)"
+                />
 
-            {{-- class schedule --}}
-            <div>
-                <div class="flex flex-col justify-between items-start mb-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Class Schedule
-                    </label>
-                    <button
-                        type='button'
-                        class="text-secondary-400 text-start border border-secondary-300 focus:ring-primary-500 focus:border-primary-500 form-input block w-full sm:text-sm rounded-md transition ease-in-out duration-100 focus:outline-none"
-                        wire:click="$set('showClassSchedule', true)"
-                    >
-                        @if ($sched_start_date && $sched_end_date)
-                            <span class="text-black">
-                                Filled
-                            </span>
-                        @else
-                            Class Schedule
-                        @endif
-                    </button>
-                </div>
+
+                {{-- class schedule --}}
+                <x-wui-button label="Class Schedule"
+                    flat
+                    :negative="$errors->any()"
+                    :emerald="!$errors->any()"
+                    xs
+                    icon="calendar"
+                    wire:click="$set('showClassSchedule', true)"
+                />
             </div>
 
             {{-- class fields --}}
@@ -95,7 +74,7 @@
                             class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
                             x-on:click.prevent="tab='#virtual'"> Virtual Class </a>
                     </li>
-                    <li class="w-full">
+                    <li class="w-full text-center">
                         <a :class="tab !== '#physical' ? '' : 'bg-white'"
                             class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
                             x-on:click.prevent="tab='#physical'"> Physical Class </a>
@@ -106,19 +85,7 @@
                 <div>
                     <div x-show="tab == '#virtual'" x-cloak>
                         <div class="max-w-xl">
-                            <x-wui-input wire:model='class_link' label="Generated Link" placeholder="Virtual Meeting">
-                                <x-slot name="append">
-                                    <div class="absolute inset-y-0 right-0 flex items-center p-0.5">
-                                        <x-wui-button
-                                            class="h-full rounded-r-md"
-                                            icon="clipboard-copy"
-                                            primary
-                                            flat
-                                            squared
-                                        />
-                                    </div>
-                                </x-slot>
-                            </x-wui-input>
+                            <x-wui-input wire:model='class_link' label="Virtual Session" placeholder="Enter virtual link" shadowless/>
                         </div>
                     </div>
 
