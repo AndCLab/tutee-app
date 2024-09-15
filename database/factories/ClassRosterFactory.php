@@ -45,8 +45,8 @@ class ClassRosterFactory extends Factory
         return [
             'class_id' => $group_class->id ?? $indi_class->id,
             'tutee_id' => $tutee->id,
-            'attendance' => false,
-            'payment_status' => false,
+            'attendance' => 'pending',
+            'payment_status' => 'pending',
         ];
     }
 
