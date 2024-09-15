@@ -12,4 +12,7 @@ class Notification extends Model
     protected $casts = [
         'date' => 'datetime', // Add this line
     ];
+
+    protected $listeners = ['load-more' => 'loadNotifications'];
+
 }

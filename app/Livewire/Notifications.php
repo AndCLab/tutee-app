@@ -5,43 +5,90 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\TuteeNotification;
 use App\Models\TutorNotification;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithPagination;
 
 class Notifications extends Component
 {
     public $notifications;
-    public $showAll = false; // Initialize showAll
+    public $pages = 5; // Number of notifications per load
 
     public function mount()
     {
-        $this->loadNotifications();
+        $this->loadNotifications($this->pages);
     }
 
-    public function loadNotifications()
+    public function loadNotifications($pages = 5)
     {
         $userType = Auth::user()->user_type;
 
         if ($userType === 'tutee') {
-            $this->notifications = TuteeNotification::orderBy('date', 'desc')->get();
+            $this->notifications = TuteeNotification::orderBy('date', 'desc')
+                ->take($pages)
+                ->get()
+                ->toArray();
         } elseif ($userType === 'tutor') {
-            $this->notifications = TutorNotification::orderBy('date', 'desc')->get();
+            $this->notifications = TutorNotification::orderBy('date', 'desc')
+                ->take($pages)
+                ->get()
+                ->toArray();
         } else {
-            $this->notifications = collect(); // Empty collection
+            $this->notifications = []; // Empty array
         }
     }
 
-    public function toggleShowAll()
+
+    public function loadMore()
     {
-        $this->showAll = !$this->showAll; // Toggle between showing all or limited
+        $this->pages += 5; // Increase the number of notifications to load
+        $this->loadNotifications($this->pages); // Load more notifications
     }
+    
 
     public function render()
     {
-        return view('livewire.pages.notifications', [
-            'notifications' => $this->notifications,
-            'showAll' => $this->showAll, // Pass showAll to the view
-        ]);
+        return view('livewire.pages.notifications');
     }
 }
 
 
+
+
+
+// class Notifications extends Component
+// {
+//     public $notifications;
+//     public $showAll = false; // Initialize showAll
+
+//     public function mount()
+//     {
+//         $this->loadNotifications();
+//     }
+
+//     public function loadNotifications()
+//     {
+//         $userType = Auth::user()->user_type;
+
+//         if ($userType === 'tutee') {
+//             $this->notifications = TuteeNotification::orderBy('date', 'desc')->get();
+//         } elseif ($userType === 'tutor') {
+//             $this->notifications = TutorNotification::orderBy('date', 'desc')->get();
+//         } else {
+//             $this->notifications = collect(); // Empty collection
+//         }
+//     }
+
+//     public function toggleShowAll()
+//     {
+//         $this->showAll = !$this->showAll; // Toggle between showing all or limited
+//     }
+
+//     public function render()
+//     {
+//         return view('livewire.pages.notifications', [
+//             'notifications' => $this->notifications,
+//             'showAll' => $this->showAll, // Pass showAll to the view
+//         ]);
+//     }
+// }
