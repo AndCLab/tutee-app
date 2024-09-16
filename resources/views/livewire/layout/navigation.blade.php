@@ -73,7 +73,7 @@ new class extends Component {
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between min-h-fit py-3">
-            <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6"></div>
+            <div></div>
             <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6">
                 {{-- Be a Tutee (Tutor and not yet Tutee) --}}
                 @if ($role == 'tutor' && !$user->is_applied)
