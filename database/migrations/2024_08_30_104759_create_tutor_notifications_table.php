@@ -15,6 +15,7 @@ class CreateTutorNotificationsTable extends Migration
             $table->dateTime('date');
             $table->string('type'); // Type of notification (e.g., change, schedule)
             $table->timestamps();
+
         });
     }
 
