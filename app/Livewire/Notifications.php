@@ -17,16 +17,7 @@ class Notifications extends Component
     public $pages = 5; // Number of notifications per load
 
     public function mount()
-    {
-        $userType = Auth::user()->user_type;
-        if ($userType === 'tutee') {
-            $this->unreadCount = TuteeNotification::where('read', false)->count();
-        } elseif ($userType === 'tutor') {
-            $this->unreadCount = TutorNotification::where('read', false)->count();
-        } else {
-            $this->unreadCount = 0;
-        }
-    
+    {    
         $this->loadNotifications();
     }
 
@@ -83,7 +74,7 @@ class Notifications extends Component
             $notification->save();
         }
 
-            // Your existing logic to mark notifications as read
+        // Your existing logic to mark notifications as read
         // After marking as read, refresh the unread count
         $this->loadNotifications();
     }
