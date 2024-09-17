@@ -15,19 +15,30 @@ use WireUi\Traits\Actions;
 new #[Layout('layouts.app')] class extends Component {
     use Actions, WithFileUploads;
 
+    public $title = 'Stepper | Tutor Role';
+
     public $count = 2;
 
     // General
     public $user_type = 'tutor';
     public $dates = [''];
     public $input_work = [];
+    public $input_degree = [];
+    public $input_certi = [];
     public $i;
+    public $suggestions = [];
 
     // Tutor
     public $from = [];
     public $to = [];
     public $work = [];
+
+    public $degree = [];
+
     public $certificates = [];
+    public $title_certi = [];
+    public $from_certi = [];
+
     public $selected = [];
     public $resume;
     public $specific = '';
@@ -37,10 +48,16 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->i = 0;
         $this->input_work = [0];
+        $this->input_degree = [0];
+        $this->input_certi = [0];
+
+        $this->degree = [''];
         $this->from = [''];
         $this->to = [''];
         $this->work = [''];
         $this->certificates = [''];
+        $this->title_certi = [''];
+        $this->from_certi = [''];
     }
 
     // Work experience
@@ -65,16 +82,42 @@ new #[Layout('layouts.app')] class extends Component {
         $this->work = array_values($this->work);
     }
 
-    // Certificate
+    // Degree
+    public function add_degree()
+    {
+        $this->input_degree[] = count($this->input_degree);
+        $this->degree[] = '';
+    }
+
+    public function remove_degree($index)
+    {
+        unset($this->input_degree[$index]);
+        unset($this->degree[$index]);
+
+        $this->input_degree = array_values($this->input_degree);
+        $this->degree = array_values($this->degree);
+    }
+
+    // Certificates
     public function add_cert()
     {
+        $this->input_certi[] = count($this->input_certi);
         $this->certificates[] = '';
+        $this->title_certi[] = '';
+        $this->from_certi[] = '';
     }
 
     public function remove_cert($index)
     {
+        unset($this->input_certi[$index]);
         unset($this->certificates[$index]);
+        unset($this->title_certi[$index]);
+        unset($this->from_certi[$index]);
+
+        $this->input_certi = array_values($this->input_certi);
         $this->certificates = array_values($this->certificates);
+        $this->title_certi = array_values($this->title_certi);
+        $this->from_certi = array_values($this->from_certi);
     }
 
     // Fields
@@ -97,10 +140,11 @@ new #[Layout('layouts.app')] class extends Component {
         $this->selected = array_values($this->selected);
     }
 
+    // certificates
     public function upload_certificates($tutorId)
     {
         if ($this->certificates) {
-            foreach ($this->certificates as $certificate) {
+            foreach ($this->certificates as $index => $certificate) {
                 $extension = $certificate->getClientOriginalExtension();
                 $filename = uniqid() . '_' . time() . '.' . $extension;
 
@@ -109,11 +153,14 @@ new #[Layout('layouts.app')] class extends Component {
                 Certificate::create([
                     'tutor_id' => $tutorId,
                     'file_path' => $filePath,
+                    'title' => $this->title_certi[$index],
+                    'from' => $this->from_certi[$index],
                 ]);
             }
         }
     }
 
+    // resume
     public function upload_resume($tutorId)
     {
         if ($this->resume) {
@@ -167,6 +214,11 @@ new #[Layout('layouts.app')] class extends Component {
                     'work.*' => 'required|max:200',
                     'certificates.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
                     'resume' => 'required|file|mimes:pdf|max:2048',
+
+                    'title_certi.*' => 'required|string|max:255',
+                    'from_certi.*' => 'required|date',
+
+                    'degree.*' => 'required|string|max:255',
                 ],
                 [
                     'from.*.required' => 'The from is required',
@@ -175,6 +227,11 @@ new #[Layout('layouts.app')] class extends Component {
                     'certificates.*.required' => 'The certificate is required',
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                     'resume.required' => 'The resume is required',
+
+                    'title_certi.*.required' => 'The title is required',
+                    'from_certi.*.required' => 'The certificate year is required',
+
+                    'degree.*.required' => 'The degree is required',
                 ],
             );
         }
@@ -188,9 +245,13 @@ new #[Layout('layouts.app')] class extends Component {
         $user->save();
 
         if ($user && $this->user_type === 'tutor') {
+            $degree_json = is_array($this->degree) ? json_encode($this->degree) : $this->degree;
+            $work_json = is_array($this->work) ? json_encode($this->work) : $this->work;
+
             $tutor = Tutor::create([
                 'user_id' => $user->id,
-                'work' => json_encode($this->work),
+                'work' => $work_json,
+                'degree' => $degree_json
             ]);
 
             foreach ($this->input_work as $item) {
@@ -223,6 +284,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->redirect('/login', navigate: true);
     }
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <div>
     @include('livewire.pages.stepper.body')

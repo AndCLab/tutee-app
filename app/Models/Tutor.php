@@ -11,7 +11,12 @@ class Tutor extends Model
 
     protected $table = 'tutor';
 
-    protected $fillable = ['user_id', 'bio', 'work'];
+    protected $fillable = [
+        'user_id',
+        'bio',
+        'work',
+        'degree'
+    ];
 
     public function user()
     {

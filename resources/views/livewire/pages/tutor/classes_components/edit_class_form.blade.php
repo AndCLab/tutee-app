@@ -183,6 +183,9 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Check if the schedule already exists, excluding the current schedule ID
         $scheduleExists = Schedule::where('id', '!=', $this->class->schedule->id)
+                                ->whereHas('recurring_schedule', function ($query) {
+                                    $query->whereIn('dates', $this->generatedDates);
+                                })
                                 ->whereTime('start_time', '<=', $this->end_time)
                                 ->whereTime('end_time', '>', $this->start_time)
                                 ->exists();

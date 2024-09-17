@@ -141,7 +141,10 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         // check if the schedule already exists
-        $scheduleExists = Schedule::whereTime('start_time', '<=', $this->end_time)
+        $scheduleExists = Schedule::whereHas('recurring_schedule', function ($query) {
+                                        $query->whereIn('dates', $this->generatedDates);
+                                    })
+                                    ->whereTime('start_time', '<=', $this->end_time)
                                     ->whereTime('end_time', '>', $this->start_time)
                                     ->exists();
 
@@ -291,7 +294,10 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         // check if the schedule already exists
-        $scheduleExists = Schedule::whereTime('start_time', '<=', $this->end_time)
+        $scheduleExists = Schedule::whereHas('recurring_schedule', function ($query) {
+                                        $query->whereIn('dates', $this->generatedDates);
+                                    })
+                                    ->whereTime('start_time', '<=', $this->end_time)
                                     ->whereTime('end_time', '>', $this->start_time)
                                     ->exists();
 

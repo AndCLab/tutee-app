@@ -59,7 +59,8 @@ class UserFactory extends Factory
                 $user->tutors()->create([
                     'user_id' => $user->id,
                     'bio' => fake()->paragraph(2),
-                    'work' => fake()->word(),
+                    'work' => json_encode(fake()->randomElements([fake()->word(), fake()->word(), fake()->word()], 1)),
+                    'degree' => json_encode(fake()->randomElements(['bachelor', 'master', 'PhD'], 1)),
                 ]);
             }
         });

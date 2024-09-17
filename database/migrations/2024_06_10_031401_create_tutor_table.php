@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')
                 ->onDelete('cascade');
             $table->string('bio')->nullable();
-            $table->string('work');
+            $table->json('work');
+            $table->json('degree');
             $table->timestamps();
         });
     }

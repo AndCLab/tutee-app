@@ -20,8 +20,16 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->string('proof_of_payment')->nullable();
-            $table->boolean('attendance')->default(0);
-            $table->boolean('payment_status')->default(0);
+            $table->enum('attendance', [
+                'Pending',
+                'Absent',
+                'Present'
+            ])->default('Pending');
+            $table->enum('payment_status', [
+                'Pending',
+                'Approved',
+                'Not Approved'
+            ])->default('Pending');
             $table->timestamps();
         });
     }

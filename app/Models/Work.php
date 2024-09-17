@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Work extends Model
 {
     use HasFactory;
+
     protected $table = 'works';
 
-    protected $fillable = ['tutor_id', 'from', 'to', 'work'];
+    protected $fillable = [
+        'tutor_id',
+        'from',
+        'to',
+        'work'
+    ];
 }
