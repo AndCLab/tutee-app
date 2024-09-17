@@ -29,7 +29,7 @@ class Notifications extends Component
         if ($userType === 'tutee') {
             $this->notifications = TuteeNotification::orderBy('date', 'desc')
                 ->take($pages)
-                ->get(['id', 'content', 'date', 'read'])  // Now, 'read' is a valid field
+                ->get(['id', 'content', 'date', 'read', 'type'])  // Now, 'read' is a valid field
                 ->toArray();
 
             // Count unread notifications
@@ -37,7 +37,7 @@ class Notifications extends Component
         } elseif ($userType === 'tutor') {
             $this->notifications = TutorNotification::orderBy('date', 'desc')
                 ->take($pages)
-                ->get(['id', 'content', 'date', 'read'])  // Now, 'read' is a valid field
+                ->get(['id', 'content', 'date', 'read', 'type'])  // Now, 'read' is a valid field
                 ->toArray();
 
             // Count unread notifications

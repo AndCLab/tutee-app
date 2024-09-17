@@ -15,7 +15,7 @@ class TuteeNotificationsSeeder extends Seeder
                 'title' => 'Venue Change',
                 'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
                 'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'change',
+                'type' => 'venue',
 
                 'read' => false,
             ],
@@ -31,7 +31,7 @@ class TuteeNotificationsSeeder extends Seeder
                 'title' => 'Venue Change',
                 'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
                 'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'change',
+                'type' => 'venue',
 
                 'read' => false,
             ],
@@ -47,7 +47,7 @@ class TuteeNotificationsSeeder extends Seeder
                 'title' => 'Venue Change',
                 'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
                 'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'change',
+                'type' => 'venue',
 
                 'read' => false,
             ],
@@ -63,7 +63,7 @@ class TuteeNotificationsSeeder extends Seeder
                 'title' => 'Venue Change',
                 'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
                 'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'change',
+                'type' => 'venue',
 
                 'read' => false,
             ],
