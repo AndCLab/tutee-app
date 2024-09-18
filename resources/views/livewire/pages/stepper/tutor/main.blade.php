@@ -32,6 +32,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $from = [];
     public $to = [];
     public $work = [];
+    public $company = [];
 
     public $degree = [];
 
@@ -55,6 +56,8 @@ new #[Layout('layouts.app')] class extends Component {
         $this->from = [''];
         $this->to = [''];
         $this->work = [''];
+        $this->company = [''];
+
         $this->certificates = [''];
         $this->title_certi = [''];
         $this->from_certi = [''];
@@ -67,6 +70,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->from[] = '';
         $this->to[] = '';
         $this->work[] = '';
+        $this->company[] = '';
     }
 
     public function remove_work($index)
@@ -75,11 +79,13 @@ new #[Layout('layouts.app')] class extends Component {
         unset($this->from[$index]);
         unset($this->to[$index]);
         unset($this->work[$index]);
+        unset($this->company[$index]);
 
         $this->input_work = array_values($this->input_work);
         $this->from = array_values($this->from);
         $this->to = array_values($this->to);
         $this->work = array_values($this->work);
+        $this->company = array_values($this->company);
     }
 
     // Degree
@@ -212,6 +218,8 @@ new #[Layout('layouts.app')] class extends Component {
                     'from.*' => 'required|date',
                     'to.*' => 'required|date|after:from.*',
                     'work.*' => 'required|max:200',
+                    'company.*' => 'nullable|max:255',
+
                     'certificates.*' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048',
                     'resume' => 'required|file|mimes:pdf|max:2048',
 
@@ -224,7 +232,8 @@ new #[Layout('layouts.app')] class extends Component {
                     'from.*.required' => 'The from is required',
                     'to.*.required' => 'The to is required',
                     'work.*.required' => 'The work is required',
-                    'certificates.*.required' => 'The certificate is required',
+                    'company.*.required' => 'The company is required',
+
                     'to.*.after' => 'The "to" date must be after the "from" date.',
                     'resume.required' => 'The resume is required',
 
@@ -260,6 +269,7 @@ new #[Layout('layouts.app')] class extends Component {
                     'from' => $this->from[$item],
                     'to' => $this->to[$item],
                     'work' => $this->work[$item],
+                    'company' => $this->company[$item],
                 ]);
             }
 

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('from');
             $table->date('to');
             $table->string('work');
+            $table->string('company')->nullable();
             $table->timestamps();
         });
     }

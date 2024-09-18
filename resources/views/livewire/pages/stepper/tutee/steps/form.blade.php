@@ -49,7 +49,7 @@
                             <!-- Suggestions Dropdown -->
                             <div x-show="isOpen"
                                 @click.away="close"
-                                class="absolute mt-1 z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg"
+                                class="absolute mt-1 z-10 w-full max-h-52 overflow-auto soft-scrollbar bg-white border border-gray-200 rounded-md shadow-lg"
                                 x-transition:enter="transition ease-out duration-100"
                                 x-transition:enter-start="transform opacity-0 scale-95"
                                 x-transition:enter-end="transform opacity-100 scale-100"
@@ -57,7 +57,7 @@
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95">
                                 <ul>
-                                    <template x-for="(suggestion, index) in filteredSuggestions.slice(0, 5)" :key="index">
+                                    <template x-for="(suggestion, index) in filteredSuggestions" :key="index">
                                         <li class="px-4 py-2 cursor-pointer hover:bg-gray-100"
                                             x-text="suggestion"
                                             @click="selectSuggestion(suggestion)">
@@ -134,9 +134,26 @@
 
                 filterSuggestions() {
                     this.query = this.$refs.input.value;
-                    this.filteredSuggestions = this.suggestions.filter(suggestion =>
-                        suggestion.toLowerCase().includes(this.query.toLowerCase())
-                    );
+                    this.filteredSuggestions = this.suggestions
+                        .filter(suggestion => suggestion.toLowerCase().includes(this.query.toLowerCase()))
+                        .sort((a, b) => {
+                            const queryLower = this.query.toLowerCase();
+                            const aStartsWith = a.toLowerCase().startsWith(queryLower);
+                            const bStartsWith = b.toLowerCase().startsWith(queryLower);
+
+                            /*
+                                if (aStartsWith && !bStartsWith) {
+                                    return -1;
+                                }
+                                if (!aStartsWith && bStartsWith) {
+                                    return 1;
+                                }
+                                return 0;
+                            */
+
+                            return aStartsWith && !bStartsWith ? -1 : bStartsWith && !aStartsWith ? 1 : 0;
+                        });
+
                     this.isOpen = this.filteredSuggestions.length > 0;
                 },
 
