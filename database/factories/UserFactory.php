@@ -34,6 +34,9 @@ class UserFactory extends Factory
         return [
             'fname' => fake()->firstName(),
             'lname' => fake()->lastName(),
+            'name' => function (array $attributes) {
+                return $attributes['fname'] . ' ' . $attributes['lname'];
+            },
             'email' => fake()->unique()->safeEmail(),
             'address' => fake()->address(),
             'zip_code' => fake()->randomNumber(5, true),
@@ -59,8 +62,7 @@ class UserFactory extends Factory
                 $user->tutors()->create([
                     'user_id' => $user->id,
                     'bio' => fake()->paragraph(2),
-                    'work' => json_encode(fake()->randomElements([fake()->word(), fake()->word(), fake()->word()], 1)),
-                    'degree' => json_encode(fake()->randomElements(['bachelor', 'master', 'PhD'], 1)),
+                    'work' => fake()->word(),
                 ]);
             }
         });

@@ -19,14 +19,4 @@ class ClassRoster extends Model
         'payment_status'
     ];
 
-    public function tutees()
-    {
-        return $this->belongsTo(Tutee::class, 'tutee_id');
-    }
-
-    public function classes()
-    {
-        return $this->belongsTo(Classes::class, 'class_id');
-    }
-
 }
