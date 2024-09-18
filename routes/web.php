@@ -17,13 +17,19 @@ Route::view('/', 'welcome');
 
 Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook'])->name('facebook.login');
 Route::get('auth/facebook/call-back', [FacebookController::class, 'handleFacebookCallback']);
+Route::view('auth/facebook/cancel', 'layouts.facebook.facebook_cancel')->name('facebook.cancel');
 
 // Route for handling date selection
 Route::get('/dates', [ApiSelect::class, 'getDate'])->name('dates');
 
-// Routes for Google login
+
+// Google OAuth Routes
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/call-back', [GoogleController::class, 'handleGoogleCallback']);
+Route::view('auth/google/cancel', 'layouts.google.google_cancel')->name('google.cancel');
+
+
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified', 'check.is_stepper'])
     ->name('dashboard');
