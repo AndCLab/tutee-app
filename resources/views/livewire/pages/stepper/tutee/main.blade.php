@@ -144,7 +144,6 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function submit()
     {
-        // Update stepper to 0
         $user = User::find(Auth::id());
         $user->user_type = $this->user_type;
         $user->is_stepper = 0;

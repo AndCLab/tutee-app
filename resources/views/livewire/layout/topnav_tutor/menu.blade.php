@@ -1,7 +1,4 @@
-{{-- Switch role  --}}
-<x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='Switch Role' />
-
-{{-- Icons --}}                
+{{-- Tutor Icons --}}                
 <x-wui-dropdown>
     <x-slot name="trigger">
         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  
