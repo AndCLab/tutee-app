@@ -14,6 +14,7 @@ class Work extends Model
         'tutor_id',
         'from',
         'to',
-        'work'
+        'work',
+        'company',
     ];
 }

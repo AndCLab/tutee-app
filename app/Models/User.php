@@ -109,7 +109,6 @@ class User extends Authenticatable
             'name' => $this->name,
             'is_group' => false,
             'is_user' => true,
-            'is_admin' => (bool) $this->is_admin,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'blocked_at' => $this->blocked_at,
