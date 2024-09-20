@@ -66,4 +66,26 @@ class User extends Authenticatable
         return $this->hasMany(Tutee::class);
     }
     
+
+    // Define the polymorphic relationship
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
+    
+    public function getNotifications()
+    {
+        return $this->notifications()->orderBy('created_at', 'desc')->get();
+    }
+
+    public function updateNotifications()
+    {
+        if ($this->user_type == 'tutor') {
+            $this->tuteeNotifications()->delete();
+            $this->tutorNotifications()->createMany($this->notifications()->get());
+        } elseif ($this->user_type == 'tutee') {
+            $this->tutorNotifications()->delete();
+            $this->tuteeNotifications()->createMany($this->notifications()->get());
+        }
+    }
 }

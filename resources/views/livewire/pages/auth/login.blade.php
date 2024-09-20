@@ -13,7 +13,7 @@ new #[Layout('layouts.guest')] class extends Component {
     /**
      * Handle an incoming authentication request.
      */
-    public function login(): void
+     public function login(): void
     {
         $this->validate();
 
@@ -22,19 +22,24 @@ new #[Layout('layouts.guest')] class extends Component {
         Session::regenerate();
 
         if (Auth::check()) {
-            $user = Auth::user();
+            $user = Auth::user(); // Get the authenticated user
 
+            // Fetch notifications for the logged-in user
+            // In the login function
+            $notifications = $user->getNotifications();
+
+            // Determine the route to redirect to
             if ($user->is_stepper == 1) {
                 $route = 'stepper';
             } else {
                 $route = $user->user_type == 'tutee' ? 'tutee.discover' : 'tutor.discover';
             }
 
+            // Redirect to the intended route
             $this->redirectIntended(route($route), navigate: true);
         }
-
-
     }
+
 }; ?>
 
 <div class="max-w-sm mx-auto">

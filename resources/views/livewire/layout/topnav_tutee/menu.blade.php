@@ -1,5 +1,12 @@
-{{-- Apply as Tutor --}}
-<x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical' spinner='applyAsTutor' label='Apply as Tutor' />  
+<div class="relative">
+    {{-- Role icon (to show unread notifications) --}}
+    <livewire:role-icon />
+
+    {{-- Apply as Tutor --}}
+    <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical' spinner='applyAsTutor' label='Apply as Tutor'>
+        Apply as Tutor
+    </x-wui-button>
+</div>
 
 {{-- Icons --}}                
 <x-wui-dropdown>
@@ -31,9 +38,6 @@
     </x-wui-dropdown.item>
 </x-wui-dropdown>
 
-{{-- <x-wui-dropdown >
-    <livewire:Notifications />
-</x-wui-dropdown> --}}
 
 {{-- Notification Dropdown --}}
 <x-wui-dropdown>

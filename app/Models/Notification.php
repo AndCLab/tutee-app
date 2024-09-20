@@ -10,9 +10,16 @@ class Notification extends Model
     use HasFactory;
 
     protected $casts = [
-        'date' => 'datetime', // Add this line
+        'data' => 'array', // To cast 'data' field as array
+        'created_at' => 'datetime', // To cast 'created_at' as datetime
     ];
 
-    protected $listeners = ['load-more' => 'loadNotifications'];
+    // Remove this line since $listeners are used in Livewire components, not Eloquent models.
+    // protected $listeners = ['load-more' => 'loadNotifications'];
 
+    // Define polymorphic relation
+    public function notifiable()
+    {
+        return $this->morphTo();
+    }
 }

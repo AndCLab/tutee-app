@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();  // Laravel uses UUID for notification IDs
             $table->string('type');  // Notification class name
-            $table->morphs('notifiable');  // Polymorphic relation: notifiable_type and notifiable_id
+
+            // Polymorphic relation: notifiable_type and notifiable_id
+            $table->morphs('notifiable');  // This creates `notifiable_type` and `notifiable_id`
+
             $table->text('data');  // The actual notification data (usually stored as JSON)
             $table->timestamp('read_at')->nullable();  // When the notification was read
             $table->timestamps();  // Created_at, updated_at
         });
-        
     }
-    
 
     /**
      * Reverse the migrations.

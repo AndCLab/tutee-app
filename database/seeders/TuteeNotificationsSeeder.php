@@ -3,84 +3,45 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\TuteeNotification;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class TuteeNotificationsSeeder extends Seeder
 {
     public function run()
     {
-        $notifications = [
-            [
-                'title' => 'Venue Change',
-                'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
-                'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'venue',
+        // Restrict notification types
+        $types = ['venue', 'schedule', 'assignment'];
+        // Define tutee users with their IDs
+        $tutees = [2];
 
-                'read' => false,
-            ],
-            [
-                'title' => 'Scheduled Tutorial',
-                'content' => 'You have a scheduled tutorial on Data Structures and Algorithms with tutor Regina Frey on Wednesday, May 1, 2024 (9:00AM - 12:00NN).',
-                'date' => Carbon::parse('2024-04-29')->format('Y-m-d'),
-                'type' => 'schedule',
+        foreach ($tutees as $userId) {
+            for ($i = 1; $i <= 20; $i++) {
+                // Ensure at least 2 different types of notifications per user
+                $notificationType = $types[$i % count($types)];
 
-                'read' => false,
-            ],
-            [
-                'title' => 'Venue Change',
-                'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
-                'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'venue',
+                // DB::table('tutee_notifications')->insert([
+                //     'user_id' => $userId,
+                //     'title' => 'Tutee Notification ' . $i,
+                //     'content' => "This is tutee notification {$i} for user ID {$userId}.",
+                //     'date' => Carbon::now()->subDays(rand(1, 10)),  // Random date from the past 10 days
+                //     'type' => $notificationType,
+                //     'created_at' => now(),
+                //     'updated_at' => now(),
+                // ]);
 
-                'read' => false,
-            ],
-            [
-                'title' => 'Scheduled Tutorial',
-                'content' => 'You have a scheduled tutorial on Data Structures and Algorithms with tutor Regina Frey on Wednesday, May 1, 2024 (9:00AM - 12:00NN).',
-                'date' => Carbon::parse('2024-04-29')->format('Y-m-d'),
-                'type' => 'schedule',
+                $randomDate = now()->subDays(rand(1, 10));  // Generate a random date within the past 10 days
 
-                'read' => false,
-            ],
-            [
-                'title' => 'Venue Change',
-                'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
-                'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'venue',
+                DB::table('tutee_notifications')->insert([
+                    'user_id' => $userId,
+                    'title' => 'Tutee Notification ' . $i,
+                    'content' => "This is tutee notification {$i} for user ID {$userId}.",
+                    'type' => $notificationType,
+                    'created_at' => $randomDate,  // Set created_at to the random date
+                    'updated_at' => now(),  // Set updated_at to the current date and time
+                ]);
 
-                'read' => false,
-            ],
-            [
-                'title' => 'Scheduled Tutorial',
-                'content' => 'You have a scheduled tutorial on Data Structures and Algorithms with tutor Regina Frey on Wednesday, May 1, 2024 (9:00AM - 12:00NN).',
-                'date' => Carbon::parse('2024-04-29')->format('Y-m-d'),
-                'type' => 'schedule',
-
-                'read' => false,
-            ],
-            [
-                'title' => 'Venue Change',
-                'content' => 'The venue for your tutorial on Advanced Web Technologies with Elanor Pera has been changed, see details.',
-                'date' => Carbon::today()->format('Y-m-d'),
-                'type' => 'venue',
-
-                'read' => false,
-            ],
-            [
-                'title' => 'Scheduled Tutorial',
-                'content' => 'You have a scheduled tutorial on Data Structures and Algorithms with tutor Regina Frey on Wednesday, May 1, 2024 (9:00AM - 12:00NN).',
-                'date' => Carbon::parse('2024-04-29')->format('Y-m-d'),
-                'type' => 'schedule',
-
-                'read' => false,
-            ],
-            // Add more notifications as needed
-        ];
-
-        foreach ($notifications as $notification) {
-            TuteeNotification::create($notification);
+            }
         }
     }
 }
-

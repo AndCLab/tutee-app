@@ -9,8 +9,10 @@
     </svg>
 
     @if($unreadCount > 0)
-        <span class="absolute top-[-0.25rem] right-0 inline-flex items-center justify-center px-0.5 py-0.25 text-xs font-bold leading-none text-white bg-red-600 rounded-full border border-white rounded-full">
+        <span class="absolute top-[-0.5rem] right-0 inline-block text-center leading-none text-white bg-red-600 rounded-full py-1 px-1 text-xs">
             {{ $unreadCount }}
         </span>
     @endif
+
+
 </div>

@@ -1,5 +1,7 @@
 <?php
 
+// RoleIcon.php
+
 namespace App\Livewire;
 
 use Livewire\Component;
@@ -7,27 +9,21 @@ use App\Models\TuteeNotification;
 use App\Models\TutorNotification;
 use Illuminate\Support\Facades\Auth;
 
-class NotificationIcon extends Component
+class RoleIcon extends Component
 {
-    public $unreadCount = 0;
     public $otherUnreadCount = 0;
-    
+    public $userType;  // Declare the userType property
+
     public function mount()
     {
         $user = Auth::user();
-        $userType = $user->user_type;
-        
-        if ($userType === 'tutee') {
-            $this->unreadCount = TuteeNotification::where('user_id', $user->id)
-                ->where('read', false)
-                ->count();
+        $this->userType = $user->user_type;  // Assign user_type to the public property
+
+        if ($this->userType === 'tutee') {
             $this->otherUnreadCount = TutorNotification::where('user_id', $user->id)
                 ->where('read', false)
                 ->count();
-        } elseif ($userType === 'tutor') {
-            $this->unreadCount = TutorNotification::where('user_id', $user->id)
-                ->where('read', false)
-                ->count();
+        } elseif ($this->userType === 'tutor') {
             $this->otherUnreadCount = TuteeNotification::where('user_id', $user->id)
                 ->where('read', false)
                 ->count();
@@ -36,7 +32,8 @@ class NotificationIcon extends Component
 
     public function render()
     {
-        return view('livewire.pages.notification-icon');
+        return view('livewire.pages.role-icon');
     }
 }
+
 

@@ -132,3 +132,9 @@
     </div>
 </div> --}}
 
+<script>
+    function toggleDropdown() {
+        // Toggle the visibility of the dropdown menu
+        document.querySelector('[x-show="status"]').classList.toggle('hidden');
+    }
+</script>

@@ -1,5 +1,12 @@
-{{-- Switch role  --}}
-<x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='Switch Role' />
+<div class="relative">
+    {{-- Role icon (to show unread notifications) --}}
+    <livewire:role-icon />
+
+    {{-- Switch role button --}}
+    <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='Switch Role'>
+        Switch Role
+    </x-wui-button>
+</div>
 
 {{-- Icons --}}                
 <x-wui-dropdown>
