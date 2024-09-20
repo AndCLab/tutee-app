@@ -88,4 +88,9 @@ class User extends Authenticatable
             $this->tuteeNotifications()->createMany($this->notifications()->get());
         }
     }
+    
+    public function fields()
+    {
+        return $this->hasMany(Fields::class);
+    }
 }

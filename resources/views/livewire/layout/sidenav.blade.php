@@ -55,12 +55,12 @@ new class extends Component {
 
 --}}
 
-<div class="hidden md:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
+<div class="hidden sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
 
     {{-- sidenav container --}}
     <div @class([
         'flex h-screen flex-col sticky top-0 justify-between border-e ',
-        'bg-white' => $role == 'tutee',
+        'bg-[#F9F9F9]' => $role == 'tutee',
         'bg-[#0C3B2E]' => $role == 'tutor',
     ])>
         <div class="px-4 py-6">
@@ -69,17 +69,31 @@ new class extends Component {
         <div class="flex items-center mb-4">
             <img src="{{ asset('images/tutee-logo.png') }}" alt="Tutee Logo" class="h-10 w-10 mr-2"> <!-- Adjust size as needed -->
             <h1 @class([
-                'uppercase font-bold text-4xl px-2 font-anton',
-                'text-[#0C3B2E]' => $role == 'tutee',
+                'uppercase font-bold text-center text-4xl px-2 font-anton mb-4',
+                'text-[#0F172A]' => $role == 'tutee',
+                'text-[#6D9773]' => $role == 'tutor',
+            ]) x-show='expanded'>t</h1>
+
+            {{-- tutee header --}}
+            <h1 @class([
+                'uppercase font-bold text-4xl px-2 font-anton mb-4',
+                'text-[#0F172A]' => $role == 'tutee',
                 'text-[#6D9773]' => $role == 'tutor',
             ]) x-show='!expanded'>tutee</h1>
         </div>
 
+            <div
+                @class([
+                    'w-full h-[0.063rem]',
+                    'bg-[#0C3B2E]' => $role,
+                    'bg-[#6D9773]' => $role
+                ])
+            ></div>
 
             {{-- tutee and tutor list --}}
             <ul @class([
                 'mt-6 space-y-1',
-                'text-[#0C3B2E]' => $role == 'tutee',
+                'text-[#0F172A]' => $role == 'tutee',
                 'text-[#D9D9D9]' => $role == 'tutor',
             ])>
                 @if ($role == 'tutee')
@@ -91,11 +105,11 @@ new class extends Component {
         </div>
 
         {{-- profile and logout --}}
-        <div class="sticky inset-x-0 bottom-0 px-4">
+        <div class="px-4">
             <div x-data="{ tooltip: false }" class="relative">
-                <a href="{{ route('profile') }}" wire:navigate.hover @class([
+            <a href="{{ route('profile') }}" wire:navigate @class([
                     'flex items-center gap-2 px-2 py-2 rounded-md w-full',
-                    'hover:bg-[#F2F2F2]' => $role == 'tutee',
+                    'hover:bg-[#E4E6E9]' => $role == 'tutee',
                     'hover:bg-[#F2F2F2]/10' => $role == 'tutor',
                 ])
                     x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = false">
@@ -103,17 +117,17 @@ new class extends Component {
                     {{-- profile picture --}}
                     @if (Auth::user()->avatar == null)
                         <img alt="default.png" src="{{ $defaultProfile }}" :class="expanded ? 'size-6' : 'size-10'"
-                            class="rounded-full object-cover" />
+                            class="rounded-full object-cover border border-[#F1F5F9] overflow-hidden" />
                     @else
                         <img alt="current avatar" src="{{ $avatar }}" :class="expanded ? 'size-6' : 'size-10'"
-                            class="rounded-full object-cover" />
+                            class="rounded-full object-cover border border-[#F1F5F9] overflow-hidden" />
                     @endif
 
                     {{-- full name and email --}}
                     <div x-show='!expanded'>
                         <p @class([
                             'text-xs max-w-28 truncate',
-                            'text-[#0C3B2E]' => $role == 'tutee',
+                            'text-[#0F172A]' => $role == 'tutee',
                             'text-[#D9D9D9]' => $role == 'tutor',
                         ])>
                             <strong class="block font-medium max-w-28 truncate">{{ $fullName }}</strong>
@@ -135,7 +149,7 @@ new class extends Component {
             <div x-data="{ tooltip: false }" class="relative">
                 <button wire:click='logout' :class="expanded ? 'w-fit' : 'w-full'" @class([
                     'inline-flex gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md',
-                    'text-[#0C3B2E] hover:bg-[#F2F2F2]' => $role == 'tutee',
+                    'text-[#0F172A] hover:bg-[#E4E6E9]' => $role == 'tutee',
                     'text-[#D9D9D9] hover:bg-[#F2F2F2]/10' => $role == 'tutor',
                 ])
                     x-on:mouseenter="tooltip = !tooltip" x-on:mouseleave="tooltip = !tooltip">
@@ -165,7 +179,7 @@ new class extends Component {
     {{-- collapse button --}}
     <div class="absolute h-full left-full">
         <div class="sticky top-0 flex h-screen justify-center items-center">
-            <button @click='toggleSidenav' class="text-[#0C3B2E]">
+            <button @click='toggleSidenav' class="text-[#0F172A]">
                 <template x-if='!expanded'>
                     <svg x-show='!expanded' xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                         fill="currentColor">

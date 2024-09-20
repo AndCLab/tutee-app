@@ -9,6 +9,8 @@ new #[Layout('layouts.app')] class extends Component {
     public $count;
     public $confirm;
 
+    public $title = 'Stepper | Role Selection';
+
     public function mount()
     {
         $this->count = 1;
@@ -35,6 +37,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->redirect('/login', navigate: true);
     }
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <div>
     @include('livewire.pages.stepper.body')

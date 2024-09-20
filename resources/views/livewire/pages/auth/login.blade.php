@@ -36,7 +36,8 @@ new #[Layout('layouts.guest')] class extends Component {
             }
 
             // Redirect to the intended route
-            $this->redirectIntended(route($route), navigate: true);
+            // $this->redirectIntended(route($route), navigate: true);
+            $this->redirect(route($route), navigate: true);
         }
     }
 
