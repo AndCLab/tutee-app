@@ -189,7 +189,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         if ($user->apply_status == 'pending'){
             $user->apply_status = 'applied';
-            $user->apply_status->save();
+            $user->save();
         }
 
         if ($user && $this->user_type === 'tutor') {
