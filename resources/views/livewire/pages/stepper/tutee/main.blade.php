@@ -143,11 +143,18 @@ new #[Layout('layouts.app')] class extends Component {
     public function submit()
     {
         $user = User::find(Auth::id());
-        $user->user_type = $this->user_type;
-        $user->is_stepper = 0;
-        $user->save();
+        // $user->user_type = $this->user_type;
+        // $user->is_stepper = 0;
+        // $user->save();
 
-        if ($user && $this->user_type === 'tutee') {
+        //if ($user && $this->user_type === 'tutee') {
+
+        if ($user->user_type === 'tutor') {
+            $user->user_type = 'tutee';
+            $user->apply_status = 'applied';
+            $user->is_stepper = 0;
+            $user->save();
+
             $tutee = Tutee::create([
                 'user_id' => $user->id,
                 'grade_level' => $this->grade_level,
