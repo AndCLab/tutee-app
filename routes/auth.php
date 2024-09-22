@@ -53,3 +53,8 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
 
     Route::view('/forbidden-access', 'forbidden-page');
 });
+
+Route::middleware('checkIsApplied')->group(function () {
+    Volt::route('stepper/be-a-tutee', 'pages.stepper.tutee.main')->name('stepper.be-a-tutee');
+    Volt::route('stepper/apply-as-tutor', 'pages.stepper.tutor.main')->name('stepper.apply-as-tutor');
+});
