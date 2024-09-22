@@ -183,18 +183,16 @@ new #[Layout('layouts.app')] class extends Component {
     public function submit()
     {
         $user = User::find(Auth::id());
-        // $user->user_type = $this->user_type;
-        // $user->is_stepper = 0;
-        // $user->save();
+        $user->user_type = $this->user_type;
+        $user->is_stepper = 0;
+        $user->save();
 
-        // if ($user && $this->user_type === 'tutor') {
-
-        if ($user->user_type === 'tutee') {
-            $user->user_type = 'tutor';
+        if ($user->apply_status == 'pending'){
             $user->apply_status = 'applied';
-            $user->is_stepper = 0;
-            $user->save();
+            $user->apply_status->save();
+        }
 
+        if ($user && $this->user_type === 'tutor') {
             $tutor = Tutor::create([
                 'user_id' => $user->id,
                 'work' => json_encode($this->work),
