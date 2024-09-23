@@ -110,22 +110,25 @@
 
                     <div class="mt-6">
                         <div class="block">
-                            <x-wui-checkbox wire:model='confirm' class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
+                            <x-wui-checkbox 
+                                :disabled="Auth::user()->apply_status == 'pending'"
+                                wire:model='confirm' class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
                         </div>
                     </div>
                 </div>
 
                 <div>
-
-                    <div class="mt-6 flex justify-end">
-                        <x-secondary-button x-on:click='close'>
-                            {{ __('Cancel') }}
-                        </x-secondary-button>
-
-                        <x-primary-button class="ms-3" x-bind:disabled="!open">
-                            {{ __('Submit') }}
-                        </x-primary-button>
-                    </div>
+                    @if (!(Auth::user()->apply_status == 'pending'))
+                        <div class="mt-6 flex justify-end">
+                            <x-secondary-button x-on:click='close'>
+                                {{ __('Cancel') }}
+                            </x-secondary-button>
+    
+                            <x-primary-button class="ms-3" x-bind:disabled="!open">
+                                {{ __('Submit') }}
+                            </x-primary-button>
+                        </div>
+                    @endif
                 </div>
             </form>
         </x-wui-card>
