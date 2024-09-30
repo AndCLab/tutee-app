@@ -1,3 +1,4 @@
+{{-- resources\views\livewire\pages\tutee\tutors.blade.php --}}
 <?php
 
 use Livewire\Volt\Component;
@@ -9,8 +10,11 @@ use App\Models\User;
 use App\Models\Tutee;
 use App\Models\Classes;
 use App\Models\Fields;
+use App\Models\Bookmark;
 
 new #[Layout('layouts.app')] class extends Component {
+    protected $listeners = ['selectTutor'];
+
     public $title = 'Tutors | Tutee';
 
     public $tutors;
@@ -45,9 +49,19 @@ new #[Layout('layouts.app')] class extends Component {
     public $tutor_type;
 
     public $getFields = []; // fields getter
+    
+    public $isBookmarked;
+    public $tutorIdForBookmark;
+    public $isHovered=false;
 
     public function mount()
     {
+
+        $tutor_id = request()->query('tutor_id');
+        if ($tutor_id) {
+            $this->selectTutor($tutor_id);
+        }
+
         $this->getFields = Fields::where('user_id', Auth::id())
             ->get(['field_name'])
             ->toArray();
@@ -72,7 +86,89 @@ new #[Layout('layouts.app')] class extends Component {
         $this->ST_GRClasses = Classes::where('tutor_id', $tutor_id)->where('class_category', 'group')->count();
 
         $this->selectedClass = Classes::where('tutor_id', $tutor_id)->get();
+
+        $this->tutorIdForBookmark = $tutor_id;
+        $this->isBookmarked = Bookmark::where('tutor_id', $tutor_id)
+                            ->where('user_id', Auth::id())
+                            ->exists();
     }
+
+    // public function selectTutor($tutor_id)
+    // {
+    //     $this->selectedTutor = Tutor::findOrFail($tutor_id);
+    //     $this->show_tutor = $this->selectedTutor->user->fname;
+
+    //     $this->ST_INDIClasses = Classes::where('tutor_id', $tutor_id)->where('class_category', 'individual')->count();
+    //     $this->ST_GRClasses = Classes::where('tutor_id', $tutor_id)->where('class_category', 'group')->count();
+
+    //     $this->selectedClass = Classes::where('tutor_id', $tutor_id)->get();
+
+    //     $this->tutorIdForBookmark = $tutor_id;
+    //     $this->isBookmarked = Bookmark::where('tutor_id', $tutor_id)
+    //                         ->where('user_id', Auth::id())
+    //                         ->exists();
+    // }
+
+
+
+    public function toggleBookmark()
+    {
+        if ($this->isBookmarked) {
+            // Remove bookmark
+            Bookmark::where('tutor_id', $this->tutorIdForBookmark)
+                ->where('user_id', Auth::id())
+                ->delete();
+            $this->isBookmarked = false;
+        } else {
+            // Add bookmark
+            Bookmark::create([
+                'tutor_id' => $this->tutorIdForBookmark,
+                'user_id' => Auth::id(),
+            ]);
+            $this->isBookmarked = true;
+        }
+    }
+
+    // public function toggleBookmark()
+    // {
+    //     if ($this->isBookmarked) {
+    //         // Remove bookmark
+    //         Bookmark::where('tutor_id', $this->tutorIdForBookmark)
+    //             ->where('user_id', Auth::id())
+    //             ->delete();
+    //         $this->isBookmarked = false;
+    //     } else {
+    //         // Add bookmark
+    //         Bookmark::create([
+    //             'tutor_id' => $this->tutorIdForBookmark,
+    //             'user_id' => Auth::id(),
+    //         ]);
+    //         $this->isBookmarked = true;
+    //     }
+
+    //     // Emit event to update Alpine.js state
+    //     $this->emit('bookmarkUpdated', $this->isBookmarked);
+    // }
+
+
+    public function isTutorBookmarked($tutorId)
+    {
+        // Check if the current user has bookmarked the tutor
+        return Bookmark::where('user_id', Auth::id())
+                    ->where('tutor_id', $tutorId)
+                    ->exists();
+    }
+
+    // public function hoverBookmark()
+    // {
+    //     $this->isHovered = true;
+    // }
+
+    // public function leaveBookmark()
+    // {
+    //     $this->isHovered = false;
+    // }
+
 
     public function updated()
     {

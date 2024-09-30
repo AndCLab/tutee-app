@@ -1,4 +1,6 @@
-<div class="w-96 p-4 bg-white shadow-lg rounded-lg h-full relative">
+{{-- resources\views\livewire\pages\notifications.blade.php --}}
+
+<div class="w-80 p-4 bg-white shadow-lg rounded-lg h-full relative">
     @if(empty($notifications))
         <h2 class="text-lg font-semibold mb-4">Notifications</h2>
         <p class="text-center text-gray-500">You have no Notifications</p>
