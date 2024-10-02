@@ -31,7 +31,7 @@
                     <x-primary-button wire:click='next_step' class="w-full">
                         Next
                     </x-primary-button>
-                @elseif($count === 4 && Auth::user()->is_applied == 1)
+                @elseif($count === 4 && Auth::user()->apply_status == 'pending')
                     <x-primary-button onclick="$openModal('applicationModal')" class="w-full">
                         Submit
                     </x-primary-button>

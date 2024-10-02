@@ -30,7 +30,7 @@ class User extends Authenticatable
         'phone_prefix',
         'phone_number',
         'is_stepper',
-        'is_applied',
+        'apply_status',
         'user_type',
         'google_id',
         'facebook_id',
