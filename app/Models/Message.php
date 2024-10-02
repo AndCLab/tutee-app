@@ -35,4 +35,18 @@ class Message extends Model
     {
         return $this->hasMany(MessageAttachment::class);
     }
+
+    protected static function booted()
+    {
+        static::created(function ($message) {
+            if ($message->group_id) {
+                $group = Group::find($message->group_id);
+
+                if ($group) {
+                    $group->last_message_id = $message->id;
+                    $group->save();
+                }
+            }
+        });
+    }
 }
