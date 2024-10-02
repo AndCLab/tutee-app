@@ -86,9 +86,16 @@ new class extends Component {
                         <p>Your Tutor account has been verified.</p>
                     @endif
 
-                    <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical'
-                    spinner='beATutee' label='Be a Tutee' />
-                    @include('livewire.layout.topnav_tutor.menu')
+                    <div>
+                        <livewire:role-icon />
+
+                        <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical'
+                        spinner='beATutee' label='Be a Tutee' /> 
+                        @include('livewire.layout.topnav_tutor.menu')                      
+                    </div>
+
+                    
+                    
 
                 {{-- Switch to Tutee (Tutee and applied as Tutor) --}}
                 @elseif ($role == 'tutor' && $user->is_applied)
@@ -101,21 +108,36 @@ new class extends Component {
                         <p>Your Tutor account has been verified.</p>
                     @endif
 
-                    <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
-                    spinner='switchRole' label='Switch to Tutee' />
-                    @include('livewire.layout.topnav_tutor.menu')
+                    <div>
+                        <livewire:role-icon />
+
+                        <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
+                        spinner='switchRole' label='Switch to Tutee' />
+                        @include('livewire.layout.topnav_tutor.menu')    
+                    </div>
 
                 {{-- Apply as Tutor (Tutee and not yet Tutor) --}}
                 @elseif ($role == 'tutee' && !$user->is_applied)
-                    <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
-                    spinner='applyAsTutor' label='Apply as Tutor' />
-                    @include('livewire.layout.topnav_tutee.menu')
+
+                    <div>
+                        <livewire:role-icon />
+
+                        <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
+                        spinner='applyAsTutor' label='Apply as Tutor' />
+                        @include('livewire.layout.topnav_tutee.menu')
+                    </div>
+
 
                 {{-- Switch to Tutor (Tutor and applied as Tutee) --}}
                 @elseif ($role == 'tutee' && $user->is_applied)
-                    <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
-                    spinner='switchRole' label='Switch to Tutor' />
-                    @include('livewire.layout.topnav_tutee.menu')
+                    <div>
+                        <livewire:role-icon />
+
+                        <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
+                        spinner='switchRole' label='Switch to Tutor' />
+                        @include('livewire.layout.topnav_tutee.menu')
+                    </div>
+
                 @endif
 
                 {{-- Switch role testing purposes

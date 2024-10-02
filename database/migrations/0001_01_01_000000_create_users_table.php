@@ -17,16 +17,18 @@ return new class extends Migration
             $table->string('lname');
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('address');
-            $table->string('zip_code', 5);
-            $table->string('phone_prefix');
-            $table->string('phone_number')->unique();
+            $table->string('address')->nullable(); // Make the address field nullable
+            $table->string('zip_code', 5)->nullable();
+            $table->string('phone_prefix')->nullable();
+            $table->string('phone_number')->nullable()->unique();
             $table->boolean('is_stepper')->default(1);
             $table->boolean('is_applied')->default(0);
             $table->enum('user_type', ['tutee', 'tutor'])->nullable();
             $table->string('avatar')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->string('google_id')->nullable();
+            $table->string('facebook_id')->nullable();
             $table->timestamp('blocked_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

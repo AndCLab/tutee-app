@@ -71,6 +71,18 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '9576238479',
         ]);
 
+        $this->call(UserSeeder::class);
+        $this->call(FieldsSeeder::class);
+        $this->call(TutorSeeder::class);
+        $this->call(TuteeSeeder::class);
+
+        // Adding the Tutor and Tutee Notification seeders
+        $this->call(TutorNotificationsSeeder::class);
+        $this->call(TuteeNotificationsSeeder::class);
+        
+        // $this->call(ClassesSeeder::class);
+        // $this->call(ClassRosterSeeder::class);
+
         User::factory(10)->create();
 
         for($i = 0; $i < 8; $i++){
