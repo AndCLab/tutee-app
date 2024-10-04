@@ -214,7 +214,7 @@ function openGoogleLoginPopup() {
 }
 
 // Function to trigger regular login and close Google popup
-function openRegularLogin() {
+function openOtherLogin() {
     closeGoogleLoginPopup();   // Close Google popup if it's open
     console.log('Regular login triggered.');
     // Handle the regular login process (this could be a form submission or some other logic)

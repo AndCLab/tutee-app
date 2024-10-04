@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable()->unique();
 
             $table->boolean('is_stepper')->default(1);
-            $table->boolean('is_applied')->default(0);
+            $table->enum('apply_status', ['not_applied', 'pending', 'applied'])->default('not_applied');
             $table->enum('user_type', ['tutee', 'tutor'])->nullable();
             $table->string('avatar')->nullable();
             $table->timestamp('email_verified_at')->nullable();

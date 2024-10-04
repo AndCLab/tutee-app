@@ -31,7 +31,7 @@
                     <div class="flex gap-2 items-center">
                         <h2 class="text-xl font-semibold truncate">{{ $tutor_name }}</h2>
 
-                        {{-- <div x-data="{ 
+                    <div x-data="{ 
                             isHovered: false, 
                             isBookmarked: @entangle('isBookmarked') 
                         }" 
@@ -40,61 +40,32 @@
                                 isBookmarked = value;
                             });
                         ">
-                    
-                            <button wire:click="toggleBookmark" @mouseover="isHovered = true" @mouseleave="isHovered = false">
-                                <svg 
-                                    :class="{
-                                        'shadow-lg': isHovered,  // Add shadow when hovered
-                                    }" 
-                                    class="bookMark size-5 cursor-pointer"
-                                    :style="{
-                                        'color': isBookmarked ? 'green' : 'grey'  // Green when bookmarked, grey when not
-                                    }" 
-                                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                    d="M3 2.5C3 2.22386 3.22386 2 3.5 2H11.5C11.7761 2 12 2.22386 12 2.5V13.5C12 13.6818 11.9014 13.8492 11.7424 13.9373C11.5834 14.0254 11.3891 14.0203 11.235 13.924L7.5 11.5896L3.765 13.924C3.61087 14.0203 3.41659 14.0254 3.25762 13.9373C3.09864 13.8492 3 13.6818 3 13.5V2.5ZM4 3V12.5979L6.97 10.7416C7.29427 10.539 7.70573 10.539 8.03 10.7416L11 12.5979V3H4Z"
-                                    fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
-                        </div> --}}
-
-                        <div x-data="{ 
-                            isHovered: false, 
-                            isBookmarked: @entangle('isBookmarked') 
-                        }" 
-                        x-init="
-                            Livewire.on('bookmarkUpdated', value => {
-                                isBookmarked = value;
-                            });
-                        ">
-                        
                         <!-- Button for toggling bookmark -->
                         <button wire:click="toggleBookmark" @mouseover="isHovered = true" @mouseleave="isHovered = false">
-                            
                             <!-- SVG for when not bookmarked -->
                             <template x-if="!isBookmarked">
                                 <svg :class="isHovered ? 'text-green-500' : 'text-gray-500'" class="bookMark size-5 cursor-pointer" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 10.5H14M12 8.5V12.5M8.25 5H15.75C16.4404 5 17 5.58763 17 6.3125V19L12 15.5L7 19V6.3125C7 5.58763 7.55964 5 8.25 5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
                                 </svg>
                             </template>
-                    
+
                             <!-- SVG for when bookmarked but not hovered -->
                             <template x-if="isBookmarked && !isHovered">
                                 <svg class="text-gray-500 bookMark size-5 cursor-pointer" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10.5 10.5L11.5 11.5L14 9M8.25 5H15.75C16.4404 5 17 5.58763 17 6.3125V19L12 15.5L7 19V6.3125C7 5.58763 7.55964 5 8.25 5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
                                 </svg>
                             </template>
-                    
+
                             <!-- SVG for when bookmarked and hovered -->
                             <template x-if="isBookmarked && isHovered">
                                 <svg class="text-red-500 bookMark size-5 cursor-pointer" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10.5 8.56L12 10.06M12 10.06L13.5 11.56M12 10.06L13.5 8.56M12 10.06L10.5 11.56M8.25 5H15.75C16.4404 5 17 5.58763 17 6.3125V19L12 15.5L7 19V6.3125C7 5.58763 7.55964 5 8.25 5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M10.5 10.5L11.5 11.5L14 9M8.25 5H15.75C16.4404 5 17 5.58763 17 6.3125V19L12 15.5L7 19V6.3125C7 5.58763 7.55964 5 8.25 5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
                                 </svg>
                             </template>
-                            
                         </button>
                     </div>
-                        
+
+
                         {{-- <p>Is Bookmarked: {{ $isBookmarked ? 'true' : 'false' }}</p> --}}
                     </div>
                     <div class="flex flex-col gap-2">

@@ -13,7 +13,6 @@ class Bookmarks extends Component
     public $bookmarkedTutors = [];
     public $pages = 5;
 
-    
     public function mount()
     {
         // Load the user's bookmarked tutors on component mount
@@ -96,16 +95,12 @@ class Bookmarks extends Component
 
     public function selectTutorFromBookmarks($tutorId)
     {
-        // Trigger a custom browser event with the tutorId
-        $this->dispatchBrowserEvent('tutorSelected', ['tutorId' => $tutorId]);
+        // Dispatch a browser event in Livewire 3
+        $this->dispatch('tutor-selected', tutorId: $tutorId);
     }
-    
-
 
     public function render()
     {
         return view('livewire.pages.bookmark.bookmarks');
     }
-
 }
-

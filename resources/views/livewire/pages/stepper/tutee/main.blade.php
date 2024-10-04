@@ -149,6 +149,11 @@ new #[Layout('layouts.app')] class extends Component {
         $user->is_stepper = 0;
         $user->save();
 
+        if ($user->apply_status == 'pending'){
+            $user->apply_status = 'applied';
+            $user->save();
+        }
+
         if ($user && $this->user_type === 'tutee') {
             $tutee = Tutee::create([
                 'user_id' => $user->id,
