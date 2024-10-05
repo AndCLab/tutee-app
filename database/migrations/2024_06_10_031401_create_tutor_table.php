@@ -17,6 +17,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('bio')->nullable();
             $table->string('work');
+            $table->json('degree');
             $table->enum('verify_status', ['not_verified', 'pending', 'verified'])->default('not_verified');
             $table->timestamps();
         });
