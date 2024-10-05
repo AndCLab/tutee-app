@@ -29,4 +29,14 @@ class ClassRoster extends Model
         return $this->belongsTo(Classes::class, 'class_id');
     }
 
+    public function scopeSearch($query, $term)
+    {
+        return $query->whereHas('tutees.user', function ($q) use ($term) {
+                            $q->where('fname', 'like', "%{$term}%")
+                                ->orWhere('lname', 'like', "%{$term}%")
+                                ->orWhere('email', 'like', "%{$term}%");
+                        });
+    }
+
+
 }
