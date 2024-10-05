@@ -32,13 +32,17 @@ new #[Layout('layouts.app')] class extends Component {
 
     // for class schedule date
     public $sched_initial_date;
+    public $sched_end_date;
+
     public $start_time;
     public $end_time;
-    public int $interval;
-    public $interval_unit;
-    public $occurrences;
-    public $frequency = 'once';
-    public $generatedDates = [];
+
+    public int $interval; // will always be 1
+    public $interval_unit; // days, weeks, months
+    public $stop_repeating;
+
+    public int $occurrences;
+    public $generatedDates = []; // recurring schedules
 
     // for registration date
     public $regi_start_date;
@@ -57,76 +61,22 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->get(['field_name'])->toArray();
     }
 
-    public function updated()
+    public function computeSchedule($passed_interval, $passed_interval_unit)
     {
         $this->generatedDates = [];
         $startDate = Carbon::parse($this->sched_initial_date);
 
-        if ($this->frequency === 'once') {
-            $this->generatedDates[] = $startDate->format('Y-m-d');
-        } else {
-            $this->validate([
-                // schedules
-                'sched_initial_date' => ['required', 'date'],
-                'start_time' => ['required', 'date_format:H:i'],
-                'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+        $this->interval = $passed_interval;
+        $this->interval_unit = $passed_interval_unit;
 
-                // recurrence and interval
-                'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
-                'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
-                'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
-            ]);
-            for ($i = 0; $i < $this->occurrences; $i++) {
-                $this->generatedDates[] = $startDate->copy()->format('Y-m-d');
-                $startDate->add($this->interval, $this->interval_unit);
-            }
+        for ($i = 0; $i < $this->occurrences; $i++) {
+            $this->generatedDates[] = $startDate->copy()->format('Y-m-d');
+            $startDate->add($this->interval, $this->interval_unit);
         }
     }
 
-    // individual class validation and creation
-    public function IndividualValidation()
+    public function scheduleDate()
     {
-        $this->validate([
-            // class details
-            'class_name' => ['required', 'string', 'max:255', 'unique:classes,class_name'],
-            'class_description' => ['required', 'string', 'max:255'],
-            'class_fields' => ['required'],
-            'class_location' => ['string', 'max:255'],
-            'class_link' => ['string', 'max:255'],
-        ]);
-    }
-
-    public function createIndividualClass()
-    {
-        $tutor = Tutor::where('user_id', Auth::id())->first();
-
-        $this->IndividualValidation();
-
-        if ($this->class_location && $this->class_link) {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
-
-            return;
-        } else if ($this->class_link) {
-            $this->class_type = 'virtual';
-            $this->class_location = $this->class_link;
-        } else if ($this->class_location) {
-            $this->class_type = 'physical';
-        } else {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
-
-            return;
-        }
-
         // schedule
         $scheduleData = [
             'start_time' => $this->start_time,
@@ -170,6 +120,64 @@ new #[Layout('layouts.app')] class extends Component {
 
             return;
         }
+
+    }
+
+    // individual class validation and creation
+    public function IndividualValidation()
+    {
+        $this->validate([
+            // class details
+            'class_name' => ['required', 'string', 'max:255', 'unique:classes,class_name'],
+            'class_description' => ['required', 'string', 'max:255'],
+            'class_fields' => ['required'],
+            'class_location' => ['string', 'max:255'],
+            'class_link' => ['string', 'max:255'],
+
+            // schedules
+            'sched_initial_date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+
+            // recurrence and interval
+            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
+            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
+            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+        ]);
+    }
+
+    public function createIndividualClass()
+    {
+        $tutor = Tutor::where('user_id', Auth::id())->first();
+
+        $this->IndividualValidation();
+
+        if ($this->class_location && $this->class_link) {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        } else if ($this->class_link) {
+            $this->class_type = 'virtual';
+            $this->class_location = $this->class_link;
+        } else if ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
+
+        $this->scheduleDate();
 
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
 
@@ -243,6 +251,16 @@ new #[Layout('layouts.app')] class extends Component {
             'class_link' => ['string', 'max:255'],
             'class_students' => ['required', 'lt:40', 'gt:2'],
 
+            // schedules
+            'sched_initial_date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+
+            // recurrence and interval
+            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
+            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
+            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+
             // registration
             'regi_start_date' => ['required', 'date'],
             'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
@@ -280,49 +298,7 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
-        // schedule
-        $scheduleData = [
-            'start_time' => $this->start_time,
-            'end_time' => $this->end_time,
-            'frequency' => $this->frequency,
-        ];
-
-        if ($this->frequency != 'once') {
-            $scheduleData['interval'] = $this->interval;
-            $scheduleData['interval_unit'] = $this->interval_unit;
-            $scheduleData['occurrences'] = $this->occurrences;
-        }
-
-        // check if the schedule already exists
-        $scheduleExists = Schedule::whereHas('recurring_schedule', function ($query) {
-                                        $query->whereIn('dates', $this->generatedDates);
-                                    })
-                                    ->whereTime('start_time', '<=', $this->end_time)
-                                    ->whereTime('end_time', '>', $this->start_time)
-                                    ->exists();
-
-        if (!$scheduleExists) {
-            // create the schedule
-            $schedule = Schedule::create($scheduleData);
-
-            // add recurring dates
-            foreach ($this->generatedDates as $date) {
-                RecurringSchedule::create([
-                    'schedule_id' => $schedule->id,
-                    'dates' => $date
-                ]);
-            }
-        } else {
-            // notify the user that the schedule already exists
-            $this->notification([
-                'title'       => 'Schedule must be unique',
-                'description' => 'You have chosen this schedule from one of your classes',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
-
-            return;
-        }
+        $this->scheduleDate();
 
         $registration = Registration::create([
             'start_date' => $this->regi_start_date,

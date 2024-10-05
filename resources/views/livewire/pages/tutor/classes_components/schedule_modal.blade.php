@@ -18,7 +18,7 @@
             <x-wui-datetime-picker
                 label="Start Date Time"
                 placeholder="January 1, 2000"
-                wire:model.blur="sched_initial_date"
+                wire:model.live="sched_initial_date"
                 parse-format="YYYY-MM-DD HH:mm"
                 display-format='dddd, MMMM D, YYYY'
                 :min="now()"
@@ -44,73 +44,77 @@
                     errorless
                 />
             </div>
-            <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : 'once' }">
-                {{-- Left panel as radio buttons --}}
-                <ul class="flex bg-[#F1F5F9] px-1.5 py-1.5 gap-2 rounded-lg">
-                    <li class="w-full text-center">
-                        <label :class="tab === 'once' ? 'bg-white' : ''"
-                            class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out">
-                            <input type="radio" wire:model.live='frequency' name="tab" value="once" x-model="tab" class="hidden">
-                            Do once
-                        </label>
-                    </li>
-                    <li class="w-full text-center">
-                        <label :class="tab === 'every' ? 'bg-white' : ''"
-                            class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out">
-                            <input type="radio" wire:model.live='frequency' name="tab" value="every" x-model="tab" class="hidden">
-                            Do every
-                        </label>
-                    </li>
-                </ul>
 
+            @if ($sched_initial_date && $start_time && $end_time)
                 {{-- Right panel --}}
-                <div>
-                    <div x-show="tab == 'every'" class="space-y-2 mb-3" x-cloak>
-                        <div class="gap-2 inline-flex w-full">
-                            <x-wui-inputs.maskable
-                                wire:model.live='interval'
-                                label="Interval"
-                                placeholder='Interval'
-                                mask="##"
-                                shadowless
-                                errorless
-                            />
-                            <x-wui-select
-                                wire:model.live='interval_unit'
-                                label="Interval Unit"
-                                placeholder="Weeks"
-                                wire:model.defer="model"
-                                shadowless
-                                errorless
-                            >
-                                <x-wui-select.option label="Day/s" value="days" />
-                                <x-wui-select.option label="Week/s" value="weeks" />
-                                <x-wui-select.option label="Month/s" value="months" />
-                            </x-wui-select>
-                        </div>
-                        <div class="gap-2 inline-flex items-center w-full text-nowrap">
-                            <x-wui-inputs.maskable
-                                wire:model.live='occurrences'
-                                mask="##"
-                                label='End After'
-                                placeholder='occurrences'
-                                shadowless
-                                errorless
-                            />
-                        </div>
-                        @if ($interval && $interval_unit && $occurrences && $occurrences > $interval)
-                            <x-alert-blue title="{{ $occurrences }} scheduled dates will occur every {{ $interval }} {{ $interval_unit }}.">
-                                <div class="gap-2 space-y-2">
-                                    @foreach ($generatedDates as $date)
-                                        <x-wui-badge flat info label="{{ Carbon::create($date)->format('l, F j, Y') }}" />
-                                    @endforeach
-                                </div>
-                            </x-alert-blue>
-                        @endif
-                    </div>
-                    <x-wui-errors only='sched_initial_date|start_time|end_time|interval|interval_units|occurrences'/>
+                <div class="w-full">
+                    <x-wui-select
+                        wire:model.live='interval_unit'
+                        label="Repeat Every"
+                        placeholder="Start Date: {{ Carbon::create($sched_initial_date)->toFormattedDateString() }}"
+                        shadowless
+                        errorless
+                    >
+                        <x-wui-select.option label="Once" value="once" />
+                        <x-wui-select.option label="Daily" value="days" />
+                        <x-wui-select.option label="Weekly" value="weeks" />
+                        <x-wui-select.option label="Monthly" value="months" />
+                    </x-wui-select>
                 </div>
-            </div>
+
+                @if (isset($interval_unit) && $interval_unit != 'once')
+                    <div class="w-full">
+                        <x-wui-select
+                            wire:model.live='stop_repeating'
+                            label="Stop Repeating Every"
+                            placeholder="Start Date: {{ Carbon::create($sched_initial_date)->toFormattedDateString() }}"
+                            shadowless
+                            errorless
+                        >
+                            <x-wui-select.option label="Never" value="never" />
+                            <x-wui-select.option label="Date" value="days" />
+                            <x-wui-select.option label="Occurences" value="occurences" />
+                        </x-wui-select>
+                    </div>
+                @endif
+
+                @if (isset($stop_repeating) && $stop_repeating == 'days')
+                    <x-wui-datetime-picker
+                    label="Schedule End Time"
+                    placeholder="Enter End Date"
+                    wire:model.live="sched_end_date"
+                    parse-format="YYYY-MM-DD HH:mm"
+                    display-format='dddd, MMMM D, YYYY'
+                    :min="Carbon::parse($sched_initial_date)"
+                    without-tips
+                    without-time
+                    shadowless
+                    errorless
+                />
+                @endif
+
+                @if (isset($stop_repeating) && $stop_repeating == 'occurences')
+                    <x-wui-inputs.maskable
+                        wire:model.live='occurrences'
+                        label="Occurrences"
+                        mask="##"
+                        placeholder="Enter Occurences"
+                        shadowless
+                    />
+                @endif
+            @endif
+
+            @if ($interval && $interval_unit && $occurrences)
+                <x-alert-blue title="{{ $occurrences }} scheduled dates will occur every {{ $interval }} {{ $interval_unit }}.">
+                    <div class="gap-2 space-y-2">
+                        @foreach ($generatedDates as $date)
+                            <x-wui-badge flat info label="{{ Carbon::create($date)->format('l, F j, Y') }}" />
+                        @endforeach
+                    </div>
+                </x-alert-blue>
+            @endif
+
+            <x-wui-errors only='sched_initial_date|start_time|end_time|interval|interval_units|occurrences'/>
 
         </div>
         <x-slot name="footer">

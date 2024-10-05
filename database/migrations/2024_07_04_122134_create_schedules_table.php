@@ -15,10 +15,6 @@ return new class extends Migration
             $table->id();
             $table->time('start_time');
             $table->time('end_time');
-            $table->integer('occurrences')->nullable();
-            $table->enum('frequency', ['once', 'every'])->default('once');
-            $table->integer('interval')->nullable();
-            $table->enum('interval_unit', ['months', 'weeks', 'days'])->nullable();
             $table->timestamps();
         });
     }
