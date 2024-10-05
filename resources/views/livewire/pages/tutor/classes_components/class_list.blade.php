@@ -244,8 +244,13 @@ new #[Layout('layouts.app')] class extends Component {
                         <p>
                             <strong>Starts at:</strong>
                             @foreach ($class->schedule->recurring_schedule as $recurring)
-                                {{ Carbon::create($recurring->dates)->format('l jS \\of F Y h:i A') }}
+                                {{ Carbon::create($recurring->dates)->format('l jS \\of F Y') }}
                             @endforeach
+                        </p>
+                        <p>
+                            <strong>Time:</strong>
+                            {{ Carbon::create($class->schedule->start_time)->format('g:i A') }} -
+                            {{ Carbon::create($class->schedule->end_time)->format('g:i A') }}
                         </p>
                     </div>
 

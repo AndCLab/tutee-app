@@ -17,17 +17,17 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         //dummy record for stepper testing
-        // $user = User::factory()->create([
-        //     'fname' => 'Test',
-        //     'lname' => 'User',
-        //     'is_stepper' => 1,
-        //     'user_type' => null,
-        //     'email' => 'test@example.com',
-        //     'address' => 'address',
-        //     'zip_code' => '6015',
-        //     'phone_prefix' => '+63',
-        //     'phone_number' => '9582938479',
-        // ]);
+        User::factory()->create([
+            'fname' => 'Test',
+            'lname' => 'User',
+            'is_stepper' => 1,
+            'user_type' => null,
+            'email' => 'test@example.com',
+            'address' => 'address',
+            'zip_code' => '6015',
+            'phone_prefix' => '+63',
+            'phone_number' => '9582938479',
+        ]);
 
         // Fields::factory()->create([
         //     'user_id' => $user->id,

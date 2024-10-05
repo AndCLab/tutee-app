@@ -9,11 +9,15 @@ use App\Models\Schedule;
 use App\Models\RecurringSchedule;
 use App\Models\Registration;
 use App\Models\Fields;
+use WireUi\Traits\Actions;
 
 new #[Layout('layouts.app')] class extends Component {
+    use Actions;
 
     // get auth tutor
     public $tutor;
+    public $class;
+    public $storedSchedules;
 
     // class properties
     public string $class_name = '';
@@ -43,38 +47,40 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount(int $id)
     {
-        $class = Classes::findOrFail($id);
-        $schedules = RecurringSchedule::where('schedule_id', $class->schedule->id)->get();
+        $this->class = Classes::findOrFail($id);
+        $this->storedSchedules = RecurringSchedule::where('schedule_id', $this->class->schedule->id)->get();
 
         $this->getFields = Fields::where('user_id', Auth::id())
                                 ->where('active_in', Auth::user()->user_type)
                                 ->get(['field_name'])
                                 ->toArray();
 
-        $this->class_name = $class->class_name;
-        $this->class_description = $class->class_description;
-        $this->class_type = $class->class_type;
-        $this->class_category = $class->class_category;
+        $this->class_name = $this->class->class_name;
+        $this->class_description = $this->class->class_description;
+        $this->class_type = $this->class->class_type;
+        $this->class_category = $this->class->class_category;
 
-        if ($class->class_students) {
-            $this->class_students = $class->class_students;
+        $this->start_time = Carbon::parse($this->class->schedule->start_time)->format('H:i');
+        $this->end_time = Carbon::parse($this->class->schedule->end_time)->format('H:i');
+
+
+        if ($this->class->class_students) {
+            $this->class_students = $this->class->class_students;
         }
 
-        if ($class->class_type == 'virtual') {
-            $this->class_link = $class->class_location;
-        } elseif ($class->class_type == 'physical') {
-            $this->class_location = $class->class_location;
+        if ($this->class->class_type == 'virtual') {
+            $this->class_link = $this->class->class_location;
+        } elseif ($this->class->class_type == 'physical') {
+            $this->class_location = $this->class->class_location;
         }
 
-        $this->class_fee = $class->class_fee;
-        $this->class_fields = json_decode($class->class_fields, true); //fields setter
-
-        // for class schedule date
+        $this->class_fee = $this->class->class_fee;
+        $this->class_fields = json_decode($this->class->class_fields, true); //fields setter
 
         // for registration date
-        if ($class->class_category == 'group' && $class->registration !== null) {
-            $this->regi_start_date = $class->registration->start_date;
-            $this->regi_end_date = $class->registration->end_date;
+        if ($this->class->class_category == 'group' && $this->class->registration !== null) {
+            $this->regi_start_date = $this->class->registration->start_date;
+            $this->regi_end_date = $this->class->registration->end_date;
         }
 
     }
@@ -94,6 +100,173 @@ new #[Layout('layouts.app')] class extends Component {
         }
     }
 
+    // helper method for notifications
+    private function sendNotification($title, $description, $icon, $timeout = 2500)
+    {
+        $this->notification([
+            'title' => $title,
+            'description' => $description,
+            'icon' => $icon,
+            'timeout' => $timeout,
+        ]);
+    }
+
+    public function editClass()
+    {
+        // Define validation rules
+        $rules = [
+            'class_name' => ['required', 'string', 'max:255'],
+            'class_description' => ['required', 'string', 'max:255'],
+            'class_fields' => ['required'],
+            'class_location' => ['nullable', 'string', 'max:255'],
+            'class_link' => ['nullable', 'string', 'max:255'],
+
+            // schedules
+            'sched_initial_date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+
+            // recurrence and interval
+            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
+            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
+            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+        ];
+
+        // Add conditional validation rules
+        if ($this->class->class_category == 'group' && $this->class->registration) {
+            $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
+            $rules['regi_start_date'] = ['required', 'date'];
+            $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
+        }
+
+        // Validate inputs
+        $this->validate($rules);
+
+        // Get current fields
+        $currentFields = json_decode($this->class->class_fields);
+
+        // Update class details
+        $this->class->class_name = $this->class_name;
+        $this->class->class_description = $this->class_description;
+        $this->class->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
+        $this->class->class_students = $this->class_students;
+        $this->class->class_fee = $this->class_fee;
+
+        // Determine class type
+        if ($this->class_location && $this->class_link) {
+            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
+            return;
+        } elseif ($this->class_link) {
+            $this->class_type = 'virtual';
+            $this->class_location = $this->class_link;
+        } elseif ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
+            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
+            return;
+        }
+
+        $this->class->class_location = $this->class_location;
+
+        // Update schedule
+        $scheduleData = [
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'frequency' => $this->frequency,
+        ];
+
+        if ($this->frequency != 'once') {
+            $scheduleData['interval'] = $this->interval;
+            $scheduleData['interval_unit'] = $this->interval_unit;
+            $scheduleData['occurrences'] = $this->occurrences;
+        }
+
+        // Check if the schedule already exists, excluding the current schedule ID
+        $scheduleExists = Schedule::where('id', '!=', $this->class->schedule->id)
+                                ->whereHas('recurring_schedule', function ($query) {
+                                    $query->whereIn('dates', $this->generatedDates);
+                                })
+                                ->whereTime('start_time', '<=', $this->end_time)
+                                ->whereTime('end_time', '>', $this->start_time)
+                                ->exists();
+
+        if (!$scheduleExists) {
+            // find the existing schedule by class_id or another identifier
+            $schedule = $this->class->schedule;
+
+            if ($schedule) {
+                // Update the schedule
+                $schedule->update($scheduleData);
+
+                // Delete old recurring schedules if they should be replaced
+                RecurringSchedule::where('schedule_id', $schedule->id)->delete();
+
+                // Insert the new recurring schedules
+                foreach ($this->generatedDates as $date) {
+                    RecurringSchedule::create([
+                        'schedule_id' => $schedule->id,
+                        'dates' => $date
+                    ]);
+                }
+            }
+        } else {
+            // notify the user that the schedule already exists
+            $this->notification([
+                'title'       => 'Schedule must be unique',
+                'description' => 'You have chosen this schedule from one of your classes',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
+
+        // Update registration dates if applicable
+        if ($this->class->class_category == 'group' && $this->class->registration) {
+            $this->class->registration->start_date = $this->regi_start_date;
+            $this->class->registration->end_date = $this->regi_end_date;
+            $this->class->registration->save();
+        }
+
+        $newFields = json_decode($this->class->class_fields);
+
+        // Decrement if current fields are not in the new fields
+        foreach ($currentFields as $currentField) {
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $currentField)
+                            ->get();
+
+            if (!in_array($currentField, $newFields)) {
+                foreach ($fields as $field) {
+                    $field->class_count--;
+                    $field->save();
+                }
+            }
+        }
+
+        // Increment if new fields are not in the current fields
+        foreach ($newFields as $newField) {
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $newField)
+                            ->get();
+
+            if (!in_array($newField, $currentFields)) {
+                foreach ($fields as $field) {
+                    $field->class_count++;
+                    $field->save();
+                }
+            }
+        }
+
+        // Save the class
+        $this->class->save();
+
+        // Notify user of success
+        $this->sendNotification('Updated Class!', 'Successfully updated!', 'success');
+    }
+
 }; ?>
 
 <section>
@@ -103,7 +276,7 @@ new #[Layout('layouts.app')] class extends Component {
     <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
         <form wire:submit='editClass'>
             <div class="inline-flex mb-4 justify-between items-center w-full">
-                <p class="capitalize font-semibold text-xl">Edit {{ $class_name }}</p>
+                <p class="capitalize font-semibold text-xl">Edit {{ $this->class_name }}</p>
 
                 <div class="inline-flex gap-2 items-center">
                     <x-primary-button type='submit' wireTarget='editClass'>
@@ -111,7 +284,7 @@ new #[Layout('layouts.app')] class extends Component {
                     </x-primary-button>
                 </div>
             </div>
-            <div class="lg:grid lg:grid-cols-2 items-start gap-5">
+            <div class="lg:grid lg:grid-cols-2 items-start gap-5 lg:space-y-0 space-y-3">
 
                 {{-- general info --}}
                 <div class="space-y-3">
@@ -128,7 +301,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 shadowless
                                 errorless
                             />
-                            <div class="inline-flex gap-2">
+                            <div class="inline-flex gap-4">
                                 <x-wui-time-picker
                                     wire:model.blur='start_time'
                                     label="Start Time"
@@ -215,11 +388,13 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
                         </div>
 
-                        {{-- class name --}}
-                        <div class="{{ $class_category == "group" ? 'grid grid-cols-2 gap-4' : '' }}">
+                        <div class="{{ $this->class_category == "group" ? 'grid grid-cols-2 gap-4' : '' }}">
+
+                            {{-- class name --}}
                             <x-wui-input wire:model='class_name' label="Class Name" placeholder='Enter class name' shadowless/>
+
                             {{-- class students --}}
-                            @if ($class_category == "group")
+                            @if ($this->class_category == "group")
                                 <x-wui-inputs.number wire:model='class_students' label="How many students?" shadowless/>
                             @endif
                         </div>
@@ -235,7 +410,7 @@ new #[Layout('layouts.app')] class extends Component {
                 {{-- sched and regi --}}
                 <div class="space-y-3">
                     {{-- class registration --}}
-                    @if ($class_category == 'group')
+                    @if ($this->class_category == 'group')
                         <x-wui-datetime-picker
                             label="Registration Start"
                             placeholder="January 1, 2000"
@@ -255,6 +430,7 @@ new #[Layout('layouts.app')] class extends Component {
                             shadowless
                             />
                     @endif
+
                     <div class="grid grid-cols-2 gap-4">
                         {{-- class fields --}}
                         <div>
@@ -265,12 +441,6 @@ new #[Layout('layouts.app')] class extends Component {
                                 multiselect
                                 shadowless
                             >
-                                {{-- @foreach ($class_fields as $field)
-                                    <x-wui-select.option
-                                        label="{{ $field }}"
-                                        value="{{ $field }}"
-                                    />
-                                @endforeach --}}
                                 @foreach ($getFields as $field)
                                     <x-wui-select.option
                                         label="{{ $field['field_name'] }}"
@@ -285,6 +455,7 @@ new #[Layout('layouts.app')] class extends Component {
                             <x-wui-inputs.currency wire:model='class_fee' label='Class Fee' icon="cash" placeholder="Enter class price" shadowless/>
                         </div>
                     </div>
+
                     {{-- Virtual or Physical Class --}}
                     <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#virtual' }">
                         {{-- Left panel --}}
@@ -316,10 +487,23 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
                         </div>
                     </div>
+
+                    <p class="font-semibold">Current Schedules in this Class</p>
+                    <span class="text-sm">
+                        {{ Carbon::create($class->schedule->start_time)->format('g:i A') }} -
+                        {{ Carbon::create($class->schedule->end_time)->format('g:i A') }}
+                    </span>
+                    <div class="gap-2 space-y-2">
+                        @foreach ($storedSchedules as $date)
+                            <x-wui-badge flat info label="{{ Carbon::create($date->dates)->format('l, F j, Y') }}" />
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </form>
     </div>
+
+    <x-wui-notifications position="bottom-right" />
 </section>
 
 

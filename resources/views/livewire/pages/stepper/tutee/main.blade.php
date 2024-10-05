@@ -13,6 +13,8 @@ use WireUi\Traits\Actions;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    public $title = 'Stepper | Tutee Role';
+
     public $count = 2;
 
     // General
@@ -185,6 +187,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->redirect('/login', navigate: true);
     }
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <div>
     @include('livewire.pages.stepper.body')

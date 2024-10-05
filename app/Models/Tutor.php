@@ -11,7 +11,13 @@ class Tutor extends Model
 
     protected $table = 'tutor';
 
-    protected $fillable = ['user_id', 'bio', 'work', 'verify_status'];
+    protected $fillable = [
+        'user_id',
+        'bio',
+        'work',
+        'degree',
+        'verify_status'
+    ];
 
     protected $casts = [
         'is_verified' => 'string',

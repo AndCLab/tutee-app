@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tutor_id')->constrained('tutor');
             $table->string('file_path');
+            $table->string('title');
+            $table->date('from');
             $table->timestamps();
         });
     }
