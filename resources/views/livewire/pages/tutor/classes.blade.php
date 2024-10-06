@@ -37,11 +37,9 @@ new #[Layout('layouts.app')] class extends Component {
     public $start_time;
     public $end_time;
 
-    public int $interval; // will always be 1
     public $interval_unit; // days, weeks, months
     public $stop_repeating;
 
-    public int $occurrences;
     public $generatedDates = []; // recurring schedules
 
     // for registration date
@@ -59,39 +57,123 @@ new #[Layout('layouts.app')] class extends Component {
         $this->getFields = Fields::where('user_id', Auth::id())
                                 ->where('active_in', Auth::user()->user_type)
                                 ->get(['field_name'])->toArray();
+        $this->interval_unit = 'once';
+        $this->stop_repeating = 'never';
     }
 
-    public function computeSchedule($passed_interval, $passed_interval_unit)
+    public function updated($propertyName)
     {
         $this->generatedDates = [];
+
+        // validate only the updated field
+        $this->validateOnly($propertyName, [
+            'sched_initial_date' => ['required', 'date'],
+            'sched_end_date' => ['nullable', 'date', 'after:sched_initial_date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+        ]);
+
         $startDate = Carbon::parse($this->sched_initial_date);
+        $endDate = Carbon::parse($this->sched_end_date);
 
-        $this->interval = $passed_interval;
-        $this->interval_unit = $passed_interval_unit;
+        // if interval unit is "once" then clear all input fields
+        if ($this->interval_unit == 'once') {
+            $this->stop_repeating = 'never';
+            $this->generatedDates = [$startDate];
+            $this->sched_end_date = null;
 
-        for ($i = 0; $i < $this->occurrences; $i++) {
-            $this->generatedDates[] = $startDate->copy()->format('Y-m-d');
-            $startDate->add($this->interval, $this->interval_unit);
+            return;
+        }
+
+        // if stop repeating is "never" then clear all input fields
+        if ($this->stop_repeating == 'never') {
+            $this->generatedDates = [$startDate];
+            $this->sched_end_date = null;
+
+            return;
+        }
+
+        if ($this->interval_unit && $this->sched_end_date) {
+            $diffDays = $this->calculateDiff($startDate, $endDate);
+
+            if ($startDate->lessThan($endDate)) {
+                for ($i = 0; $i <= $diffDays; $i++) {
+                    $loopDate = $this->getNextDate($startDate);
+
+                    if ($loopDate) {
+                        $this->generatedDates[] = $loopDate->format('Y-m-d');
+                    }
+
+                    $startDate = $this->incrementDate($startDate);
+                }
+            }
         }
     }
 
+    // calculate the difference between dates based on the interval unit.
+    private function calculateDiff(Carbon $startDate, Carbon $endDate)
+    {
+        switch ($this->interval_unit) {
+            case 'once':
+                return 0; // no iterations needed
+            case 'weeks':
+                return $startDate->diffInWeeks($endDate);
+            case 'months':
+                return $startDate->diffInMonths($endDate);
+            default: // days
+                return $startDate->diffInDays($endDate);
+        }
+    }
+
+    // get the next date to be added to the generated list.
+    private function getNextDate(Carbon $date)
+    {
+        if ($this->interval_unit == 'weekdays' && $date->isWeekend()) {
+            return null; // skip weekends for 'weekdays'
+        }
+
+        // return if the date is not weekend
+        return $date;
+    }
+
+    // increment the start date based on the interval unit.
+    private function incrementDate(Carbon $date)
+    {
+        if ($this->interval_unit == 'weekdays') {
+            return $this->skipWeekends($date->copy()->addDay());
+        }
+
+        return $date->add(1, $this->interval_unit);
+    }
+
+    // skip weekends for 'weekdays' interval.
+    private function skipWeekends(Carbon $date)
+    {
+        while ($date->isWeekend()) {
+            $date->addDay();
+        }
+
+        return $date;
+    }
+
+    // schedule db insertion
     public function scheduleDate()
     {
+        $tutor = Tutor::where('user_id', Auth::id())->first();
+
         // schedule
         $scheduleData = [
             'start_time' => $this->start_time,
+            'tutor_id' => $tutor->id,
             'end_time' => $this->end_time,
-            'frequency' => $this->frequency,
+            'never_end' => $this->stop_repeating == 'never' ? 1 : 0, // tutor will close this class manually if it sets to 1
         ];
 
-        if ($this->frequency != 'once') {
-            $scheduleData['interval'] = $this->interval;
-            $scheduleData['interval_unit'] = $this->interval_unit;
-            $scheduleData['occurrences'] = $this->occurrences;
-        }
+        $schedule = null;
 
         // check if the schedule already exists
-        $scheduleExists = Schedule::whereHas('recurring_schedule', function ($query) {
+        $scheduleExists = Schedule::where('tutor_id', $tutor->id)
+                                    ->whereHas('recurring_schedule', function ($query) {
                                         $query->whereIn('dates', $this->generatedDates);
                                     })
                                     ->whereTime('start_time', '<=', $this->end_time)
@@ -109,18 +191,10 @@ new #[Layout('layouts.app')] class extends Component {
                     'dates' => $date
                 ]);
             }
-        } else {
-            // notify the user that the schedule already exists
-            $this->notification([
-                'title'       => 'Schedule must be unique',
-                'description' => 'You have chosen this schedule from one of your classes',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
 
-            return;
         }
 
+        return $schedule;
     }
 
     // individual class validation and creation
@@ -128,7 +202,7 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->validate([
             // class details
-            'class_name' => ['required', 'string', 'max:255', 'unique:classes,class_name'],
+            'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
             'class_location' => ['string', 'max:255'],
@@ -136,13 +210,13 @@ new #[Layout('layouts.app')] class extends Component {
 
             // schedules
             'sched_initial_date' => ['required', 'date'],
+            'sched_end_date' => ['nullable', 'date', 'after:sched_initial_date'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
 
             // recurrence and interval
-            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
-            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
-            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+            'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays'],
+            'stop_repeating' => ['required', 'string', 'in:never,date'],
         ]);
     }
 
@@ -163,7 +237,6 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         } else if ($this->class_link) {
             $this->class_type = 'virtual';
-            $this->class_location = $this->class_link;
         } else if ($this->class_location) {
             $this->class_type = 'physical';
         } else {
@@ -177,18 +250,30 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
-        $this->scheduleDate();
+        $schedule = $this->scheduleDate();
+
+        if ($schedule == null) {
+            // notify the user that the schedule already exists
+            $this->notification([
+                'title'       => 'Schedule must be unique',
+                'description' => 'You have chosen this schedule from one of your classes',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
 
         $classFieldsJson = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
 
-        $new_class = Classes::create([
+        Classes::create([
             'tutor_id' => $tutor->id,
             'class_name' => $this->class_name,
             'class_description' => $this->class_description,
             'class_fields' => $classFieldsJson,
             'class_type' => $this->class_type,
             'class_category' => 'individual',
-            'class_location' => $this->class_location,
+            'class_location' => $this->class_type == 'virtual' ? $this->class_link : $this->class_location,
             'class_fee' => $this->class_fee,
             'class_status' => 1,
             'schedule_id' => $schedule->id
@@ -220,15 +305,17 @@ new #[Layout('layouts.app')] class extends Component {
             'class_link',
 
             'sched_initial_date',
+            'sched_end_date',
             'start_time',
             'end_time',
-            'interval',
-            'interval_unit',
-            'occurrences',
 
             'regi_start_date',
             'regi_end_date',
         );
+
+        $this->interval_unit = 'once';
+        $this->stop_repeating = 'never';
+        $this->generatedDates = [];
 
         $this->notification([
             'title'       => 'Fresh Class!',
@@ -253,13 +340,13 @@ new #[Layout('layouts.app')] class extends Component {
 
             // schedules
             'sched_initial_date' => ['required', 'date'],
+            'sched_end_date' => ['nullable', 'date', 'after:sched_initial_date'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
 
             // recurrence and interval
-            'interval' => ['nullable', 'integer', 'lt:10', 'required_with:sched_date'],
-            'interval_unit' => ['nullable', 'string', 'in:months,weeks,days', 'required_with:sched_date', 'required_with:interval'],
-            'occurrences' => ['nullable', 'integer', 'gt:interval', 'lt:60', 'required_with:sched_date', 'required_with:interval', 'required_with:interval_unit'],
+            'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays,weekdays'],
+            'stop_repeating' => ['required', 'string', 'in:never,date'],
 
             // registration
             'regi_start_date' => ['required', 'date'],
@@ -284,7 +371,6 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         } else if ($this->class_link) {
             $this->class_type = 'virtual';
-            $this->class_location = $this->class_link;
         } else if ($this->class_location) {
             $this->class_type = 'physical';
         } else {
@@ -298,7 +384,19 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
-        $this->scheduleDate();
+        $schedule = $this->scheduleDate();
+
+        if ($schedule == null) {
+            // notify the user that the schedule already exists
+            $this->notification([
+                'title'       => 'Schedule must be unique',
+                'description' => 'You have chosen this schedule from one of your classes',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
 
         $registration = Registration::create([
             'start_date' => $this->regi_start_date,
@@ -314,7 +412,7 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fields' => $classFieldsJson,
             'class_type' => $this->class_type,
             'class_category' => 'group',
-            'class_location' => $this->class_location,
+            'class_location' => $this->class_type == 'virtual' ? $this->class_link : $this->class_location,
             'class_students' => $this->class_students,
             'class_fee' => $this->class_fee,
             'class_status' => 1,
@@ -346,15 +444,19 @@ new #[Layout('layouts.app')] class extends Component {
             'class_link',
 
             'sched_initial_date',
+            'sched_end_date',
             'start_time',
             'end_time',
-            'interval',
             'interval_unit',
-            'occurrences',
+            'stop_repeating',
 
             'regi_start_date',
             'regi_end_date',
         );
+
+        $this->interval_unit = 'once';
+        $this->stop_repeating = 'never';
+        $this->generatedDates = [];
 
         $this->notification([
             'title'       => 'Fresh Class!',

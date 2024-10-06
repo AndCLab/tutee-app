@@ -158,7 +158,6 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         } elseif ($this->class_link) {
             $this->class_type = 'virtual';
-            $this->class_location = $this->class_link;
         } elseif ($this->class_location) {
             $this->class_type = 'physical';
         } else {
@@ -166,7 +165,7 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
-        $this->class->class_location = $this->class_location;
+        $this->class->class_location = $this->class_type == 'virtual' ? $this->class_link : $this->class_location;
 
         // Update schedule
         $scheduleData = [

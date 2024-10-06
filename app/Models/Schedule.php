@@ -13,11 +13,9 @@ class Schedule extends Model
 
     protected $fillable = [
         'start_time',
+        'tutor_id',
         'end_time',
-        'occurrences',
-        'frequency',
-        'interval',
-        'interval_unit'
+        'never_end',
     ];
 
     /**

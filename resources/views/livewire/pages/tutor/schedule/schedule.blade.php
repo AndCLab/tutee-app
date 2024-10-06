@@ -110,7 +110,7 @@ new #[Layout('layouts.app')] class extends Component {
                             <x-wui-icon name='calendar' class="size-5" />
                             <div class="font-light text-sm">
                                 @foreach ($scheduleCardInfo->schedule->recurring_schedule as $recurring)
-                                    @if (Carbon::parse($recurring->dates)->isFuture())
+                                    @if (Carbon::parse($recurring->dates)->isToday() || Carbon::parse($recurring->dates)->isFuture())
                                         <p class="font-medium"> Upcoming Schedule Date: </p>
                                         <span> {{
                                                     Carbon::parse($recurring->dates)->format('l jS \\of F Y') . ' ' .

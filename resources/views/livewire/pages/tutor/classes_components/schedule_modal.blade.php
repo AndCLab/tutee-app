@@ -3,23 +3,14 @@
 @endphp
 
 {{-- class schedule modal --}}
-{{--
-    logic:
-        if 3 ka scheduled dates every 2 weeks kay like
-
-        1. Sept 2
-        2. Sept 16
-        3. Sept 30
---}}
-
 <x-wui-modal wire:model="showClassSchedule" max-width='lg' persistent>
-    <x-wui-card title='Class Schedule'>
+    <x-wui-card title='Class Schedule' wire:loading.class='opacity-60'>
         <div class="grid grid-cols-1 gap-4">
             <x-wui-datetime-picker
                 label="Start Date Time"
                 placeholder="January 1, 2000"
                 wire:model.live="sched_initial_date"
-                parse-format="YYYY-MM-DD HH:mm"
+                parse-format="YYYY-MM-DD"
                 display-format='dddd, MMMM D, YYYY'
                 :min="now()"
                 without-time
@@ -28,7 +19,7 @@
             />
             <div class="inline-flex gap-2">
                 <x-wui-time-picker
-                    wire:model.blur='start_time'
+                    wire:model.live='start_time'
                     label="Start Time"
                     placeholder="12:00 AM"
                     interval="30"
@@ -36,7 +27,7 @@
                     errorless
                 />
                 <x-wui-time-picker
-                    wire:model.blur='end_time'
+                    wire:model.live='end_time'
                     label="End Time"
                     placeholder="12:00 PM"
                     interval="30"
@@ -45,76 +36,80 @@
                 />
             </div>
 
-            @if ($sched_initial_date && $start_time && $end_time)
-                {{-- Right panel --}}
-                <div class="w-full">
-                    <x-wui-select
-                        wire:model.live='interval_unit'
-                        label="Repeat Every"
-                        placeholder="Start Date: {{ Carbon::create($sched_initial_date)->toFormattedDateString() }}"
-                        shadowless
-                        errorless
-                    >
-                        <x-wui-select.option label="Once" value="once" />
-                        <x-wui-select.option label="Daily" value="days" />
-                        <x-wui-select.option label="Weekly" value="weeks" />
-                        <x-wui-select.option label="Monthly" value="months" />
-                    </x-wui-select>
+            @if ($sched_initial_date && ($start_time && $end_time))
+
+                <div class="grid grid-cols-1 gap-2 {{ $interval_unit != 'once' ? 'md:grid-cols-12' : '' }}">
+
+                    {{-- interval unit --}}
+                    @if (Carbon::parse($start_time)->lessThan(Carbon::parse($end_time)))
+                        <div class="w-full col-span-7">
+                            <x-wui-select
+                                wire:model.live='interval_unit'
+                                label="Repeat Every"
+                                placeholder="Choose your preference"
+                                shadowless
+                                errorless
+                            >
+                                <x-wui-select.option label="Once" value="once" />
+                                <x-wui-select.option label="Daily" value="days" />
+                                <x-wui-select.option label="Weekly" value="weeks" />
+                                <x-wui-select.option label="Monthly" value="months" />
+                                <x-wui-select.option label="Weekdays (Monday to Friday)" value="weekdays" />
+                            </x-wui-select>
+                        </div>
+                    @endif
+
+                    {{-- stop repeating --}}
+                    @if (($interval_unit && $interval_unit != 'once') && ($start_time && $end_time))
+                        <div class="w-full col-span-5">
+                            <x-wui-select
+                                wire:model.live='stop_repeating'
+                                label="Stop Repeating Every"
+                                placeholder="Choose your preference"
+                                shadowless
+                                errorless
+                            >
+                                <x-wui-select.option label="Never" value="never" />
+                                <x-wui-select.option label="Date" value="date" />
+                            </x-wui-select>
+                        </div>
+                    @endif
                 </div>
 
-                @if (isset($interval_unit) && $interval_unit != 'once')
-                    <div class="w-full">
-                        <x-wui-select
-                            wire:model.live='stop_repeating'
-                            label="Stop Repeating Every"
-                            placeholder="Start Date: {{ Carbon::create($sched_initial_date)->toFormattedDateString() }}"
-                            shadowless
-                            errorless
-                        >
-                            <x-wui-select.option label="Never" value="never" />
-                            <x-wui-select.option label="Date" value="days" />
-                            <x-wui-select.option label="Occurences" value="occurences" />
-                        </x-wui-select>
-                    </div>
-                @endif
-
-                @if (isset($stop_repeating) && $stop_repeating == 'days')
+                @if ($stop_repeating && $stop_repeating == 'date')
+                    {{-- end date --}}
                     <x-wui-datetime-picker
-                    label="Schedule End Time"
-                    placeholder="Enter End Date"
-                    wire:model.live="sched_end_date"
-                    parse-format="YYYY-MM-DD HH:mm"
-                    display-format='dddd, MMMM D, YYYY'
-                    :min="Carbon::parse($sched_initial_date)"
-                    without-tips
-                    without-time
-                    shadowless
-                    errorless
-                />
-                @endif
-
-                @if (isset($stop_repeating) && $stop_repeating == 'occurences')
-                    <x-wui-inputs.maskable
-                        wire:model.live='occurrences'
-                        label="Occurrences"
-                        mask="##"
-                        placeholder="Enter Occurences"
+                        label="Schedule End Date"
+                        placeholder="Enter End Date"
+                        wire:model.live="sched_end_date"
+                        parse-format="YYYY-MM-DD"
+                        display-format='dddd, MMMM D, YYYY'
+                        :min="Carbon::parse($sched_initial_date)"
+                        without-tips
+                        without-time
                         shadowless
+                        errorless
                     />
                 @endif
             @endif
 
-            @if ($interval && $interval_unit && $occurrences)
-                <x-alert-blue title="{{ $occurrences }} scheduled dates will occur every {{ $interval }} {{ $interval_unit }}.">
-                    <div class="gap-2 space-y-2">
+            @if ($interval_unit && $stop_repeating && $sched_end_date)
+                <x-alert-blue title="{{ empty($generatedDates) ? 'Set your Schedule' : 'Your selected days' }}">
+                    <div class="{{ !empty($generatedDates) ? 'pt-3 gap-2 space-y-2' : '' }}">
                         @foreach ($generatedDates as $date)
-                            <x-wui-badge flat info label="{{ Carbon::create($date)->format('l, F j, Y') }}" />
+                            <x-wui-badge flat info label="{{ Carbon::parse($date)->format('l, F j, Y') }}" />
                         @endforeach
                     </div>
                 </x-alert-blue>
             @endif
 
-            <x-wui-errors only='sched_initial_date|start_time|end_time|interval|interval_units|occurrences'/>
+            <x-wui-errors only='sched_initial_date|sched_end_date|start_time|end_time|interval_units'/>
+
+            {{--  @if ($sched_initial_date)
+                {{
+                    Carbon::parse($sched_initial_date)->diffInDays((clone Carbon::parse($sched_initial_date))->addDays($occurrences))
+                }}
+            @endif --}}
 
         </div>
         <x-slot name="footer">

@@ -1,7 +1,7 @@
 @props(['title'])
 
 <div class="bg-info-50 w-full flex flex-col p-4 rounded-md">
-    <div class="flex justify-between items-center pb-3">
+    <div class="flex justify-between items-center">
         <div class="flex items-center">
             <svg
                 class="text-info-800 w-5 h-5 mr-3 shrink-0"
