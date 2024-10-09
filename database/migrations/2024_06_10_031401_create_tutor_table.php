@@ -19,7 +19,7 @@ return new class extends Migration
 
             //from dhony
             // $table->json('work');
-            $table->json('degree');
+            $table->json('degree')->nullable();
 
             //from ariannie
             $table->string('work');

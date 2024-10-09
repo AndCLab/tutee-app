@@ -13,7 +13,7 @@ class TuteeNotificationsSeeder extends Seeder
         // Restrict notification types
         $types = ['venue', 'schedule', 'assignment'];
         // Define tutee users with their IDs
-        $tutees = [2];
+        $tutees = [3,1];
 
         foreach ($tutees as $userId) {
             for ($i = 1; $i <= 20; $i++) {

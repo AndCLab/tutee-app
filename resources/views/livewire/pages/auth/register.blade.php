@@ -13,6 +13,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
     public string $fname = '';
     public string $lname = '';
+    public string $name = '';
     public string $email = '';
     public string $zip_code = '';
     public string $phone_number = '';
@@ -35,10 +36,14 @@ new #[Layout('layouts.guest')] class extends Component {
         // merge prefix with phone number: +639562398125
         $this->phone_number = "{$this->phone_prefix}{$this->phone_number}";
 
+        // concatenation of fname and lname
+        $this->name = "{$this->fname} {$this->lname}";
+
         try {
             $validated = $this->validate([
                 'fname' => ['required', 'string', 'max:255'],
                 'lname' => ['required', 'string', 'max:255'],
+                'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
                 'zip_code' => ['required', 'numeric'],
                 'phone_prefix' => ['required', 'string'],

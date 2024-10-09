@@ -18,6 +18,7 @@
         "livewire/livewire": "^3.5",
         "livewire/volt": "^1.0",
         "propaganistas/laravel-phone": "^5.3",
+        "rappasoft/laravel-livewire-tables": "^3.4",
         "wireui/wireui": "1.19.2"
     },
     "require-dev": {

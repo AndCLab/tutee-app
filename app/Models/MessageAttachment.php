@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Work extends Model
+class MessageAttachment extends Model
 {
     use HasFactory;
-    protected $table = 'works';
 
     protected $fillable = [
-        'tutor_id',
-        'from',
-        'to',
-        'work',
-        'company',
+        'message_id',
+        'name',
+        'path',
+        'mime',
+        'size',
     ];
 }

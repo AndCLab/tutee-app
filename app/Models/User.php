@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\User;
 
 class User extends Authenticatable
 {
@@ -17,19 +18,20 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'avatar',
         'fname',
         'lname',
+        'name',
         'email',
+        'email_verified_at',
+        'password',
         'address',
         'zip_code',
         'phone_prefix',
         'phone_number',
-
         'is_stepper',
         'apply_status',
         'user_type',
-        'avatar',
-        'password',
         'google_id',
         'facebook_id',
     ];
@@ -94,10 +96,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Fields::class);
     }
-
-    public function bookmarks()
-    {
-        return $this->hasMany(Bookmark::class);
-    }
-
 }

@@ -24,12 +24,12 @@ return new class extends Migration
                 'Pending',
                 'Absent',
                 'Present'
-            ])->default('Pending');
+            ])->default('pending');
             $table->enum('payment_status', [
                 'Pending',
                 'Approved',
                 'Not Approved'
-            ])->default('Pending');
+            ])->default('pending');
             $table->timestamps();
         });
     }
