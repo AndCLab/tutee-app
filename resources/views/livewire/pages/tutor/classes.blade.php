@@ -40,6 +40,10 @@ new #[Layout('layouts.app')] class extends Component {
     public $interval_unit; // days, weeks, months
     public $stop_repeating;
 
+    // custom
+    public $frequency = [];
+    public $customEndDate;
+
     public $generatedDates = []; // recurring schedules
 
     // for registration date
@@ -51,6 +55,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $GroupClassFeeToggle;
     public $showRegistrationDate;
     public $showClassSchedule;
+    public $customModal = false;
 
     public function mount()
     {
@@ -61,9 +66,53 @@ new #[Layout('layouts.app')] class extends Component {
         $this->stop_repeating = 'never';
     }
 
+    public function getCustomWeek($week)
+    {
+        // Define valid week days
+        $validWeeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        // Check if the provided week is valid
+        if (!in_array($week, $validWeeks)) {
+            return; // Exit if invalid week
+        }
+
+        // Toggle the week in the frequency array
+        if (($key = array_search($week, $this->frequency)) !== false) {
+            // If it is present, remove it
+            unset($this->frequency[$key]);
+        } else {
+            // If not present, add it to the frequency array
+            $this->frequency[] = $week;
+        }
+
+        // Clear previous dates
+        $this->generatedDates = [];
+
+        // Ensure sched_initial_date and customEndDate are set
+        if (isset($this->sched_initial_date) && isset($this->customEndDate)) {
+            $startDate = Carbon::parse($this->sched_initial_date);
+            $endDate = Carbon::parse($this->customEndDate);
+
+            // Generate dates based on the selected weekdays
+            foreach ($this->frequency as $day) {
+                // Get the next occurrence of the day
+                $current = $startDate->copy()->next($day);
+
+                while ($current <= $endDate) {
+                    $this->generatedDates[] = $current->toDateString(); // Store the date as a string
+                    $current->addWeek(); // Move to the same weekday in the next week
+                }
+            }
+        }
+    }
+
     public function updated($propertyName)
     {
-        $this->generatedDates = [];
+        if ($this->interval_unit != 'custom') {
+            $this->customEndDate = null;
+            $this->frequency = [];
+            $this->generatedDates = [];
+        }
 
         // validate only the updated field
         $this->validateOnly($propertyName, [
@@ -81,6 +130,16 @@ new #[Layout('layouts.app')] class extends Component {
             $this->stop_repeating = 'never';
             $this->generatedDates = [$startDate];
             $this->sched_end_date = null;
+
+            return;
+        }
+
+        // if interval unit is "custom" then clear all input fields
+        if ($this->interval_unit == 'custom') {
+            $this->stop_repeating = 'never';
+            $this->sched_end_date = null;
+
+            $this->customModal = true;
 
             return;
         }
@@ -215,7 +274,7 @@ new #[Layout('layouts.app')] class extends Component {
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
 
             // recurrence and interval
-            'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays'],
+            'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays,custom'],
             'stop_repeating' => ['required', 'string', 'in:never,date'],
         ]);
     }
@@ -313,6 +372,7 @@ new #[Layout('layouts.app')] class extends Component {
             'regi_end_date',
         );
 
+        $this->customModal = false;
         $this->interval_unit = 'once';
         $this->stop_repeating = 'never';
         $this->generatedDates = [];
@@ -345,7 +405,7 @@ new #[Layout('layouts.app')] class extends Component {
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
 
             // recurrence and interval
-            'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays,weekdays'],
+            'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays,custom'],
             'stop_repeating' => ['required', 'string', 'in:never,date'],
 
             // registration
@@ -454,6 +514,7 @@ new #[Layout('layouts.app')] class extends Component {
             'regi_end_date',
         );
 
+        $this->customModal = false;
         $this->interval_unit = 'once';
         $this->stop_repeating = 'never';
         $this->generatedDates = [];
