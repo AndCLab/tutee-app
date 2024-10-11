@@ -13,6 +13,7 @@ class Post extends Model
 
     protected $fillable = [
         'tutee_id',
+        'post_title',
         'class_fields',
         'class_date',
         'class_fee',
