@@ -261,15 +261,19 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $tutor = Tutor::where('user_id', Auth::id())->first();
 
+        $neverValue = false;
+
+        if ($this->stop_repeating == 'never' && ($this->interval_unit != 'once' && $this->interval_unit != 'custom')) {
+            $neverValue = true;
+        }
+
         // schedule
         $scheduleData = [
             'start_time' => $this->start_time,
             'tutor_id' => $tutor->id,
             'end_time' => $this->end_time,
-            'never_end' => $this->stop_repeating == 'never' ? 1 : 0, // tutor will close this class manually if it sets to 1
+            'never_end' => $neverValue == true ? 1 : 0, // tutor will close this class manually if it sets to 1
         ];
-
-        $schedule = null;
 
         // Check if the schedule already exists, excluding the current schedule ID
         $scheduleExists = Schedule::where('id', '!=', $this->class->schedule->id)
@@ -278,6 +282,9 @@ new #[Layout('layouts.app')] class extends Component {
                                 })
                                 ->whereTime('start_time', '<=', $this->end_time)
                                 ->whereTime('end_time', '>', $this->start_time)
+                                ->whereHas('classes', function ($query) {
+                                    $query->where('class_status', '!=', 0); // Exclude closed classes
+                                })
                                 ->exists();
 
         if (!$scheduleExists) {
@@ -542,25 +549,27 @@ new #[Layout('layouts.app')] class extends Component {
                                 />
                             </div>
 
-                            {{-- class registration --}}
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="block text-sm font-medium text-gray-700">
-                                        Class Registration
-                                    </label>
+                            @if ($this->class_category == "group")
+                                {{-- class registration --}}
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <label class="block text-sm font-medium text-gray-700">
+                                            Class Registration
+                                        </label>
+                                    </div>
+                                    <x-wui-button label="Class Registration"
+                                        flat
+                                        :negative="$errors->has('regi_start_date') ||
+                                                    $errors->has('regi_end_date')"
+                                        :emerald="!$errors->has('regi_start_date') ||
+                                                    !$errors->has('regi_end_date')"
+                                        sm
+                                        :icon="!$errors->has('regi_start_date') &&
+                                                !$errors->has('regi_end_date') ? 'calendar' : 'exclamation-circle' "
+                                        wire:click="$set('showRegistrationDate', true)"
+                                    />
                                 </div>
-                                <x-wui-button label="Class Registration"
-                                    flat
-                                    :negative="$errors->has('regi_start_date') ||
-                                                $errors->has('regi_end_date')"
-                                    :emerald="!$errors->has('regi_start_date') ||
-                                                !$errors->has('regi_end_date')"
-                                    sm
-                                    :icon="!$errors->has('regi_start_date') &&
-                                            !$errors->has('regi_end_date') ? 'calendar' : 'exclamation-circle' "
-                                    wire:click="$set('showRegistrationDate', true)"
-                                />
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

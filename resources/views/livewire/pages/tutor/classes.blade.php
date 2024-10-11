@@ -220,12 +220,18 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $tutor = Tutor::where('user_id', Auth::id())->first();
 
+        $neverValue = false;
+
+        if ($this->stop_repeating == 'never' && ($this->interval_unit != 'once' && $this->interval_unit != 'custom')) {
+            $neverValue = true;
+        }
+
         // schedule
         $scheduleData = [
             'start_time' => $this->start_time,
             'tutor_id' => $tutor->id,
             'end_time' => $this->end_time,
-            'never_end' => $this->stop_repeating == 'never' ? 1 : 0, // tutor will close this class manually if it sets to 1
+            'never_end' => $neverValue == true ? 1 : 0, // tutor will close this class manually if it sets to 1
         ];
 
         $schedule = null;
@@ -237,6 +243,9 @@ new #[Layout('layouts.app')] class extends Component {
                                     })
                                     ->whereTime('start_time', '<=', $this->end_time)
                                     ->whereTime('end_time', '>', $this->start_time)
+                                    ->whereHas('classes', function ($query) {
+                                        $query->where('class_status', '!=', 0); // Exclude closed classes
+                                    })
                                     ->exists();
 
         if (!$scheduleExists) {

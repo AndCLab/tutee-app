@@ -28,4 +28,9 @@ class Schedule extends Model
         return $this->hasMany(RecurringSchedule::class);
     }
 
+    public function classes()
+    {
+        return $this->hasMany(Classes::class, 'schedule_id');
+    }
+
 }
