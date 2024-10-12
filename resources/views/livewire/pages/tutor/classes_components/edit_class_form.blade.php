@@ -107,45 +107,68 @@ new #[Layout('layouts.app')] class extends Component {
         ];
     }
 
+    // START:CUSTOM SCHEDULE
     public function getCustomWeek($week)
     {
-        // Define valid week days
         $validWeeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-        // Check if the provided week is valid
         if (!in_array($week, $validWeeks)) {
-            return; // Exit if invalid week
+            return;
         }
 
-        // Toggle the week in the frequency array
         if (($key = array_search($week, $this->frequency)) !== false) {
-            // If it is present, remove it
             unset($this->frequency[$key]);
         } else {
-            // If not present, add it to the frequency array
             $this->frequency[] = $week;
         }
 
-        // Clear previous dates
-        $this->generatedDates = [];
+        $this->regenerateDates();
+    }
 
-        // Ensure sched_initial_date and customEndDate are set
+    public function updatedCustomEndDate($newEndDate)
+    {
+        // update the customEndDate
+        $this->customEndDate = $newEndDate;
+
+        // regenerate the dates after updating the end date
+        $this->regenerateDates();
+    }
+
+    public function regenerateDates()
+    {
+        // ensure sched_initial_date and customEndDate are set
         if (isset($this->sched_initial_date) && isset($this->customEndDate)) {
             $startDate = Carbon::parse($this->sched_initial_date);
             $endDate = Carbon::parse($this->customEndDate);
 
-            // Generate dates based on the selected weekdays
+            // clear previous dates
+            $this->generatedDates = [];
+
+            // get the day of the week for sched_initial_date
+            // D is 'Mon', 'Tue'
+            $startDayOfWeek = $startDate->format('D');
+
+            // check if the initial date's day is part of the selected frequency
+            // if the initial day is part of the frequency, include it in generated dates
+            if (in_array($startDayOfWeek, $this->frequency)) {
+                $this->generatedDates[] = $startDate->toDateString();
+            }
+
+            // generate dates based on the selected weekdays
             foreach ($this->frequency as $day) {
-                // Get the next occurrence of the day
+                // get the next occurrence of the day after the initial date
                 $current = $startDate->copy()->next($day);
 
                 while ($current <= $endDate) {
-                    $this->generatedDates[] = $current->toDateString(); // Store the date as a string
-                    $current->addWeek(); // Move to the same weekday in the next week
+                    $this->generatedDates[] = $current->toDateString(); // store the date as a string
+                    $current->addWeek(); // move to the same weekday in the next week
                 }
             }
+
+            sort($this->generatedDates);
         }
     }
+    // END:CUSTOM SCHEDULE
 
     public function updated($propertyName)
     {
@@ -323,7 +346,7 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
     }
 
-    public function editClass($check_sched)
+    public function editClass()
     {
         // Define validation rules
         $rules = [
@@ -334,26 +357,30 @@ new #[Layout('layouts.app')] class extends Component {
             'class_link' => ['nullable', 'string', 'max:255'],
         ];
 
-        if ($check_sched == 'with_sched') {
-            // schedules
+        if ($this->sched_initial_date && $this->interval_unit) {
+            // Schedule validation
             $rules['sched_initial_date'] = ['required', 'date'];
+
+            if ($this->class->registration) {
+                $rules['sched_initial_date'][] = 'after:regi_end_date';
+            }
+
             $rules['sched_end_date'] = ['nullable', 'date', 'after:sched_initial_date'];
             $rules['start_time'] = ['required', 'date_format:H:i'];
             $rules['end_time'] = ['required', 'date_format:H:i', 'after:start_time'];
 
-            // recurrence and interval
+            // Recurrence and interval validation
             $rules['interval_unit'] = ['required', 'string', 'in:once,months,weeks,days,weekdays,custom'];
             $rules['stop_repeating'] = ['required', 'string', 'in:never,date'];
         }
 
-        // Add conditional validation rules
-        if ($check_sched == 'only_regi') {
-            if ($this->class->class_category == 'group' && $this->class->registration) {
-                $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
-                $rules['regi_start_date'] = ['required', 'date'];
-                $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
-            }
+        // Add conditional validation for group class with registration
+        if ($this->class->class_category === 'group' && $this->class->registration) {
+            $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
+            $rules['regi_start_date'] = ['required', 'date'];
+            $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
         }
+
 
         // Validate inputs
         $this->validate($rules);
@@ -384,7 +411,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->class->class_location = $this->class_type == 'virtual' ? $this->class_link : $this->class_location;
 
         // Update schedule
-        if ($check_sched == 'with_sched') {
+        if ($this->sched_initial_date && $this->interval_unit) {
             $schedule = $this->updateScheduleDate();
 
             if ($schedule == null) {
@@ -401,12 +428,10 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         // Update registration dates if applicable
-        if ($check_sched == 'only_regi') {
-            if ($this->class->class_category == 'group' && $this->class->registration) {
-                $this->class->registration->start_date = $this->regi_start_date;
-                $this->class->registration->end_date = $this->regi_end_date;
-                $this->class->registration->save();
-            }
+        if ($this->class->class_category == 'group' && $this->class->registration) {
+            $this->class->registration->start_date = $this->regi_start_date;
+            $this->class->registration->end_date = $this->regi_end_date;
+            $this->class->registration->save();
         }
 
         $newFields = json_decode($this->class->class_fields);
@@ -481,20 +506,12 @@ new #[Layout('layouts.app')] class extends Component {
         </nav>
 
         {{-- form --}}
-        <form action="">
+        <form wire:submit='editClass'>
             <div class="space-y-2 md:space-y-0 md:inline-flex my-4 justify-between items-center w-full">
                 <p class="capitalize font-semibold text-xl">Edit {{ $this->class_name }}</p>
 
                 <div class="inline-flex gap-2 items-center">
-                    <x-primary-button class="text-xs" type='submit' wire:click.prevent="editClass('without_sched')" wireTarget="editClass('without_sched')">
-                        Update without Dates
-                    </x-primary-button>
-                    @if ($this->class_category == "group")
-                        <x-primary-button class="text-xs" type='submit' wire:click.prevent="editClass('only_regi')" wireTarget="editClass('only_regi')">
-                            Update only Registration
-                        </x-primary-button>
-                    @endif
-                    <x-primary-button class="text-xs" type='submit' wire:click.prevent="editClass('with_sched')" wireTarget="editClass('with_sched')">
+                    <x-primary-button class="text-xs" type='submit' wireTarget="editClass">
                         Update Class
                     </x-primary-button>
                 </div>
@@ -520,6 +537,29 @@ new #[Layout('layouts.app')] class extends Component {
                         </div>
 
                         <div class="flex gap-2 items-center justify-between w-full">
+
+                            @if ($this->class_category == "group")
+                                {{-- class registration --}}
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <label class="block text-sm font-medium text-gray-700">
+                                            Class Registration
+                                        </label>
+                                    </div>
+                                    <x-wui-button label="Class Registration"
+                                        flat
+                                        :negative="$errors->has('regi_start_date') ||
+                                                    $errors->has('regi_end_date')"
+                                        :emerald="!$errors->has('regi_start_date') ||
+                                                    !$errors->has('regi_end_date')"
+                                        sm
+                                        :icon="!$errors->has('regi_start_date') &&
+                                                !$errors->has('regi_end_date') ? 'calendar' : 'exclamation-circle' "
+                                        wire:click="$set('showRegistrationDate', true)"
+                                    />
+                                </div>
+                            @endif
+
                             {{-- class schedule --}}
                             <div>
                                 <div class="flex justify-between mb-1">
@@ -548,28 +588,6 @@ new #[Layout('layouts.app')] class extends Component {
                                     wire:click="$set('showClassSchedule', true)"
                                 />
                             </div>
-
-                            @if ($this->class_category == "group")
-                                {{-- class registration --}}
-                                <div>
-                                    <div class="flex justify-between mb-1">
-                                        <label class="block text-sm font-medium text-gray-700">
-                                            Class Registration
-                                        </label>
-                                    </div>
-                                    <x-wui-button label="Class Registration"
-                                        flat
-                                        :negative="$errors->has('regi_start_date') ||
-                                                    $errors->has('regi_end_date')"
-                                        :emerald="!$errors->has('regi_start_date') ||
-                                                    !$errors->has('regi_end_date')"
-                                        sm
-                                        :icon="!$errors->has('regi_start_date') &&
-                                                !$errors->has('regi_end_date') ? 'calendar' : 'exclamation-circle' "
-                                        wire:click="$set('showRegistrationDate', true)"
-                                    />
-                                </div>
-                            @endif
                         </div>
                     </div>
                 </div>

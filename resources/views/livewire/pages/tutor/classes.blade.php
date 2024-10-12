@@ -66,45 +66,68 @@ new #[Layout('layouts.app')] class extends Component {
         $this->stop_repeating = 'never';
     }
 
+    // START:CUSTOM SCHEDULE
     public function getCustomWeek($week)
     {
-        // Define valid week days
         $validWeeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-        // Check if the provided week is valid
         if (!in_array($week, $validWeeks)) {
-            return; // Exit if invalid week
+            return;
         }
 
-        // Toggle the week in the frequency array
         if (($key = array_search($week, $this->frequency)) !== false) {
-            // If it is present, remove it
             unset($this->frequency[$key]);
         } else {
-            // If not present, add it to the frequency array
             $this->frequency[] = $week;
         }
 
-        // Clear previous dates
-        $this->generatedDates = [];
+        $this->regenerateDates();
+    }
 
-        // Ensure sched_initial_date and customEndDate are set
+    public function updatedCustomEndDate($newEndDate)
+    {
+        // update the customEndDate
+        $this->customEndDate = $newEndDate;
+
+        // regenerate the dates after updating the end date
+        $this->regenerateDates();
+    }
+
+    public function regenerateDates()
+    {
+        // ensure sched_initial_date and customEndDate are set
         if (isset($this->sched_initial_date) && isset($this->customEndDate)) {
             $startDate = Carbon::parse($this->sched_initial_date);
             $endDate = Carbon::parse($this->customEndDate);
 
-            // Generate dates based on the selected weekdays
+            // clear previous dates
+            $this->generatedDates = [];
+
+            // get the day of the week for sched_initial_date
+            // D is 'Mon', 'Tue'
+            $startDayOfWeek = $startDate->format('D');
+
+            // check if the initial date's day is part of the selected frequency
+            // if the initial day is part of the frequency, include it in generated dates
+            if (in_array($startDayOfWeek, $this->frequency)) {
+                $this->generatedDates[] = $startDate->toDateString();
+            }
+
+            // generate dates based on the selected weekdays
             foreach ($this->frequency as $day) {
-                // Get the next occurrence of the day
+                // get the next occurrence of the day after the initial date
                 $current = $startDate->copy()->next($day);
 
                 while ($current <= $endDate) {
-                    $this->generatedDates[] = $current->toDateString(); // Store the date as a string
-                    $current->addWeek(); // Move to the same weekday in the next week
+                    $this->generatedDates[] = $current->toDateString(); // store the date as a string
+                    $current->addWeek(); // move to the same weekday in the next week
                 }
             }
+
+            sort($this->generatedDates);
         }
     }
+    // END:CUSTOM SCHEDULE
 
     public function updated($propertyName)
     {
