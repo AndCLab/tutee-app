@@ -1,9 +1,97 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use WireUi\Traits\Actions;
+use App\Models\Fields;
+use App\Models\Post;
+use App\Models\Tutee;
 
 new #[Layout('layouts.app')] class extends Component {
+    use Actions;
+
+    public string $post_title ='';
+    public $getFields = [];
+    public $class_fields = [];
+    public $class_date;
+    public $class_fee = 0;
+    public string $class_category = '';
+    public string $class_type = '';
+    public string $class_location = '';
+    public $post_created;
+
+    public function mount()
+    {
+        $this->getFields = Fields::where('user_id', Auth::id())
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
+    }
+
+    public function validation()
+    {
+        $this->validate([
+            'post_title' => ['required', 'string', 'max:255'],
+            'class_fields' => ['required'],
+            'class_date' => ['required', 'date'],
+            'class_fee' => ['required', 'numeric'],
+            'class_category'=> ['required'],
+            'class_type' => ['required'],
+            'class_location' => ['string', 'max:255'],
+        ]);
+    }
+
+    public function post()
+    {
+        $tutee = Tutee::where('user_id', Auth::id())->first();
+
+        if (!$this->class_location) {
+            $this->class_type = 'virtual';
+        }elseif ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
+
+        $this->validation();
+
+        Post::create([
+            'tutee_id' => $tutee->id,
+            'post_title' => $this->post_title,
+            'class_fields' => json_encode($this->class_fields),
+            'class_date' => $this->class_date,
+            'class_fee' => $this->class_fee,
+            'class_category' => $this->class_category,
+            'class_type' => $this->class_type,
+            'class_location' => $this->class_location,
+            'post_created'=> 1
+        ]);
+
+        $this->reset(
+            'post_title',
+            'class_fields',
+            'class_date',
+            'class_fee',
+            'class_category',
+            'class_type',
+            'class_location'
+        );
+
+        $this->notification([
+            'title'       => 'Success',
+            'description' => 'Post created successfully.',
+            'icon'        => 'success',
+            'timeout'     => 2500,
+        ]);
+    }
 }; ?>
 
 <section>
@@ -26,6 +114,12 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         </div>
 
+        {{-- Post List --}}
+        <div>
+            <livewire:pages.tutee.post_components.post_list>
+        </div>
+
+
         <!-- Post modal class -->
         <x-wui-modal name="postModal" align='center' max-width='xl' persistent>
             <x-wui-card>
@@ -42,34 +136,62 @@ new #[Layout('layouts.app')] class extends Component {
                     <strong class="block font-medium max-w-28 truncate">{{ Auth::user()->fname }}</strong>
                 </div>
 
-                <div class="flex space-x-4 mb-4">
-                    {{-- class fields --}}
-                    <x-wui-select
-                        wire:model="class_fields"
-                        placeholder="Class fields"
-                        multiselect
-                        shadowless
-                    >
-                    </x-wui-select>
-
-                    {{-- class schedule --}}
-                    <x-wui-select
-                        wire:model="class_schedule"
-                        placeholder="Class schedule"
-                        multiselect
-                        shadowless
-                    >
-                    </x-wui-select>
+            <form>
+                {{-- post title --}}
+                <div class="mb-4">
+                    <x-wui-input
+                        wire:model="post_title"
+                        placeholder="Enter post title"
+                        shadowless />
                 </div>
 
                 <div class="flex space-x-4 mb-4">
-                    <x-wui-inputs.currency wire:model.live.debounce.250ms='pricing' icon="cash" placeholder="Pricing" shadowless />
+                    {{-- class fields --}}
+                        <x-wui-select
+                            wire:model="class_fields"
+                            placeholder="Select fields"
+                            multiselect
+                            shadowless
+                        >
+                            @foreach ($getFields as $field)
+                                <x-wui-select.option
+                                    label="{{ $field['field_name'] }}"
+                                    value="{{ $field['field_name'] }}"
+                                />
+                            @endforeach
+                        </x-wui-select>
+
+                    {{-- class schedule --}}
+                    <x-wui-datetime-picker
+                            placeholder="Select Date"
+                            wire:model.live="class_date"
+                            parse-format="YYYY-MM-DD HH:mm"
+                            display-format='dddd, MMMM D, YYYY'
+                            :min="now()"
+                            without-time
+                            shadowless
+                        />
+                </div>
+
+                <div class="flex space-x-4 mb-4">
+                    {{-- Class Fee --}}
+                    <x-wui-inputs.currency wire:model.live.debounce.250ms='class_fee' icon="cash" placeholder="Estimated Price" shadowless />
+
+                    {{-- Class Category --}}
+                    <x-wui-select
+                        wire:model="class_category"
+                        placeholder="Select Category"
+                        shadowless
+                    >
+                    <x-wui-select.option label="Individual" value="individual" />
+                    <x-wui-select.option label="Group" value="group" />
+                    </x-wui-select>
+
                 </div>
 
                 Class Type
                 {{-- Virtual or Physical Class --}}
                 <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#virtual' }">
-                    {{-- Left panel --}}
                     <ul class="flex bg-[#F1F5F9] px-1.5 py-1.5 gap-2 rounded-lg">
                         <li class="w-full text-center">
                             <a :class="tab !== '#virtual' ? '' : 'bg-white'"
@@ -83,17 +205,10 @@ new #[Layout('layouts.app')] class extends Component {
                         </li>
                     </ul>
 
-                    {{-- Right panel --}}
                     <div>
-                        <div x-show="tab == '#virtual'" x-cloak>
-                            <div class="max-w-xl">
-                                <x-wui-input wire:model='class_link' label="Virtual Session" placeholder="Enter virtual link" shadowless/>
-                            </div>
-                        </div>
-
                         <div x-show="tab == '#physical'" x-cloak>
                             <div class="max-w-xl">
-                                <x-wui-input wire:model='class_location' label="Class Venue" placeholder='Enter class venue' shadowless/>
+                                <x-wui-input wire:model='class_location' label="Class Venue" placeholder='Enter desired class venue' shadowless/>
                             </div>
                         </div>
                     </div>
@@ -108,7 +223,9 @@ new #[Layout('layouts.app')] class extends Component {
                         {{ __('Post') }}
                     </x-primary-button>
                 </div>
+            </form>
             </x-wui-card>
         </x-wui-modal>
     </div>
+    <x-wui-notifications position="bottom-right" />
 </section>

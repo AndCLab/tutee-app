@@ -15,7 +15,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "livewire/volt": "^1.0",
+        "livewire/volt": "^1.6",
         "propaganistas/laravel-phone": "^5.3",
         "wireui/wireui": "1.19.2"
     },
