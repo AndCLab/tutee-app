@@ -34,6 +34,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     public bool $isEmptyPost = false;
 
+    public $showDeletePostModal;
+    public $deletePostId;
+
     public function mount()
     {
         $this->sort_by = 'desc';
@@ -67,6 +70,39 @@ new #[Layout('layouts.app')] class extends Component {
                             ->get();
     }
 
+    public function deletePost()
+    {
+        $post = Post::find($this->deletePostId);
+
+        if ($post) {
+
+            $post->delete();
+
+            $this->notification([
+                'title' => 'Removed',
+                'description' => 'Successfully removed post',
+                'icon' => 'success',
+                'timeout' => 2500,
+            ]);
+
+            $this->showDeletePostModal = false;
+
+            $this->mount();
+        } else {
+            $this->notification([
+                'title' => 'Error',
+                'description' => 'Post not found',
+                'icon' => 'error',
+                'timeout' => 2500,
+            ]);
+        }
+    }
+
+    public function deletePostModal($postId)
+    {
+        $this->showDeletePostModal = true;
+        $this->deletePostId = $postId;
+    }
 }; ?>
 
 <section>
@@ -123,9 +159,6 @@ new #[Layout('layouts.app')] class extends Component {
                             <strong>Estimated Fee:</strong> {{ $post->class_fee == 0.0 ? 'Free Class' : number_format($post->class_fee, 2) }}
                         </p>
                         <p>
-                            <strong>Class Category:</strong> {{ ucfirst($post->class_category) }}
-                        </p>
-                        <p>
                             <strong>Class Type:</strong> {{ ucfirst($post->class_type) }}
                         </p>
                         <p>
@@ -152,4 +185,19 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         @endforelse
     </div>
+
+    {{-- Delete Post Modal --}}
+    <x-wui-modal wire:model="showDeletePostModal" persistent align='center' max-width='sm'>
+        <x-wui-card title="Delete Post">
+            <p class="text-gray-600">
+                Are you sure you want to remove this post?
+            </p>
+            <x-slot name="footer">
+                <div class="flex justify-end gap-x-4">
+                    <x-wui-button flat label="Cancel" x-on:click="close" />
+                    <x-wui-button wire:click='deletePost' spinner='deletePost' negative label="Yes, Delete it" />
+                </div>
+            </x-slot>
+        </x-wui-card>
+    </x-wui-modal>
 </section>
