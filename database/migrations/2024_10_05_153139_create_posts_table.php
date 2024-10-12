@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('class_category', ['individual', 'group']);
             $table->enum('class_type', ['virtual', 'physical']);
             $table->string('class_location');
+            $table->boolean('post_created')->default(1);
             $table->timestamps();
         });
     }
