@@ -2,19 +2,27 @@
 
 namespace Database\Seeders;
 
-use App\Models\Fields;
+use App\Models\Admin;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
+    protected static ?string $password;
+
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
         // User::factory(10)->create();
+
+        // admin
+        Admin::create([
+            'password' => static::$password ??= Hash::make('password'),
+        ]);
 
         //dummy record for stepper testing
         User::factory()->create([
