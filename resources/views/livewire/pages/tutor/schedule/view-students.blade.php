@@ -136,14 +136,25 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="md:grid md:grid-row items-start pb-6">
             <div class="w-full flex justify-between">
                 <p class="capitalize font-semibold text-xl">List of Attendees</p>
-                <x-primary-button href="{{ route('tutor.schedule') }}" wire:navigate>
+                <x-primary-button class="text-xs" href="{{ route('tutor.schedule') }}" wire:navigate>
                     Return to Schedule
                 </x-primary-button>
             </div>
             <p class="capitalize text-sm text-[#0F172A]">Class Name: {{ $class->class_name }}</p>
-            <p class="capitalize text-sm text-[#0F172A]">Schedule: {{
-                Carbon::create($class->schedule->start_time)->format('g:iA') . ' - ' .
-                Carbon::create($class->schedule->end_time)->format('g:iA l')
+            <p class="capitalize text-sm text-[#0F172A]">Date Schedule:
+                @foreach ($class->schedule->recurring_schedule as $recurring)
+                    @if (Carbon::parse($recurring->dates)->isToday() || Carbon::parse($recurring->dates)->isFuture())
+                        <span>
+                            {{ Carbon::parse($recurring->dates)->format('l jS \\of F Y') }}
+                        </span>
+                        @break
+                    @endif
+                @endforeach
+
+            </p>
+            <p class="capitalize text-sm text-[#0F172A]">Time Schedule: {{
+                Carbon::create($class->schedule->start_time)->format('g:i A') . ' - ' .
+                Carbon::create($class->schedule->end_time)->format('g:i A')
             }}</p>
             <p class="capitalize text-sm text-[#0F172A]">Total Students: {{ $total_students }}</p>
         </div>

@@ -40,12 +40,18 @@ new #[Layout('layouts.app')] class extends Component {
 
         foreach ($this->classes as $class) {
             foreach ($class->schedule->recurring_schedule as $recurring) {
+                $backgroundColor = $class->class_category == 'group' ? '#fef3c7' : '#f3e8ff';
+                $textColor = $class->class_category == 'group' ? '#d97706' : '#9333ea';
+
                 $events[] =  [
                     'id' => $class->id,
                     'url' => route('view-students', $class->id),
                     'title' => $class->class_name,
                     'start' => Carbon::parse($recurring->dates)->format('Y-m-d') . 'T' . Carbon::parse($recurring->schedules->start_time)->format('H:i:s'),
-                    'end' => Carbon::parse($recurring->dates)->format('Y-m-d') . 'T' . Carbon::parse($recurring->schedules->end_time)->format('H:i:s')
+                    'end' => Carbon::parse($recurring->dates)->format('Y-m-d') . 'T' . Carbon::parse($recurring->schedules->end_time)->format('H:i:s'),
+                    'backgroundColor' => $backgroundColor,
+                    'textColor' => $textColor,
+                    'borderColor' => $textColor
                 ];
 
             }
@@ -138,7 +144,7 @@ new #[Layout('layouts.app')] class extends Component {
             var calendarEl = document.getElementById('calendar');
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'timeGridFourDay',
+            initialView: 'timeGridWeek',
             eventClick: function(info) {
                 var eventObj = info.event;
 
@@ -154,14 +160,10 @@ new #[Layout('layouts.app')] class extends Component {
             headerToolbar: {
                 left: 'prev,next,today',
                 center: 'title',
-                right: 'timeGridDay,timeGridFourDay,listDay,listWeek,listMonth'
+                // right: 'timeGridDay,timeGridFourDay,listDay,listWeek,listMonth'
+                right: 'timeGridWeek,listDay,listWeek,listMonth'
             },
             views: {
-                timeGridFourDay: {
-                    type: 'timeGrid',
-                    duration: { days: 4 },
-                    buttonText: '4 day'
-                },
                 listDay: { buttonText: 'list day' },
                 listWeek: { buttonText: 'list week' },
                 listMonth: { buttonText: 'list month' }

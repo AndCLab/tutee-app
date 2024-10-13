@@ -17,8 +17,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         // admin
         Admin::create([
             'password' => static::$password ??= Hash::make('password'),
@@ -36,12 +34,6 @@ class DatabaseSeeder extends Seeder
             'phone_prefix' => '+63',
             'phone_number' => '9582938479',
         ]);
-
-        // Fields::factory()->create([
-        //     'user_id' => $user->id,
-        //     'field_name' => fake()->randomElement($fields),
-        //     'active_in' => $user->user_type
-        // ]);
 
         User::factory()->create([
             'fname' => 'Tutee',
@@ -69,8 +61,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
-        // $this->call(ClassesSeeder::class);
-        // $this->call(ClassRosterSeeder::class);
+        $this->call(ClassesSeeder::class);
+        $this->call(ClassRosterSeeder::class);
         // $this->call(TutorSeeder::class);
         // $this->call(TuteeSeeder::class);
     }

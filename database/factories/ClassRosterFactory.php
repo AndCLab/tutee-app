@@ -6,6 +6,7 @@ use App\Models\Classes;
 use App\Models\ClassRoster;
 use App\Models\Tutee;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ClassRoster>
@@ -25,29 +26,39 @@ class ClassRosterFactory extends Factory
         $tutee = Tutee::inRandomOrder()->first();
         $class = null;
 
-        // loop until a class that meets the condition is found
-        do {
+        for ($attempt = 0; $attempt < 10; $attempt++) { // Limit to 10 attempts
             $class = Classes::inRandomOrder()->first();
 
-            if ($class->class_category == 'individual' && $class->class_students > 0) {
-                $indi_class = $class;
-                $class->class_students--;
-                $class->save();
-                break;
-            } elseif ($class->class_category == 'group' && $class->class_students > 0) {
-                $group_class = $class;
-                $class->class_students--;
-                $class->save();
-                break;
-            }
-        } while (true);
+            // Check if the class is suitable for the tutee
+            $existsInRoster = ClassRoster::where('class_id', $class->id)
+                ->where('tutee_id', $tutee->id)
+                ->exists();
 
-        return [
-            'class_id' => $group_class->id ?? $indi_class->id,
-            'tutee_id' => $tutee->id,
-            'attendance' => 'Pending',
-            'payment_status' => 'Pending',
-        ];
+            if (!$existsInRoster && $class->class_students > 0) {
+                if ($class->class_category == 'individual') {
+                    $class->class_students--;
+                    $class->save();
+                    return [
+                        'class_id' => $class->id,
+                        'tutee_id' => $tutee->id,
+                        'attendance' => 'Pending',
+                        'payment_status' => 'Pending',
+                    ];
+                } elseif ($class->class_category == 'group') {
+                    $class->class_students--;
+                    $class->save();
+                    return [
+                        'class_id' => $class->id,
+                        'tutee_id' => $tutee->id,
+                        'attendance' => 'Pending',
+                        'payment_status' => 'Pending',
+                    ];
+                }
+            }
+        }
+
+        // In case no suitable class is found after attempts, return default values or handle it as needed
+        throw new ModelNotFoundException("No suitable class found for tutee ID {$tutee->id}.");
     }
 
 }
