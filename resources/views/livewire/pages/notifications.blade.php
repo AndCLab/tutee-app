@@ -74,19 +74,20 @@
                 @endforeach
 
 
-            </ul>
-                                <!-- Loading indicator -->
-                                <div x-show="$el.scrollHeight - $el.scrollTop <= $el.clientHeight" x-intersect='$wire.loadMore()'>
-                                    <div wire:loading wire:target="loadMore" class="w-full flex flex-col bg-white rounded-xl">
-                                        <div class="flex flex-auto flex-col justify-center items-center">
-                                            <div class="flex justify-center">
-                                                <div class="animate-spin inline-block size-7 border-[3px] border-current border-t-transparent text-blue-600 rounded-full dark:text-blue-500" role="status" aria-label="loading">
-                                                    <span class="sr-only">Loading...</span>
+                                                <!-- Loading indicator -->
+                                                <div x-show="$el.scrollHeight - $el.scrollTop <= $el.clientHeight" x-intersect='$wire.loadMore()'>
+                                                    <div wire:loading wire:target="loadMore" class="w-full flex flex-col bg-white rounded-xl">
+                                                        <div class="flex flex-auto flex-col justify-center items-center">
+                                                            <div class="flex justify-center">
+                                                                <div class="animate-spin inline-block size-7 border-[3px] border-current border-t-transparent text-blue-600 rounded-full dark:text-blue-500" role="status" aria-label="loading">
+                                                                    <span class="sr-only">Loading...</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+            </ul>
+
         </div>
     @endif
 
