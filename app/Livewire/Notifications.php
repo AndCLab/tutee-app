@@ -7,6 +7,7 @@ use App\Models\TuteeNotification;
 use App\Models\TutorNotification;
 use App\Models\Classes;
 use App\Models\Schedule;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
