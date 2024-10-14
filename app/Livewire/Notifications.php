@@ -5,8 +5,12 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\TuteeNotification;
 use App\Models\TutorNotification;
+use App\Models\Classes;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
+use Carbon\Carbon;
 
 class Notifications extends Component
 {
@@ -15,7 +19,7 @@ class Notifications extends Component
     public $pages = 5;
 
     public function mount()
-    {    
+    {
         $this->unreadCount = 0;
         $this->loadNotifications();
     }
@@ -24,7 +28,7 @@ class Notifications extends Component
     {
         $user = Auth::user();
         $userType = $user->user_type;
-    
+
         if ($userType === 'tutee') {
             $notifications = TuteeNotification::where('user_id', $user->id)
                 ->orderBy('created_at', 'desc') // Use created_at for sorting
@@ -38,7 +42,7 @@ class Notifications extends Component
         } else {
             $notifications = collect();
         }
-    
+
         // Group notifications by created_at date
         $this->notifications = $notifications
             ->get()
@@ -46,18 +50,15 @@ class Notifications extends Component
                 return \Carbon\Carbon::parse($notification['created_at'])->format('F d, Y');
             })
             ->toArray();
-    
+
         $this->updateUnreadCount();
     }
-    
-
-    
 
     public function markAsRead($notificationId)
     {
         $user = Auth::user();
         $userType = $user->user_type;
-    
+
         if ($userType === 'tutee') {
             $notification = TuteeNotification::where('user_id', $user->id)->find($notificationId);
         } elseif ($userType === 'tutor') {
@@ -65,18 +66,15 @@ class Notifications extends Component
         } else {
             return;
         }
-    
-        Log::info("Notification found: ", ['notification' => $notification]);
-    
+
         if ($notification && !$notification->read) {
-            Log::info("Updating notification: ", ['id' => $notification->id]);
             // Update read status
             $notification->read = true;
             $notification->read_at = now();
-            
+
             // Save without timestamps (since timestamps are disabled in the model)
             $notification->saveQuietly();
-    
+
             // Update the read status in the notifications array
             foreach ($this->notifications as $date => &$dateGroup) {
                 foreach ($dateGroup as &$notif) {
@@ -87,14 +85,9 @@ class Notifications extends Component
                 }
             }
         }
-    
-        Log::info("Unread count updated.");
+
         $this->updateUnreadCount();
     }
-    
-    
-    
-    
 
     public function updateUnreadCount()
     {
@@ -111,7 +104,7 @@ class Notifications extends Component
                 ->count();
         } else {
             $this->unreadCount = 0;
-        }
+ }
     }
 
     public function loadMore()
@@ -119,6 +112,35 @@ class Notifications extends Component
         $this->pages += 5;
         $this->loadNotifications($this->pages);
     }
+
+
+    #[On('classJoined')]
+    public function classJoined($classId, $tutorName)
+    {
+        // Fetch the class and schedule information
+        $class = \App\Models\Classes::findOrFail($classId);
+        $schedule = $class->schedule; // Get the schedule associated with the class
+
+        $startDate = Carbon::create($schedule->start_date);
+        $formattedDate = $startDate->format('l jS \\of F Y g:i A');
+
+        $content = "You have joined the class '{$class->class_name}' handled by {$tutorName}. The class is scheduled to start on {$formattedDate}.";
+
+        TuteeNotification::create([
+            'user_id' => Auth::id(),
+            'title' => 'Class Joined', // Provide a title for the notification
+            'content' => $content,
+            'type' => 'venue',
+            'created_at' => now(), // Set created_at field
+            'updated_at' => now(), // Set updated_at field
+        ]);
+
+        // Flash a success message
+        session()->flash('success', 'You have successfully joined the class!');
+
+        $this->loadNotifications();
+    }
+
 
     public function render()
     {

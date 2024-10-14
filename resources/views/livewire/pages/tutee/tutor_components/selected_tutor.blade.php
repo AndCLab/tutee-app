@@ -3,6 +3,9 @@
 @php
     use App\Models\Fields;
     use App\Models\Bookmark;
+    use App\Livewire\Notifications;
+    use App\Models\TuteeNotification;
+    use App\Models\TutorNotification;
     use Carbon\Carbon;
 
 @endphp
@@ -31,10 +34,10 @@
                     <div class="flex gap-2 items-center">
                         <h2 class="text-xl font-semibold truncate">{{ $tutor_name }}</h2>
 
-                    <div x-data="{ 
-                            isHovered: false, 
-                            isBookmarked: @entangle('isBookmarked') 
-                        }" 
+                    <div x-data="{
+                            isHovered: false,
+                            isBookmarked: @entangle('isBookmarked')
+                        }"
                         x-init="
                             Livewire.on('bookmarkUpdated', value => {
                                 isBookmarked = value;
@@ -136,7 +139,14 @@
                                 </p>
                             </div>
                             <div>
-                                <x-secondary-button class="w-full lg:w-fit text-nowrap">Join Class</x-secondary-button>
+                                <!-- ... -->
+                                <div>
+                                    <x-secondary-button class="w-full lg:w-fit text-nowrap"
+                                    wire:click="$dispatchTo('notifications', 'classJoined', { classId: {{ $class->id }}, tutorName: '{{ $selectedTutor->user->fname }}' })">
+                                    Join Class
+                                    </x-secondary-button>
+                                </div>
+
                             </div>
                         </div>
                     </div>
