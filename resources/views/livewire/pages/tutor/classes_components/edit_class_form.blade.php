@@ -7,6 +7,7 @@ use App\Models\Tutor;
 use App\Models\Classes;
 use App\Models\Schedule;
 use App\Models\RecurringSchedule;
+use App\Models\ClassRoster;
 use App\Models\Registration;
 use App\Models\Fields;
 use WireUi\Traits\Actions;
@@ -101,9 +102,11 @@ new #[Layout('layouts.app')] class extends Component {
     public function with(): array
     {
         $this->storedSchedules = RecurringSchedule::where('schedule_id', $this->class->schedule->id)->get();
+        $payment_check = ClassRoster::where('class_id', $this->class->id)->where('proof_of_payment', '!=', null)->exists();
 
         return [
             'storedSchedules' => $this->storedSchedules,
+            'payment_check' => $payment_check,
         ];
     }
 
@@ -614,7 +617,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                         {{-- class price --}}
                         <div>
-                            <x-wui-inputs.currency wire:model='class_fee' label='Class Fee' icon="cash" placeholder="Enter class price" shadowless/>
+                            <x-wui-inputs.currency :disabled="$payment_check" wire:model='class_fee' label='Class Fee' icon="cash" placeholder="Enter class price" shadowless/>
                         </div>
                     </div>
 

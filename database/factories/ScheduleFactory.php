@@ -58,7 +58,7 @@ class ScheduleFactory extends Factory
             // Generate unique random dates within the next 5 weeks
             while ($dates->count() < 5) { // Change 5 to the number of unique dates you want
                 // Generate a random date within the next 5 weeks
-                $randomDate = now()->addDays(rand(0, 35))->format('Y-m-d');
+                $randomDate = now()->addDays(rand(1, 35))->format('Y-m-d');
                 $dates->push($randomDate)->unique(); // Ensure uniqueness
             }
 

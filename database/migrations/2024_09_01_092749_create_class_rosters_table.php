@@ -30,6 +30,7 @@ return new class extends Migration
                 'Approved',
                 'Not Approved'
             ])->default('Pending');
+            $table->boolean('rated')->default(0);
             $table->timestamps();
         });
     }

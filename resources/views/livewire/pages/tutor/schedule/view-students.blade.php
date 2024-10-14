@@ -88,8 +88,8 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function verifyPayment()
     {
-        $newPaymentStatus = ($this->attachment_id->payment_status === 'Approved' ||
-                            $this->attachment_id->payment_status === 'Pending') ? 'Not Approved' : 'Approved';
+        $newPaymentStatus = ($this->attachment_id->payment_status === 'Not Approved' ||
+                            $this->attachment_id->payment_status === 'Pending') ? 'Approved' : 'Not Approved';
 
         $this->attachment_id->payment_status = $newPaymentStatus;
         $this->attachment_id->save();
@@ -284,15 +284,28 @@ new #[Layout('layouts.app')] class extends Component {
         {{-- modal --}}
         @if ($attachment_id)
             <x-wui-modal.card title="Proof of Payment" blur wire:model="attachment" persistent align='center' max-width='sm'>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {{ $attachment_id->tutee_id }}
+                <div class="grid grid-row-1 sm:grid-row-2 gap-4">
+                    <div class="w-full flex justify-center items-center">
+                        @if ($attachment_id->proof_of_payment)
+                            <img class="border-2 rounded-lg border-[#F1F5F9] overflow-hidden" src="{{ Storage::url($attachment_id->proof_of_payment) }}" alt="">
+                        @else
+                            <p class="text-center">
+                                Your student
+                                <span class="font-medium">{{ $attachment_id->tutees->user->fname . ' ' . $attachment_id->tutees->user->lname }}</span>
+                                 has not uploaded their proof of payment yet.
+                            </p>
+                            @php
+                                $no_upload = true;
+                            @endphp
+                        @endif
+                    </div>
                 </div>
 
                 <x-slot name="footer">
                     @if ($attachment_id->payment_status === 'Approved')
                         <x-wui-button negative label="Disapprove" spinner='verifyPayment' wire:click='verifyPayment' class="w-full"/>
                     @else
-                        <x-primary-button wire:click='verifyPayment' wireTarget='verifyPayment' class="w-full">Verify Payment</x-primary-button>
+                        <x-primary-button wire:click='verifyPayment' :disabled="isset($no_upload) && $no_upload" wireTarget='verifyPayment' class="w-full">Verify Payment</x-primary-button>
                     @endif
                 </x-slot>
             </x-wui-modal.card>

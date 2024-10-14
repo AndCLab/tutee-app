@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tutor', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')
+            $table->foreignId('reviewer')->constrained('tutee')
                 ->onDelete('cascade');
-            $table->string('bio')->nullable();
-            $table->json('work');
-            $table->json('degree');
-            $table->decimal('average_rating', 3, 1)->nullable();
+            $table->foreignId('class_id')->constrained('classes')
+                ->onDelete('cascade');
+            $table->unsignedInteger('rating');
+            $table->text('remarks');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tutor');
+        Schema::dropIfExists('reviews');
     }
 };

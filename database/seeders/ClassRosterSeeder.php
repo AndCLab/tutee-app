@@ -13,6 +13,6 @@ class ClassRosterSeeder extends Seeder
      */
     public function run(): void
     {
-        ClassRoster::factory()->times(450)->create();
+        ClassRoster::factory()->times(250)->create();
     }
 }

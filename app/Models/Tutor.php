@@ -15,7 +15,8 @@ class Tutor extends Model
         'user_id',
         'bio',
         'work',
-        'degree'
+        'degree',
+        'average_rating'
     ];
 
     public function user()

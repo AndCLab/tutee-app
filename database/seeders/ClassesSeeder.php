@@ -14,6 +14,6 @@ class ClassesSeeder extends Seeder
      */
     public function run(): void
     {
-        Classes::factory()->times(200)->create();
+        Classes::factory()->times(300)->create();
     }
 }
