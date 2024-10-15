@@ -43,12 +43,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->post_created = '1';
         $this->tutee = Tutee::where('user_id', Auth::id())->first();
 
-        if($this->tutee){
         $this->posts = Post::where('tutee_id', $this->tutee->id)
                             ->where('post_created', 1)
                             ->orderBy('created_at', $this->sort_by)
                             ->get();
-        }
 
         $this->getFields = Fields::where('user_id', Auth::id())
                                 ->where('active_in', Auth::user()->user_type)
@@ -118,17 +116,17 @@ new #[Layout('layouts.app')] class extends Component {
                 <div class="space-y-1">
                     <div class="flex justify-between items-center">
                         <div class="inline-flex items-center gap-2">
-                            <p class="font-semibold">{{ $post->post_title }}</p>
+                            <p class="font-semibold">{{ $post->post_title }} - Created by: {{ $post->tutee_id}}</p>
                             @if ($post->class_category == 'group')
                                 <x-wui-badge flat warning label="{{ $post->class_category }}" />
                             @else
                                 <x-wui-badge flat purple label="{{ $post->class_category }}" />
                             @endif
                         </div>
-                        @if ($post->post_created == 1)
+                        @if ($post->post_created == 1 && $post->tutee_id == $tutee->id)
                             <x-wui-dropdown>
                                 <x-wui-dropdown.header class="font-semibold" label="Actions">
-                                    <x-wui-dropdown.item onclick="$openModal('editPostModal', {{ $post->id }})"
+                                    <x-wui-dropdown.item wire:navigate href="{{ route('edit-post', $post->id) }}"
                                         icon='pencil-alt' label="Edit" />
                                     <x-wui-dropdown.item wire:click='deletePostModal({{ $post->id }})'
                                         icon='trash' label="Delete" />

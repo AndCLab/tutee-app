@@ -38,6 +38,7 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
         Volt::route('tutee/discover', 'pages.tutee.discover')->name('tutee.discover');
         Volt::route('tutors', 'pages.tutee.tutors')->name('tutors');
         Volt::route('tutee/schedule', 'pages.tutee.schedule')->name('tutee.schedule');
+        Volt::route('tutee/edit-post/{id}', 'pages.tutee.post_components.edit_post_form')->name('edit-post');
     });
 
     // Add tutor routes here
