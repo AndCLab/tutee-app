@@ -35,4 +35,10 @@ class Classes extends Model
     {
         return $this->belongsTo(Registration::class, 'registration_id');
     }
+
+    public function tutor()
+    {
+        return $this->belongsTo(Tutor::class, 'tutor_id');
+    }
+
 }

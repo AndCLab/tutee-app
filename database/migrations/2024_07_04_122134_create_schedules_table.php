@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->time('start_time');
+            $table->integer('tutor_id')->unsigned();
             $table->time('end_time');
-            $table->integer('occurrences')->nullable();
-            $table->enum('frequency', ['once', 'every'])->default('once');
-            $table->integer('interval')->nullable();
-            $table->enum('interval_unit', ['months', 'weeks', 'days'])->nullable();
+            $table->boolean('never_end')->default(0);
             $table->timestamps();
         });
     }

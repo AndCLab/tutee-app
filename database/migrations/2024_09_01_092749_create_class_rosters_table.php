@@ -29,7 +29,8 @@ return new class extends Migration
                 'Pending',
                 'Approved',
                 'Not Approved'
-            ])->default('pending');
+            ])->default('Pending');
+            $table->boolean('rated')->default(0);
             $table->timestamps();
         });
     }

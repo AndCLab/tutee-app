@@ -6,6 +6,7 @@ use App\Models\Classes;
 use App\Models\ClassRoster;
 use App\Models\Tutee;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ClassRoster>
@@ -22,32 +23,44 @@ class ClassRosterFactory extends Factory
 
     public function definition(): array
     {
-        $tutee = Tutee::inRandomOrder()->first();
-        $class = null;
+        while (true) { // Infinite loop, will continue until a suitable class and tutee combination is found
+            $tutee = Tutee::inRandomOrder()->first();
+            $class = null;
 
-        // loop until a class that meets the condition is found
-        do {
-            $class = Classes::inRandomOrder()->first();
+            for ($i = 0; $i < 10; $i++) { // Limit to 10 attempts to find a suitable class
+                $class = Classes::inRandomOrder()->first();
 
-            if ($class->class_category == 'individual' && $class->class_students > 0) {
-                $indi_class = $class;
-                $class->class_students--;
-                $class->save();
-                break;
-            } elseif ($class->class_category == 'group' && $class->class_students > 0) {
-                $group_class = $class;
-                $class->class_students--;
-                $class->save();
-                break;
+                // Check if the class is suitable for the tutee
+                $existsInRoster = ClassRoster::where('class_id', $class->id)
+                    ->where('tutee_id', $tutee->id)
+                    ->exists();
+
+                if (!$existsInRoster && $class->class_students > 0) {
+                    if ($class->class_category == 'individual') {
+                        $class->class_students--;
+                        $class->save();
+                        return [
+                            'class_id' => $class->id,
+                            'tutee_id' => $tutee->id,
+                            'attendance' => 'Pending',
+                            'payment_status' => 'Pending',
+                        ];
+                    } elseif ($class->class_category == 'group') {
+                        $class->class_students--;
+                        $class->save();
+                        return [
+                            'class_id' => $class->id,
+                            'tutee_id' => $tutee->id,
+                            'attendance' => 'Pending',
+                            'payment_status' => 'Pending',
+                        ];
+                    }
+                }
             }
-        } while (true);
-
-        return [
-            'class_id' => $group_class->id ?? $indi_class->id,
-            'tutee_id' => $tutee->id,
-            'attendance' => 'pending',
-            'payment_status' => 'pending',
-        ];
+            // If no suitable class found after 10 attempts, try with a new tutee
+        }
     }
+
+    // If no suitable class is found in 10 tries, the loop fetches a new tutee and starts the process again.
 
 }

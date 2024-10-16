@@ -6,17 +6,29 @@ use Carbon\Carbon;
 use App\Models\Message;
 use App\Models\Conversation;
 use App\Models\Group;
+use App\Models\Admin;
+use App\Models\Classes;
+use App\Models\ClassRoster;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
+    protected static ?string $password;
+
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
+        // admin
+        Admin::create([
+            'password' => static::$password ??= Hash::make('password'),
+        ]);
+
+        //dummy record for stepper testing
         User::factory()->create([
             'fname' => 'John',
             'lname' => 'Doe',

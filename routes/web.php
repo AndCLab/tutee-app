@@ -42,3 +42,4 @@ Route::middleware(['auth', 'verified', 'check.is_stepper'])->group(function () {
 
 // Include the default authentication routes provided by Laravel
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';

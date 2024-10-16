@@ -15,10 +15,22 @@
             <div>
                 <x-wui-button label="Class Schedule"
                     flat
-                    :negative="$errors->any()"
-                    :emerald="!$errors->any()"
+                    :negative="$errors->has('sched_initial_date') ||
+                                $errors->has('sched_end_date') ||
+                                $errors->has('start_time') ||
+                                $errors->has('end_time') ||
+                                $errors->has('interval_units')"
+                    :emerald="!$errors->has('sched_initial_date') ||
+                                !$errors->has('sched_end_date') ||
+                                !$errors->has('start_time') ||
+                                !$errors->has('end_time') ||
+                                !$errors->has('interval_units')"
                     xs
-                    icon="calendar"
+                    :icon="!$errors->has('sched_initial_date') &&
+                            !$errors->has('sched_end_date') &&
+                            !$errors->has('start_time') &&
+                            !$errors->has('end_time') &&
+                            !$errors->has('interval_units') ? 'calendar' : 'exclamation-circle' "
                     wire:click="$set('showClassSchedule', true)"
                 />
             </div>

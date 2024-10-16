@@ -49,6 +49,14 @@
                 <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
                     <img class="size-2/3" src="{{ asset('images/forgot-password.svg') }}" alt="">
                 </div>
+            @elseif (Route::is('login.admin'))
+                <div class="md:flex hidden justify-center items-center h-screen sticky top-0">
+                    <img class="size-4/5" src="{{ asset('images/admin-login.svg') }}" alt="">
+                </div>
+                <div class="my-auto py-10 md:py-32">
+                    <h1 class="max-w-sm mx-auto uppercase font-bold text-6xl text-[#0F172A] font-anton mb-4">tutee</h1>
+                    {{ $slot }}
+                </div>
             @endif
         </div>
     </div>
