@@ -15,7 +15,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public $tutee;
 
-    public string $post_title ='';
+    public string $post_desc ='';
     public $getFields = [];
     public $class_fields = [];
     public $class_date;
@@ -109,46 +109,57 @@ new #[Layout('layouts.app')] class extends Component {
     {{--<p class="capitalize font-semibold text-xl mb-9">post list</p> --}}
 
     {{-- Post List: Post Cards --}}
-    <div class="space-y-3">
+    <div class="space-y-6">
         @forelse ($posts as $post)
-            <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4" wire:loading.remove>
-                <div class="space-y-1">
-                    <div class="flex justify-between items-center">
-                        <div class="inline-flex items-center gap-2">
-                            <p class="font-semibold">{{ $post->post_title }} - Created by: {{ $post->tutee_id}}</p>
-                            @if ($post->class_category == 'group')
-                                <x-wui-badge flat warning label="{{ $post->class_category }}" />
-                            @else
-                                <x-wui-badge flat purple label="{{ $post->class_category }}" />
-                            @endif
+            <div class="w-full bg-white p-6 shadow-lg rounded-lg text-[#0F172A] space-y-6" wire:loading.remove>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between space-x-3">
+                        <div class="flex items-center space-x-3">
+                            {{-- Tutee Post Creator --}}
+                            <img
+                                alt="User Avatar"
+                                src="{{ Auth::user()->avatar ? Storage::url(Auth::user()->avatar) : asset('images/default.jpg') }}"
+                                class="w-10 h-10 rounded-full object-cover border border-[#F1F5F9] overflow-hidden"
+                            />
+                            <strong class="block font-medium max-w-28 truncate">{{ $post->tutees->user->fname .' '. $post->tutees->user->lname}}</strong>
                         </div>
+
+                        {{-- Action Buttons --}}
                         @if ($post->post_created == 1 && $post->tutee_id == $tutee->id)
-                            <x-wui-dropdown>
-                                <x-wui-dropdown.header class="font-semibold" label="Actions">
-                                    <x-wui-dropdown.item wire:navigate href="{{ route('edit-post', $post->id) }}"
-                                        icon='pencil-alt' label="Edit" />
-                                    <x-wui-dropdown.item wire:click='deletePostModal({{ $post->id }})'
-                                        icon='trash' label="Delete" />
-                                </x-wui-dropdown.header>
-                            </x-wui-dropdown>
+                            <div class="ml-auto">
+                                <x-wui-dropdown>
+                                    <x-wui-dropdown.header class="font-semibold" label="Actions">
+                                        <x-wui-dropdown.item wire:navigate href="{{ route('edit-post', $post->id) }}"
+                                            icon='pencil-alt' label="Edit" />
+                                        <x-wui-dropdown.item wire:click='deletePostModal({{ $post->id }})'
+                                            icon='trash' label="Delete" />
+                                    </x-wui-dropdown.header>
+                                </x-wui-dropdown>
+                            </div>
                         @endif
                     </div>
-                    <div class="flex gap-2 items-center text-[#64748B] text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p>Post at {{ $post->created_at->format('l jS \\of F Y h:i A') }}</p>
-                    </div>
-                </div>
 
-                <div x-data="{ expanded: false }">
-                    <div class="text-sm p-3 rounded-md bg-[#E1E7EC]" x-show="expanded" x-collapse x-cloak>
-                        <p>
-                            <strong>Class Field/s:</strong>
-                            {{ implode(', ', array_filter(json_decode($post->class_fields, true))) }}
-                        </p>
+                    {{-- Class Category --}}
+                    <div>
+                        @if ($post->class_category == 'group')
+                            <x-wui-badge flat warning label="{{ $post->class_category }}" />
+                        @else
+                            <x-wui-badge flat purple label="{{ $post->class_category }}" />
+                        @endif
+
+                        @foreach (array_filter(json_decode($post->class_fields, true)) as $field)
+                            <x-wui-badge flat gray label="{{ $field }}" />
+                        @endforeach
+                    </div>
+
+                    <div class="flex justify-between items-center">
+
+                        <div class="inline-flex items-center gap-3">
+                            <p>{{ $post->post_desc }}</p>
+                        </div>
+                    </div>
+
+                    <div>
                         <p>
                             <strong>Desired Date:</strong> {{ $post->class_date }}
                         </p>
@@ -158,20 +169,20 @@ new #[Layout('layouts.app')] class extends Component {
                         <p>
                             <strong>Class Type:</strong> {{ ucfirst($post->class_type) }}
                         </p>
-                        <p>
+                        @if ($post->class_location)
+                            <p>
                             <strong>Class Location:</strong> {{ $post->class_location }}
-                        </p>
+                            </p>
+                        @endif
                     </div>
 
-                    <div class="flex justify-end">
-                        <template x-if='expanded == false' x-transition>
-                            <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down'
-                                flat />
-                        </template>
-                        <template x-if='expanded == true' x-transition>
-                            <x-wui-button @click="expanded = ! expanded" xs label='View less' icon='arrow-up'
-                                flat />
-                        </template>
+                    <div class="flex gap-2 items-center text-[#64748B] text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p>Post at {{ $post->created_at->format('l jS \\of F Y h:i A') }}</p>
                     </div>
                 </div>
             </div>

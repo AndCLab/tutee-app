@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('tutee_id')->constrained('tutee')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('post_title');
+            $table->string('post_desc');
             $table->json('class_fields');
             $table->date('class_date');
             $table->decimal('class_fee')->default(0);

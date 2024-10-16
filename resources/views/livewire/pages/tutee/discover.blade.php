@@ -11,7 +11,7 @@ use App\Models\Tutee;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
-    public string $post_title ='';
+    public string $post_desc ='';
     public $getFields = [];
     public $class_fields = [];
     public $class_date;
@@ -32,7 +32,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function validation()
     {
         $this->validate([
-            'post_title' => ['required', 'string', 'max:255'],
+            'post_desc' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
             'class_date' => ['required', 'date'],
             'class_fee' => ['required', 'numeric'],
@@ -65,7 +65,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         Post::create([
             'tutee_id' => $tutee->id,
-            'post_title' => $this->post_title,
+            'post_desc' => $this->post_desc,
             'class_fields' => json_encode($this->class_fields),
             'class_date' => $this->class_date,
             'class_fee' => $this->class_fee,
@@ -76,7 +76,7 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         $this->reset(
-            'post_title',
+            'post_desc',
             'class_fields',
             'class_date',
             'class_fee',
@@ -137,12 +137,12 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
 
             <form>
-                {{-- post title --}}
+                {{-- post desc --}}
                 <div class="mb-4">
                     <x-wui-input
-                        wire:model="post_title"
-                        placeholder="Enter post title"
-                        shadowless />
+                        wire:model="post_desc"
+                        placeholder="Enter post description"
+                        class="border-none shadowless focus:ring-0" />
                 </div>
 
                 <div class="flex space-x-4 mb-4">

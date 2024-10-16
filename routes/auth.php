@@ -48,6 +48,7 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
         Volt::route('tutor/schedule', 'pages.tutor.schedule.schedule')->name('tutor.schedule');
         Volt::route('tutor/view-students/{id}', 'pages.tutor.schedule.view-students')->name('view-students');
         Volt::route('tutor/edit-class/{id}', 'pages.tutor.classes_components.edit_class_form')->name('edit-class');
+        Volt::route('tutor/edit-post/{id}', 'pages.tutee.post_components.edit_post_form')->name('edit-post');
     });
 
     Route::middleware('checkIsApplied')->group(function () {

@@ -13,7 +13,7 @@ class Post extends Model
 
     protected $fillable = [
         'tutee_id',
-        'post_title',
+        'post_desc',
         'class_fields',
         'class_date',
         'class_fee',
@@ -22,4 +22,9 @@ class Post extends Model
         'class_location',
         'post_created'
     ];
+
+    public function tutees()
+    {
+        return $this->belongsTo(Tutee::class, 'tutee_id');
+    }
 }
