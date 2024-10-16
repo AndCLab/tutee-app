@@ -247,16 +247,20 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
 
                 <ol @class([
-                        'border-s border-gray-200 relative' => $first_dates->isNotEmpty(),
+                        'sm:border-s sm:border-gray-200 sm:relative' => $first_dates->isNotEmpty(),
                     ])>
 
-                    @forelse ($distinct_dates as $date)
+                    @forelse ($distinct_dates as $index => $date)
                         {{-- check if ni labay nga schedule pero wa pa na rate sa studyante --}}
-                        {{-- @if ($date > Carbon::now()->format('Y-m-d')) --}}
-                        @if (!$all_rated_status[$date] && $schedule_type == 'future')
-                            <li class="mb-10 ms-6">
-                                <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
-                                    <x-wui-icon name='calendar' class="size-2.5 text-[#0C3B2E]" solid />
+                        @php
+                            $isFuture = !$all_rated_status[$date] && $schedule_type == 'future';
+                            $isPast = $date < Carbon::now()->format('Y-m-d') && $schedule_type == 'past';
+                        @endphp
+
+                        @if ($isFuture)
+                            <li class="mb-10 sm:ms-6">
+                                <span class="sm:absolute -start-3 sm:flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
+                                    <x-wui-icon name='calendar' class="hidden sm:block size-2.5 text-[#0C3B2E]" solid />
                                 </span>
                                 <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
                                     {{ Carbon::parse($date)->format('l, F d, Y') }}
@@ -265,10 +269,10 @@ new #[Layout('layouts.app')] class extends Component {
                                     @include('livewire.pages.tutee.schedule.schedule-card')
                                 </div>
                             </li>
-                        @elseif ($date < Carbon::now()->format('Y-m-d') && $schedule_type == 'past')
-                            <li class="mb-10 ms-6">
-                                <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
-                                    <x-wui-icon name='calendar' class="size-2.5 text-[#0C3B2E]" solid />
+                        @elseif ($isPast)
+                            <li class="mb-10 sm:ms-6">
+                                <span class="sm:absolute -start-3 sm:flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
+                                    <x-wui-icon name='calendar' class="hidden sm:block size-2.5 text-[#0C3B2E]" solid />
                                 </span>
                                 <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
                                     {{ Carbon::parse($date)->format('l, F d, Y') }}

@@ -24,8 +24,8 @@
                     <div class="space-y-1 w-full">
                         {{-- class name and category --}}
                         <div class="flex w-full items-center justify-between gap-2">
-                            <div class="lg:inline-flex gap-2 items-center">
-                                <p class="text-[#8F8F8F] font-medium">
+                            <div class="inline-flex gap-2 items-center">
+                                <p class="text-[#8F8F8F] font-medium truncate w-[8rem] md:w-60 lg:w-fit">
                                     {{ $item['class_details']->schedule->id }}
                                     {{ $item['class_details']->id }}
                                     {{ $item['class_roster_id'] }}
@@ -102,7 +102,7 @@
                         @include('livewire.pages.tutee.schedule.indicator-buttons')
 
                         {{-- date and collapse button --}}
-                        <div class="lg:flex flex-wrap lg:flex-nowrap lg:justify-between lg:items-center">
+                        <div class="flex justify-between items-center">
                             <div class="text-[#64748B] inline-flex gap-2 items-center">
                                 <x-wui-icon name='calendar' class="size-5" />
                                 <p class="font-light text-sm line-clamp-1">
@@ -111,7 +111,7 @@
                                 </p>
                             </div>
                             <div>
-                                <div class="flex justify-end mt-2">
+                                <div class="flex justify-end">
                                     <template x-if='expanded == false' x-transition>
                                         <x-wui-button @click="expanded = ! expanded" xs label='View Tutor' icon='arrow-down'
                                             flat />
