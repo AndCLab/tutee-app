@@ -43,10 +43,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->post_created = '1';
         $this->tutee = Tutee::where('user_id', Auth::id())->first();
 
-        $this->posts = Post::where('tutee_id', $this->tutee->id)
-                            ->where('post_created', 1)
-                            ->orderBy('created_at', $this->sort_by)
-                            ->get();
+        $this->posts = Post::where('post_created', 1)
+                                    ->orderBy('created_at', $this->sort_by)
+                                    ->get();
 
         $this->getFields = Fields::where('user_id', Auth::id())
                                 ->where('active_in', Auth::user()->user_type)
