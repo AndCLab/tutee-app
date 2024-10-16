@@ -16,7 +16,7 @@
                                 </div>
                             </div>
     @else
-        <div class="mb-4 max-h-124 overflow-y-auto soft-scrollbar"
+        <div wire:ignore class="mb-4 max-h-124 overflow-y-auto soft-scrollbar"
             x-data="{ page: 1, isLoading: false }"
             @scroll="if ($el.scrollTop + $el.clientHeight >= $el.scrollHeight - 10 && !isLoading) {
             isLoading = true;
