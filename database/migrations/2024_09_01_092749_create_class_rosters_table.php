@@ -31,6 +31,7 @@ return new class extends Migration
                 'Not Approved'
             ])->default('Pending');
             $table->boolean('rated')->default(0);
+            $table->timestamp('date_of_upload')->nullable();
             $table->timestamps();
         });
     }

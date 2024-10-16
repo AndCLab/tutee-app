@@ -277,6 +277,7 @@ new #[Layout('layouts.app')] class extends Component {
                 Fields::create([
                     'user_id' => $user->id,
                     'field_name' => $item,
+                    'active_in' => 'tutor',
                 ]);
             }
 

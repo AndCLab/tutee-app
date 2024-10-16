@@ -64,6 +64,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $this->class_roster_payment->payment_status = 'Pending';
             }
             $this->class_roster_payment->proof_of_payment = $filePath;
+            $this->class_roster_payment->date_of_upload = Carbon::now();
             $this->class_roster_payment->save();
         }
 
@@ -156,6 +157,18 @@ new #[Layout('layouts.app')] class extends Component {
     public function with(): array
     {
         $tutee = Tutee::where('user_id', Auth::id())->first();
+
+        $getFields = Fields::where('user_id', Auth::id())
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
+
+        $allTutors = Tutor::whereHas('user.fields', function ($query) use ($getFields){
+                                $query->whereIn('field_name', $getFields);
+                            })
+                            ->orderBy('average_rating', 'desc')->get();
+
+
         $class_rosters = ClassRoster::with(['classes.schedule.recurring_schedule', 'classes.tutor']) // Eager load tutor
             ->where('tutee_id', $tutee->id)
             ->get();
@@ -198,6 +211,7 @@ new #[Layout('layouts.app')] class extends Component {
             'first_dates' => $first_dates,
             'distinct_dates' => $distinct_dates,
             'all_rated_status' => $all_rated_status,
+            'allTutors' => $allTutors,
         ];
     }
 
@@ -214,11 +228,13 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- Schedule --}}
             <div class="lg:col-span-2 space-y-3">
                 {{-- Header --}}
-                <p class="capitalize font-semibold text-xl mb-9">schedule</p>
+                <p class="capitalize font-semibold text-xl mb-9">your schedule</p>
 
-                <ol class="relative border-s border-gray-200 dark:border-gray-700">
+                <ol @class([
+                        'border-s border-gray-200 relative' => $first_dates->isNotEmpty(),
+                    ])>
 
-                    @foreach ($distinct_dates as $date)
+                    @forelse ($distinct_dates as $date)
                         {{-- check if ni labay nga schedule pero wa pa na rate sa studyante --}}
                         {{-- @if ($date > Carbon::now()->format('Y-m-d')) --}}
                         @if (!$all_rated_status[$date])
@@ -234,8 +250,13 @@ new #[Layout('layouts.app')] class extends Component {
                                 </div>
                             </li>
                         @endif
-
-                    @endforeach
+                    @empty
+                        <div class="flex flex-col gap-2 justify-center items-center w-full" wire:loading.remove>
+                            <img class="size-1/2" src="{{ asset('images/empty_schedule.svg') }}" alt="">
+                            <p class="font-semibold text-xl">You don't have any schedule set up yet.</p>
+                            <span class="font-light">Find classes in the Discover</span>
+                        </div>
+                    @endforelse
                 </ol>
             </div>
 
@@ -245,6 +266,16 @@ new #[Layout('layouts.app')] class extends Component {
                 {{-- Header --}}
                 <p class="capitalize font-semibold text-xl mb-9">top tutors</p>
 
+                @forelse ($allTutors as $index => $tutor)
+                    <div class="flex flex-col">
+                       @include('livewire.pages.tutee.schedule.top-tutors')
+                       @break($index === 2)
+                    </div>
+                @empty
+                    <div>
+                        No tutor
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>

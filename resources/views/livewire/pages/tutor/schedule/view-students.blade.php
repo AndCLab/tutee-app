@@ -86,12 +86,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->attachment = true;
     }
 
-    public function verifyPayment()
+    public function verifyPayment($status)
     {
-        $newPaymentStatus = ($this->attachment_id->payment_status === 'Not Approved' ||
-                            $this->attachment_id->payment_status === 'Pending') ? 'Approved' : 'Not Approved';
-
-        $this->attachment_id->payment_status = $newPaymentStatus;
+        $this->attachment_id->payment_status = $status;
         $this->attachment_id->save();
 
         $this->attachment = false;
@@ -302,11 +299,16 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
 
                 <x-slot name="footer">
-                    @if ($attachment_id->payment_status === 'Approved')
-                        <x-wui-button negative label="Disapprove" spinner='verifyPayment' wire:click='verifyPayment' class="w-full"/>
-                    @else
-                        <x-primary-button wire:click='verifyPayment' :disabled="isset($no_upload) && $no_upload" wireTarget='verifyPayment' class="w-full">Verify Payment</x-primary-button>
-                    @endif
+                    <div class="inline-flex gap-2 items-center w-full">
+                        @if ($attachment_id->payment_status === 'Pending')
+                            <x-wui-button negative label="Disapprove" :disabled="isset($no_upload) && $no_upload" spinner="verifyPayment('Not Approved')" wire:click="verifyPayment('Not Approved')" class="w-full"/>
+                            <x-primary-button wire:click="verifyPayment('Approved')" :disabled="isset($no_upload) && $no_upload" wireTarget="verifyPayment('Approved')" class="w-full">Verify Payment</x-primary-button>
+                        @endif
+                    </div>
+                    <div class="inline-flex justify-center gap-1 items-center mt-2 text-[#64748B] w-full">
+                        <x-wui-icon name='calendar' class="size-4" />
+                        <span class="font-light text-sm">Uploaded on {{ Carbon::parse($attachment_id->date_of_upload)->format('F d, Y l h:i A') }}</span>
+                    </div>
                 </x-slot>
             </x-wui-modal.card>
         @endif

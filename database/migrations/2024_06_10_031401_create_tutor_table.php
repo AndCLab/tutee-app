@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('bio')->nullable();
             $table->json('work');
             $table->json('degree');
-            $table->decimal('average_rating', 3, 1)->nullable();
+            $table->decimal('average_rating', 3, 1)->default(0);
             $table->timestamps();
         });
     }

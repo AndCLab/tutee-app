@@ -12,9 +12,10 @@
 
             {{-- container --}}
             <div @class([
-                    'rounded border p-4 space-y-2',
-                    'border-info-500' => $date < Carbon::now()->format('Y-m-d') && $item['class_roster_details']->payment_status == 'Approved'
-                    ]) x-data="{ expanded: false }">
+                'rounded border p-4 space-y-2',
+                'border-info-500' => $date < Carbon::now()->format('Y-m-d') && $item['class_roster_details']->payment_status == 'Approved',
+                'border-red-500' => $date < Carbon::now()->format('Y-m-d') && ($item['class_roster_details']->payment_status == 'Not Approved' || $item['class_roster_details']->payment_status == 'Pending')
+                ]) x-data="{ expanded: false }">
                 <div class="flex justify-between items-start gap-4">
 
                     {{-- parent div --}}
@@ -155,7 +156,11 @@
                         </div>
                     </div>
                     <p class="mt-2">
-                        <strong>Bio:</strong> {{ $item['tutor']->bio }}
+                        @if ($item['tutor']->bio == null)
+                            This tutor doesn't have a bio yet.
+                        @else
+                            <strong>Bio:</strong> {{ $item['tutor']->bio }}
+                        @endif
                     </p>
                 </div>
             </div>
