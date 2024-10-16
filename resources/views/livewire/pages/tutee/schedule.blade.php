@@ -22,6 +22,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $payment;
     public $rating;
     public $remarks;
+    public $schedule_type;
 
     // collections
     public $review_class;
@@ -35,6 +36,11 @@ new #[Layout('layouts.app')] class extends Component {
     public $leave_class_modal;
     public $review_class_modal;
     public $view_attendees;
+
+    public function mount()
+    {
+        $this->schedule_type = 'future';
+    }
 
     public function openPaymentModal($id)
     {
@@ -153,6 +159,11 @@ new #[Layout('layouts.app')] class extends Component {
         $this->review_class_modal = false;
     }
 
+    public function setSchedule($schedule_type)
+    {
+        $this->schedule_type = $schedule_type;
+    }
+
 
     public function with(): array
     {
@@ -228,7 +239,12 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- Schedule --}}
             <div class="lg:col-span-2 space-y-3">
                 {{-- Header --}}
-                <p class="capitalize font-semibold text-xl mb-9">your schedule</p>
+                <div class="w-full inline-flex justify-between items-center mb-5">
+                    <p class="capitalize font-semibold text-xl">your schedule</p>
+                    <x-primary-button class="text-xs" wire:click="setSchedule('{{ $schedule_type == 'future' ? 'past' : 'future' }}')">
+                        {{ $schedule_type == 'future' ? 'View Past Schedules' : 'View Upcoming Schedules' }}
+                    </x-primary-button>
+                </div>
 
                 <ol @class([
                         'border-s border-gray-200 relative' => $first_dates->isNotEmpty(),
@@ -237,7 +253,19 @@ new #[Layout('layouts.app')] class extends Component {
                     @forelse ($distinct_dates as $date)
                         {{-- check if ni labay nga schedule pero wa pa na rate sa studyante --}}
                         {{-- @if ($date > Carbon::now()->format('Y-m-d')) --}}
-                        @if (!$all_rated_status[$date])
+                        @if (!$all_rated_status[$date] && $schedule_type == 'future')
+                            <li class="mb-10 ms-6">
+                                <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
+                                    <x-wui-icon name='calendar' class="size-2.5 text-[#0C3B2E]" solid />
+                                </span>
+                                <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                                    {{ Carbon::parse($date)->format('l, F d, Y') }}
+                                </h3>
+                                <div class="space-y-3">
+                                    @include('livewire.pages.tutee.schedule.schedule-card')
+                                </div>
+                            </li>
+                        @elseif ($date < Carbon::now()->format('Y-m-d') && $schedule_type == 'past')
                             <li class="mb-10 ms-6">
                                 <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
                                     <x-wui-icon name='calendar' class="size-2.5 text-[#0C3B2E]" solid />

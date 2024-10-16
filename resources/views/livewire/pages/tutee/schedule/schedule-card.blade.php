@@ -4,7 +4,9 @@
 @endphp
 
 @forelse ($first_dates as $item)
-    @continue($date < Carbon::now()->format('Y-m-d') && $item['class_roster_details']->rated)
+    {{-- @if ($schedule == 'future')
+        @continue($date < Carbon::now()->format('Y-m-d') && $item['class_roster_details']->rated)
+    @endif --}}
 
     @if ($item['first_date'] === $date)
         {{-- $date > Carbon::parse($item['first_date']) --}}
@@ -143,7 +145,10 @@
                                 <div class="inline-flex items-center gap-1">
                                     <x-wui-icon name='academic-cap' class="size-4 text-[#64748B]" solid />
                                     <span class="text-xs text-[#64748B]">
-                                        {{ implode(', ', json_decode($item['tutor']->degree, true)) }}
+                                        @php
+                                            $degrees = json_decode($item['tutor']->degree, true);
+                                        @endphp
+                                        {{ is_array($degrees) ? implode(', ', $degrees) : $item['tutor']->degree }}
                                     </span>
                                 </div>
                                 <div class="inline-flex items-center gap-1">
