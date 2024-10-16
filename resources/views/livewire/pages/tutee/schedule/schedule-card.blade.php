@@ -12,9 +12,10 @@
 
             {{-- container --}}
             <div @class([
-                    'rounded border p-4 space-y-2',
-                    'border-info-500' => $date < Carbon::now()->format('Y-m-d') && $item['class_roster_details']->payment_status == 'Approved'
-                    ]) x-data="{ expanded: false }">
+                'rounded border p-4 space-y-2',
+                'border-info-500' => $date < Carbon::now()->format('Y-m-d') && $item['class_roster_details']->payment_status == 'Approved',
+                'border-red-500' => $date < Carbon::now()->format('Y-m-d') && ($item['class_roster_details']->payment_status == 'Not Approved' || $item['class_roster_details']->payment_status == 'Pending')
+                ]) x-data="{ expanded: false }">
                 <div class="flex justify-between items-start gap-4">
 
                     {{-- parent div --}}
@@ -142,7 +143,10 @@
                                 <div class="inline-flex items-center gap-1">
                                     <x-wui-icon name='academic-cap' class="size-4 text-[#64748B]" solid />
                                     <span class="text-xs text-[#64748B]">
-                                        {{ implode(', ', json_decode($item['tutor']->degree, true)) }}
+                                        @php
+                                            $degrees = json_decode($item['tutor']->degree, true);
+                                        @endphp
+                                        {{ is_array($degrees) ? implode(', ', $degrees) : $item['tutor']->degree }}
                                     </span>
                                 </div>
                                 <div class="inline-flex items-center gap-1">
@@ -155,7 +159,11 @@
                         </div>
                     </div>
                     <p class="mt-2">
-                        <strong>Bio:</strong> {{ $item['tutor']->bio }}
+                        @if ($item['tutor']->bio == null)
+                            This tutor doesn't have a bio yet.
+                        @else
+                            <strong>Bio:</strong> {{ $item['tutor']->bio }}
+                        @endif
                     </p>
                 </div>
             </div>

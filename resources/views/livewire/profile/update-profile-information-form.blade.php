@@ -90,8 +90,10 @@ new class extends Component
 
         $user->fill($validated);
 
-        $this->tutor->bio = $this->bio;
-        $this->tutor->save();
+        if ($user->user_type == 'tutor') {
+            $this->tutor->bio = $this->bio;
+            $this->tutor->save();
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;

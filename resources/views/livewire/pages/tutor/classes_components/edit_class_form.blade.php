@@ -301,6 +301,8 @@ new #[Layout('layouts.app')] class extends Component {
             'never_end' => $neverValue == true ? 1 : 0, // tutor will close this class manually if it sets to 1
         ];
 
+        $schedule = null;
+
         // Check if the schedule already exists, excluding the current schedule ID
         $scheduleExists = Schedule::where('id', '!=', $this->class->schedule->id)
                                 ->whereHas('recurring_schedule', function ($query) {

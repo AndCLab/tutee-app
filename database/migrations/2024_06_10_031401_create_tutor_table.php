@@ -17,9 +17,12 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('bio')->nullable();
             $table->string('work')->nullable();
-            $table->string('degree')->nullable();
+            // $table->string('degree')->nullable();
             $table->decimal('average_rating', 3, 1)->nullable();
             $table->enum('verify_status', ['not_verified', 'pending', 'verified'])->default('not_verified');
+            // $table->json('work');
+            $table->json('degree')->nullable();
+            
             $table->timestamps();
         });
     }
