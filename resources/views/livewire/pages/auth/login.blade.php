@@ -121,7 +121,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 {{ __('Login with Facebook') }}
             </a>
         </div>
-        
+
     </form>
 
 
@@ -154,7 +154,7 @@ new #[Layout('layouts.guest')] class extends Component {
         text-align: center;
     }
 </style>
-    
+
 <script>
 let googleWindow = null;  // Store the reference to the Google popup window
 
@@ -184,7 +184,7 @@ function openGoogleLoginPopup() {
     const screenTop = window.screenTop || window.screenY;
     const screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
     const screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
-    
+
     const left = screenLeft + (screenWidth - popupWidth) / 2;
     const top = screenTop + (screenHeight - popupHeight) / 2;
 
@@ -196,8 +196,8 @@ function openGoogleLoginPopup() {
     } else {
         // Otherwise, open a new popup window for Google login in the center of the screen
         googleWindow = window.open(
-            googleLoginUrl, 
-            "googleLoginWindow", 
+            googleLoginUrl,
+            "googleLoginWindow",
             `width=${popupWidth},height=${popupHeight},top=${top},left=${left}`
         );
         console.log('Google popup opened.');
@@ -226,4 +226,3 @@ function openOtherLogin() {
 
 
 </div>
-
