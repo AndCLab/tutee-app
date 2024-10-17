@@ -1,4 +1,4 @@
-<div class="icon-container flex items-center space-x-4">
+<div class="icon-container flex items-center space-x-2">
     {{-- Icons --}}
 
     {{-- Bookmark Dropdown --}}
