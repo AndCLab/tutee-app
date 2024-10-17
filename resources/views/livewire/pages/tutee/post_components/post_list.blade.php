@@ -55,7 +55,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->isEmptyPost = $this->posts->isEmpty();
     }
 
-    public function updateList($isNotEmpty)
+    public function displayList($isNotEmpty)
     {
         if ($this->isEmptyPost != $isNotEmpty) {
             $this->isEmptyPost = $isNotEmpty;
