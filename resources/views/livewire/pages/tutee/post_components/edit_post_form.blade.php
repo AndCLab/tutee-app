@@ -15,7 +15,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $tutee;
     public $post;
 
-    public string $post_title ='';
+    public string $post_desc ='';
     public $getFields = [];
     public $class_fields = [];
     public $class_date;
@@ -33,7 +33,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->get(['field_name'])
                                 ->toArray();
 
-        $this->post_title = $this->post->post_title;
+        $this->post_desc = $this->post->post_desc;
         $this->class_fields = json_decode($this->post->class_fields, true);
         $this->class_date = Carbon::parse($this->post->class_date);
         $this->class_fee = $this->post->class_fee;
@@ -48,7 +48,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function editPost()
     {
         $rules = [
-            'post_title' => ['required', 'string', 'max:255'],
+            'post_desc' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
             'class_date' => ['required', 'date'],
             'class_fee' => ['required', 'numeric'],
@@ -59,7 +59,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         $this->validate($rules);
 
-        $this->post->post_title = $this->post_title;
+        $this->post->post_desc = $this->post_desc;
         $this->post->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
         $this->post->class_date = $this->class_date;
         $this->post->class_fee = $this->class_fee;
@@ -95,11 +95,11 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
             </div>
 
-                {{-- post title --}}
+                {{-- post desc --}}
                 <div class="mb-4">
                     <x-wui-input
-                        wire:model="post_title"
-                        placeholder="Edit post title"
+                        wire:model="post_desc"
+                        placeholder="Edit post description"
                         shadowless />
                 </div>
 
