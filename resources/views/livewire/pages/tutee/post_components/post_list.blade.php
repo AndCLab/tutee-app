@@ -182,7 +182,21 @@ new #[Layout('layouts.app')] class extends Component {
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p>Post at {{ $post->created_at->format('l jS \\of F Y h:i A') }}</p>
+                        <p>Posted on {{ $post->created_at->format('l jS \\of F Y h:i A') }}</p>
+                    </div>
+
+                    <div class="flex justify-end items-center space-x-2">
+                        <x-primary-button type='' wireTarget='openPost'>
+                            View Post
+                        </x-primary-button>
+
+                        <button class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"
+                            fill="#292D32"  class="icon icon-tabler icons-tabler-filled icon-tabler-message">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M18 3a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-4.724l-4.762 2.857a1 1 0 0 1 -1.508 -.743l-.006 -.114v-2h-1a4 4 0 0 1 -3.995 -3.8l-.005 -.2v-8a4 4 0 0 1 4 -4zm-4 9h-6a1 1 0 0 0 0 2h6a1 1 0 0 0 0 -2m2 -4h-8a1 1 0 1 0 0 2h8a1 1 0 0 0 0 -2" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
