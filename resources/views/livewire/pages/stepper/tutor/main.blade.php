@@ -253,6 +253,11 @@ new #[Layout('layouts.app')] class extends Component {
         $user->is_stepper = 0;
         $user->save();
 
+        if ($user->apply_status == 'pending'){
+            $user->apply_status = 'applied';
+            $user->save();
+        }
+
         if ($user && $this->user_type === 'tutor') {
             $degree_json = is_array($this->degree) ? json_encode($this->degree) : $this->degree;
             $work_json = is_array($this->work) ? json_encode($this->work) : $this->work;

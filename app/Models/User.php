@@ -26,6 +26,7 @@ class User extends Authenticatable
         'phone_number',
 
         'is_stepper',
+        'apply_status',
         'user_type',
         'avatar',
         'password',

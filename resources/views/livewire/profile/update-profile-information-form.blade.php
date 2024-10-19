@@ -17,6 +17,8 @@ new class extends Component
     public string $lname = '';
     public string $bio = '';
     public string $email = '';
+    public string $address = '';
+    public string $zip_code = '';
     public string $phone_prefix = '';
     public string $phone_number = '';
     public string $tempPhoneStorage = '';
@@ -36,6 +38,8 @@ new class extends Component
         $this->fname = Auth::user()->fname;
         $this->lname = Auth::user()->lname;
         $this->email = Auth::user()->email;
+        $this->address = Auth::user()->address;
+        $this->zip_code = Auth::user()->zip_code;
         $this->phone_prefix = Auth::user()->phone_prefix;
         $this->phone_number = Auth::user()->phone_number;
     }
@@ -51,6 +55,8 @@ new class extends Component
             'fname' => ['required'],
             'lname' => ['required'],
             'email' => ['required'],
+            'address' => ['required', 'string', 'max:255'],
+            'zip_code' => ['required', 'numeric'],
             'phone_prefix' => ['required'],
             'phone_number' => ['required'],
         ], [
@@ -69,6 +75,8 @@ new class extends Component
                 'lname' => ['string', 'max:255'],
                 'bio' => ['string', 'max:255'],
                 'email' => ['string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'address' => ['string', 'max:255'],
+                'zip_code' => ['string'],
                 'phone_prefix' => ['string'],
                 'phone_number' => ['string', 'phone'],
             ]);
@@ -184,6 +192,31 @@ new class extends Component
                     @endif
                 </div>
             @endif
+        </div>
+
+        <!-- Address -->
+        <div>
+            <x-wui-input
+                label="Address"
+                placeholder="Address"
+                wire:model="address"
+                autocomplete='address'
+                hint='Update your address'
+                errorless
+            />
+        </div>
+
+        <!-- Zip Code -->
+        <div>
+            <x-wui-inputs.maskable
+                label="Zip Code"
+                placeholder="1234"
+                mask="#####"
+                wire:model="zip_code"
+                autocomplete='postal-code'
+                hint='Update your zip code'
+                errorless
+            />
         </div>
 
         <!-- Phone Number -->

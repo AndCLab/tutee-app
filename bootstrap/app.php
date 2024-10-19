@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'check.is_stepper' => \App\Http\Middleware\CheckStepper::class,
             'checkUserType' => \App\Http\Middleware\CheckUserType::class,
+            'checkIsApplied' => \App\Http\Middleware\CheckIsApplied::class,
         ]);
     })->withExceptions(function (Exceptions $exceptions) {
         //

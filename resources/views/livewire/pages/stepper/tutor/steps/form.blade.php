@@ -171,6 +171,9 @@
                             <x-wui-input wire:model="certificates.{{ $index }}" type="file" accept=".pdf,.png,.jpg,.jpeg"
                                 class="p-0 text-gray-500 font-medium text-sm border-none shadow-none bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-[#0F172A] file:hover:bg-[#0F172A]/90 file:text-white rounded"
                                 errorless />
+                            <div class="text-xs text-gray-400">
+                                Only PDF, JPG, JPEG, or PNG format. Less than 2 MB.
+                            </div>
                         </div>
                         <div>
                             <div @class([
@@ -235,10 +238,10 @@
                                 Uploading...
                             </div>
                         </span>
-                        <p class="text-xs font-light text-gray-400">Only PDF is allowed.</p>
+                        <p class="text-xs font-light text-gray-400">Only PDF, JPG, JPEG, or PNG format. Less than 2 MB.</p>
                     </div>
                 </label>
-                <input wire:model="resume" class="hidden" type="file" accept=".pdf" name="resume" id="upload-resume">
+                <input wire:model="resume" class="hidden" type="file" accept=".pdf,.png,.jpg,.jpeg" name="resume" id="upload-resume">
             </div>
         </div>
     </div>

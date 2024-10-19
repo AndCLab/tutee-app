@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')
                 ->onDelete('cascade');
             $table->string('bio')->nullable();
-            $table->json('work');
+            $table->string('work');
             $table->json('degree');
+            $table->enum('verify_status', ['not_verified', 'pending', 'verified'])->default('not_verified');
             $table->decimal('average_rating', 3, 1)->default(0);
             $table->timestamps();
         });

@@ -45,7 +45,7 @@
             </div>
             <form wire:submit='get_specific_field' class="space-y-2 mt-2">
                 <div class="w-full">
-                    <x-wui-input class="py-1.5" placeholder="Enter specific field" wire:model="specific" autofocus autocomplete='off' shadowless/>
+                    <x-wui-input corner-hint="Must be at least 3 fields." class="py-1.5" placeholder="Enter specific field" wire:model="specific" autofocus autocomplete='off' shadowless/>
                 </div>
                 <div class="grid">
                     <x-white-button type='submit' wireTarget='get_specific_field'>Add Field</x-white-button>

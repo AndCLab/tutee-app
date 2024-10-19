@@ -37,6 +37,12 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '9582938479',
         ]);
 
+        // Fields::factory()->create([
+        //     'user_id' => $user->id,
+        //     'field_name' => fake()->randomElement($fields),
+        //     'active_in' => $user->user_type
+        // ]);
+
         User::factory()->create([
             'fname' => 'Tutee',
             'lname' => 'Example',
