@@ -16,8 +16,8 @@ class Tutor extends Model
         'bio',
         'work',
         'degree',
-        'verify_status'
-        'average_rating'
+        'verify_status',
+        'average_rating',
     ];
 
     protected $casts = [
