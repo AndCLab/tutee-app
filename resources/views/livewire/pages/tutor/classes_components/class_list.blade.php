@@ -29,7 +29,6 @@ new #[Layout('layouts.app')] class extends Component {
     public $class_students;
     public $class_fee = 0;
     public $class_fields = []; //fields setter
-    public $getFields = []; // fields getter
 
     // for class schedule date
     public $sched_start_date;
@@ -38,8 +37,6 @@ new #[Layout('layouts.app')] class extends Component {
     // for registration date
     public $regi_start_date;
     public $regi_end_date;
-
-    public $classes;
 
     // states
     #[Url(as: 'search_class')]
@@ -61,21 +58,33 @@ new #[Layout('layouts.app')] class extends Component {
         $this->sort_by = 'desc';
         $this->class_status = '1';
         $this->tutor = Tutor::where('user_id', Auth::id())->first();
+    }
 
+    public function with(): array
+    {
         if ($this->tutor) {
-            $this->classes = Classes::where('tutor_id', $this->tutor->id)
-                                    ->where('class_status', 1)
-                                    ->orderBy('created_at', $this->sort_by)
-                                    ->get();
+            $classes = Classes::where('tutor_id', $this->tutor->id)
+                            ->when($this->search, function ($q) {
+                                $q->where('class_name', 'like', "%{$this->search}%");
+                            })
+                            ->when($this->sort_by, function ($q) {
+                                $q->orderBy('created_at', $this->sort_by);
+                            })
+                            ->when($this->class_status && $this->class_status !== null, function ($q) {
+                                $q->where('class_status', $this->class_status);
+                            })
+                            ->get();
         }
 
-        $this->getFields = Fields::where('user_id', Auth::id())
+        $getFields = Fields::where('user_id', Auth::id())
                                 ->where('active_in', Auth::user()->user_type)
                                 ->get(['field_name'])
                                 ->toArray();
 
         // boolean for checking if the collection is empty
-        $this->isEmptyClass = $this->classes->isEmpty();
+        $this->isEmptyClass = $classes->isEmpty();
+
+        return ['classes' => $classes, 'getFields' => $getFields, 'isEmptyClass' => $this->isEmptyClass];
     }
 
 
@@ -91,22 +100,6 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->orderBy('created_at', $this->sort_by)
                                 ->get();
     }
-
-    /* start filter functions */
-    public function updated()
-    {
-        $this->classes = Classes::when($this->search, function ($q) {
-                                $q->where('class_name', 'like', "%{$this->search}%");
-                            })
-                            ->when($this->sort_by, function ($q) {
-                                $q->orderBy('created_at', $this->sort_by);
-                            })
-                            ->when($this->class_status && $this->class_status !== null, function ($q) {
-                                $q->where('class_status', $this->class_status);
-                            })
-                            ->get();
-    }
-    /* end filter functions */
 
     // delete class
     public function withdrawClass()
@@ -145,7 +138,6 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         $this->showWithdrawClassModal = false;
-        $this->mount();
     }
 
     // trigger withdraw class modal
@@ -154,6 +146,20 @@ new #[Layout('layouts.app')] class extends Component {
         $this->showWithdrawClassModal = true;
         $this->deleteClassId = $classId;
     }
+
+    public function closeEndlessClass($classId)
+    {
+        return Classes::findOrFail($classId)->update(['class_status' => 0]);
+
+        $this->notification([
+            'title' => 'Class Closed',
+            'description' => 'Successfully closed the class',
+            'icon' => 'success',
+            'timeout' => 2500,
+        ]);
+    }
+
+
 }; ?>
 
 <section>
@@ -193,6 +199,9 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-wui-badge flat warning label="{{ $class->class_category }}" />
                             @else
                                 <x-wui-badge flat purple label="{{ $class->class_category }}" />
+                                @if ($class->schedule->never_end == 1)
+                                    <x-wui-badge flat zinc label="Closing this class is manual" />
+                                @endif
                             @endif
                         </div>
                         @if ($class->class_status == 1)
@@ -202,6 +211,10 @@ new #[Layout('layouts.app')] class extends Component {
                                         icon='pencil-alt' label="Edit" />
                                     <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})'
                                         icon='trash' label="Withdraw" />
+                                    @if ($class->schedule->never_end == 1)
+                                        <x-wui-dropdown.item wire:click='closeEndlessClass({{ $class->id }})'
+                                            icon='lock-closed' label="Close Class" />
+                                    @endif
                                 </x-wui-dropdown.header>
                             </x-wui-dropdown>
                         @endif
@@ -242,9 +255,14 @@ new #[Layout('layouts.app')] class extends Component {
                             <strong>Class Location:</strong> {{ $class->class_location }}
                         </p>
                         <p>
-                            <strong>Starts at:</strong>
+                            <strong>Upcoming Schedule Date:</strong>
                             @foreach ($class->schedule->recurring_schedule as $recurring)
-                                {{ Carbon::create($recurring->dates)->format('l jS \\of F Y') }}
+                                @if (Carbon::parse($recurring->dates)->isToday() || Carbon::parse($recurring->dates)->isFuture())
+                                    <span>
+                                        {{ Carbon::parse($recurring->dates)->format('l jS \\of F Y') }}
+                                    </span>
+                                    @break
+                                @endif
                             @endforeach
                         </p>
                         <p>
@@ -298,5 +316,6 @@ new #[Layout('layouts.app')] class extends Component {
     <x-class-skeleton loadClass='class_status' />
     <x-class-skeleton loadClass='withdrawClass' />
     <x-class-skeleton loadClass='withdrawClassModal' />
+    <x-class-skeleton loadClass='closeEndlessClass' />
 
 </section>

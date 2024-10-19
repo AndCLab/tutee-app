@@ -13,11 +13,9 @@ class Schedule extends Model
 
     protected $fillable = [
         'start_time',
+        'tutor_id',
         'end_time',
-        'occurrences',
-        'frequency',
-        'interval',
-        'interval_unit'
+        'never_end',
     ];
 
     /**
@@ -28,6 +26,11 @@ class Schedule extends Model
     public function recurring_schedule()
     {
         return $this->hasMany(RecurringSchedule::class);
+    }
+
+    public function classes()
+    {
+        return $this->hasMany(Classes::class, 'schedule_id');
     }
 
 }

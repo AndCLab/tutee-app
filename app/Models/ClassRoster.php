@@ -16,7 +16,9 @@ class ClassRoster extends Model
         'tutee_id',
         'proof_of_payment',
         'attendance',
-        'payment_status'
+        'payment_status',
+        'rated',
+        'date_of_upload'
     ];
 
     public function tutees()

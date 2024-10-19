@@ -17,6 +17,7 @@ class Tutor extends Model
         'work',
         'degree',
         'verify_status'
+        'average_rating'
     ];
 
     protected $casts = [

@@ -49,8 +49,9 @@ new #[Layout('layouts.app')] class extends Component {
     public function mount()
     {
         $this->getFields = Fields::where('user_id', Auth::id())
-            ->get(['field_name'])
-            ->toArray();
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
         $this->tutors = Tutor::take($this->pages)->get();
         $this->selectedTutor = null;
     }

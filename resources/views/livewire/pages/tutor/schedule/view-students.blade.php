@@ -86,12 +86,9 @@ new #[Layout('layouts.app')] class extends Component {
         $this->attachment = true;
     }
 
-    public function verifyPayment()
+    public function verifyPayment($status)
     {
-        $newPaymentStatus = ($this->attachment_id->payment_status === 'Approved' ||
-                            $this->attachment_id->payment_status === 'Pending') ? 'Not Approved' : 'Approved';
-
-        $this->attachment_id->payment_status = $newPaymentStatus;
+        $this->attachment_id->payment_status = $status;
         $this->attachment_id->save();
 
         $this->attachment = false;
@@ -136,24 +133,39 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="md:grid md:grid-row items-start pb-6">
             <div class="w-full flex justify-between">
                 <p class="capitalize font-semibold text-xl">List of Attendees</p>
-                <x-primary-button href="{{ route('tutor.schedule') }}" wire:navigate>
+                <x-primary-button class="text-xs" href="{{ route('tutor.schedule') }}" wire:navigate>
                     Return to Schedule
                 </x-primary-button>
             </div>
             <p class="capitalize text-sm text-[#0F172A]">Class Name: {{ $class->class_name }}</p>
-            <p class="capitalize text-sm text-[#0F172A]">Schedule: {{
-                Carbon::create($class->schedule->start_time)->format('g:iA') . ' - ' .
-                Carbon::create($class->schedule->end_time)->format('g:iA l')
+            <p class="capitalize text-sm text-[#0F172A]">Date Schedule:
+                @foreach ($class->schedule->recurring_schedule as $recurring)
+                    @if (Carbon::parse($recurring->dates)->isToday() || Carbon::parse($recurring->dates)->isFuture())
+                        <span>
+                            {{ Carbon::parse($recurring->dates)->format('l jS \\of F Y') }}
+                        </span>
+                        @break
+                    @endif
+                @endforeach
+
+            </p>
+            <p class="capitalize text-sm text-[#0F172A]">Time Schedule: {{
+                Carbon::create($class->schedule->start_time)->format('g:i A') . ' - ' .
+                Carbon::create($class->schedule->end_time)->format('g:i A')
             }}</p>
-            <p class="capitalize text-sm text-[#0F172A]">Total Students: {{ $total_students }}</p>
+            @if ($class->class_category == 'group')
+                <p class="capitalize text-sm text-[#0F172A]">Total Students: {{ $total_students }}</p>
+            @endif
         </div>
 
         <div>
             {{-- search filter --}}
             <div class="sm:inline-flex sm:justify-between sm:items-center mb-4 w-full">
-                <div class="w-full sm:w-2/6">
-                    <x-wui-input placeholder='Search a student...' wire:model.live='search' shadowless/>
-                </div>
+                @if ($class->class_category == 'group')
+                    <div class="w-full sm:w-2/6">
+                        <x-wui-input placeholder='Search a student...' wire:model.live='search' shadowless/>
+                    </div>
+                @endif
                 @if ($selected || $selectAll)
                     <div class="mt-2 sm:mt-0">
                         <x-wui-dropdown class="w-full">
@@ -255,17 +267,19 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- pagination --}}
             <div class="mt-4">
-                <div class="w-full sm:w-[7rem] mb-4 sm:mb-0">
-                    <x-wui-select
-                        placeholder='Per Page'
-                        wire:model.live="perPage"
-                        shadowless
-                    >
-                        <x-wui-select.option label="5" value="5" />
-                        <x-wui-select.option label="10" value="10" />
-                        <x-wui-select.option label="20" value="20" />
-                    </x-wui-select>
-                </div>
+                @if ($total_students >= 5)
+                    <div class="w-full sm:w-[7rem] mb-4 sm:mb-0">
+                        <x-wui-select
+                            placeholder='Per Page'
+                            wire:model.live="perPage"
+                            shadowless
+                        >
+                            <x-wui-select.option label="5" value="5" />
+                            <x-wui-select.option label="10" value="10" />
+                            <x-wui-select.option label="20" value="20" />
+                        </x-wui-select>
+                    </div>
+                @endif
                 {{ $class_roster->links() }}
             </div>
         </div>
@@ -273,16 +287,34 @@ new #[Layout('layouts.app')] class extends Component {
         {{-- modal --}}
         @if ($attachment_id)
             <x-wui-modal.card title="Proof of Payment" blur wire:model="attachment" persistent align='center' max-width='sm'>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {{ $attachment_id->tutee_id }}
+                <div class="grid grid-row-1 sm:grid-row-2 gap-4">
+                    <div class="w-full flex justify-center items-center">
+                        @if ($attachment_id->proof_of_payment)
+                            <img class="border-2 rounded-lg border-[#F1F5F9] overflow-hidden" src="{{ Storage::url($attachment_id->proof_of_payment) }}" alt="">
+                        @else
+                            <p class="text-center">
+                                Your student
+                                <span class="font-medium">{{ $attachment_id->tutees->user->fname . ' ' . $attachment_id->tutees->user->lname }}</span>
+                                 has not uploaded their proof of payment yet.
+                            </p>
+                            @php
+                                $no_upload = true;
+                            @endphp
+                        @endif
+                    </div>
                 </div>
 
                 <x-slot name="footer">
-                    @if ($attachment_id->payment_status === 'Approved')
-                        <x-wui-button negative label="Disapprove" spinner='verifyPayment' wire:click='verifyPayment' class="w-full"/>
-                    @else
-                        <x-primary-button wire:click='verifyPayment' wireTarget='verifyPayment' class="w-full">Verify Payment</x-primary-button>
+                    @if ($attachment_id->payment_status === 'Pending')
+                        <div class="inline-flex gap-2 items-center w-full">
+                            <x-wui-button negative label="Disapprove" :disabled="isset($no_upload) && $no_upload" spinner="verifyPayment('Not Approved')" wire:click="verifyPayment('Not Approved')" class="w-full"/>
+                            <x-primary-button wire:click="verifyPayment('Approved')" :disabled="isset($no_upload) && $no_upload" wireTarget="verifyPayment('Approved')" class="w-full">Verify Payment</x-primary-button>
+                        </div>
                     @endif
+                    <div class="inline-flex justify-center gap-1 items-center mt-2 text-[#64748B] w-full">
+                        <x-wui-icon name='calendar' class="size-4" />
+                        <span class="font-light text-xs">Uploaded on {{ Carbon::parse($attachment_id->date_of_upload)->format('F d, Y l h:i A') }}</span>
+                    </div>
                 </x-slot>
             </x-wui-modal.card>
         @endif
