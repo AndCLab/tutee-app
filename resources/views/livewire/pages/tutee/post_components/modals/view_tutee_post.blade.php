@@ -19,7 +19,7 @@
                 <div class="inline-flex items-center gap-1">
                     <x-wui-icon name='academic-cap' class="size-4 text-[#64748B]" solid />
                     <p class="font-light text-xs">
-                        {{ $getPost->grade_level }}
+                        {{ $getPost->tutees->grade_level }}
                     </p>
                 </div>
             </div>
@@ -50,14 +50,14 @@
                     <strong>Desired Date:</strong> {{ Carbon::parse($getPost->class_date)->format('l, F d Y g:i A') }}
                 </p>
                 <p>
-                    <strong>Estimated Fee:</strong> {{ $post->class_fee == 0.0 ? 'Free Class' : number_format($post->class_fee, 2) }}
+                    <strong>Estimated Fee:</strong> {{ $getPost->class_fee == 0.0 ? 'Free Class' : number_format($getPost->class_fee, 2) }}
                 </p>
                 <p>
-                    <strong>Class Type:</strong> {{ ucfirst($post->class_type) }}
+                    <strong>Class Type:</strong> {{ ucfirst($getPost->class_type) }}
                 </p>
-                @if ($post->class_location && $post->class_type == 'physical')
+                @if ($getPost->class_location && $getPost->class_type == 'physical')
                     <p>
-                    <strong>Class Location:</strong> {{ $post->class_location }}
+                    <strong>Class Location:</strong> {{ $getPost->class_location }}
                     </p>
                 @endif
             </div>

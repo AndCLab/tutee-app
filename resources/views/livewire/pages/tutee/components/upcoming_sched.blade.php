@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use App\Models\Tutee;
+use App\Models\Tutor;
 use App\Models\ClassRoster;
 use Carbon\Carbon;
 
@@ -12,10 +13,19 @@ new #[Layout('layouts.app')] class extends Component {
     public function with(): array
     {
         $tutee = Tutee::where('user_id', Auth::id())->first();
+        $tutor = Tutor::where('user_id', Auth::id())->first();
 
-        $class_rosters = ClassRoster::with(['classes.schedule.recurring_schedule', 'classes.tutor']) // Eager load tutor
-            ->where('tutee_id', $tutee->id)
-            ->get();
+        if ($tutee) {
+            $class_rosters = ClassRoster::with(['classes.schedule.recurring_schedule', 'classes.tutor']) // Eager load tutor
+                ->where('tutee_id', $tutee->id)
+                ->get();
+        } elseif ($tutor){
+            $class_rosters = ClassRoster::with(['classes.schedule.recurring_schedule', 'classes.tutor']) // Eager load tutor
+                ->whereHas('classes', function ($query) use ($tutor){
+                    $query->where('tutor_id', $tutor->id);
+                })
+                ->get();
+        }
 
         // Get the first date for each class roster
         $first_dates = $class_rosters->map(function ($class_roster) {
@@ -57,7 +67,7 @@ new #[Layout('layouts.app')] class extends Component {
     <x-slot name="header">
     </x-slot>
 
-    <p class="capitalize font-semibold text-xl mb-3">upcoming schedule</p>
+    <p class="capitalize font-semibold text-xl {{ Auth::user()->user_type == 'tutee' ? 'mb-3' : 'mb-9' }}">upcoming schedule</p>
     @forelse ($distinct_dates as $index => $date)
         @if ($date > Carbon::now()->format('Y-m-d'))
             <div class="space-y-2">
@@ -97,10 +107,10 @@ new #[Layout('layouts.app')] class extends Component {
             @break
         @endif
     @empty
-        <div class="flex flex-col gap-2 justify-center items-center w-full" wire:loading.remove>
+        <div class="flex flex-col gap-1 justify-center items-center w-full" wire:loading.remove>
             <img class="size-1/2" src="{{ asset('images/empty_schedule.svg') }}" alt="">
-            <p class="font-semibold text-xl">You don't have any schedule set up yet.</p>
-            <span class="font-light">Find classes in the Discover</span>
+            <p class="font-semibold text-base">Empty Schedule</p>
+            <span class="font-light text-sm">Find classes in the Discover</span>
         </div>
     @endforelse
 

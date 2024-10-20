@@ -126,7 +126,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <div class="size-10">
                         <img
                             alt="User Avatar"
-                            src="{{ Auth::user()->avatar ? Storage::url(Auth::user()->avatar) : asset('images/default.jpg') }}"
+                            src="{{ $post->tutees->user->avatar ? Storage::url($post->tutees->user->avatar) : asset('images/default.jpg') }}"
                             class="rounded-full object-cover border border-[#F1F5F9] overflow-hidden"
                         />
                     </div>

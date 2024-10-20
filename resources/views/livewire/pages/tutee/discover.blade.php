@@ -42,7 +42,6 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fee' => ['required', 'numeric'],
             'class_category'=> ['required'],
             'class_type' => ['required'],
-            'class_location' => ['string', 'max:255'],
         ]);
     }
 
@@ -50,22 +49,15 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $tutee = Tutee::where('user_id', Auth::id())->first();
 
-        if (!$this->class_location) {
-            $this->class_type = 'virtual';
-        }elseif ($this->class_location) {
-            $this->class_type = 'physical';
-        } else {
-            $this->notification([
-                'title'       => 'Error',
-                'description' => 'Either virtual or physical class',
-                'icon'        => 'error',
-                'timeout'     => 2500,
-            ]);
-
-            return;
+        if ($this->class_type === 'physical') {
+            $rules['class_location'] = ['required', 'string', 'max:255'];
         }
 
         $this->validation();
+
+        if ($this->class_type === 'virtual') {
+            $this->class_location = '';
+        }
 
         Post::create([
             'tutee_id' => $tutee->id,
@@ -75,7 +67,7 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fee' => $this->class_fee,
             'class_category' => $this->class_category,
             'class_type' => $this->class_type,
-            'class_location' => $this->class_location,
+            'class_location' => $this->class_type === 'physical' ? $this->class_location : '',
         ]);
 
         $this->reset(

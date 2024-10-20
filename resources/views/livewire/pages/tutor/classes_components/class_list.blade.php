@@ -286,7 +286,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
             </div>
         @empty
-            <div class="flex flex-col gap-3 justify-center items-center w-full" wire:loading.remove>
+            <div class="flex flex-col gap-3 justify-center items-center w-full">
                 <img class="size-60" src="{{ asset('images/empty_class.svg') }}" alt="">
                 <p class="font-semibold text-xl">No classes</p>
             </div>

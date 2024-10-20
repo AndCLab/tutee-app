@@ -99,6 +99,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function leaveClass()
     {
+        $this->class_roster_leave->classes->class_students++;
+        $this->class_roster_leave->classes->save();
+
         $this->class_roster_leave->delete();
 
         $this->notification([
@@ -283,7 +286,7 @@ new #[Layout('layouts.app')] class extends Component {
                             </li>
                         @endif
                     @empty
-                        <div class="flex flex-col gap-2 justify-center items-center w-full" wire:loading.remove>
+                        <div class="flex flex-col gap-2 justify-center items-center w-full">
                             <img class="size-1/2" src="{{ asset('images/empty_schedule.svg') }}" alt="">
                             <p class="font-semibold text-xl">You don't have any schedule set up yet.</p>
                             <span class="font-light">Find classes in the Discover</span>

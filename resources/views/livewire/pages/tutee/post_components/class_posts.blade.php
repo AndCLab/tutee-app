@@ -28,10 +28,15 @@ new #[Layout('layouts.app')] class extends Component {
                                             ->exists();
 
         if (!$checkIfAlreadyJoined) {
-            ClassRoster::create([
+            $roster = ClassRoster::create([
                 'class_id' => $this->getClass->id,
                 'tutee_id' => $tutee_id,
             ]);
+
+            if ($roster->classes->class_students > 0) {
+                $roster->classes->class_students--;
+                $roster->classes->save();
+            }
 
             $this->notification([
                 'title'       => 'Success',

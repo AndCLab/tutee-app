@@ -51,25 +51,39 @@
         Class Type
     </label>
     {{-- Virtual or Physical Class --}}
-    <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#virtual' }">
+    <div class="flex flex-col gap-4" x-data="{ classType: '{{ $class_type }}' }">
+        {{-- Radio buttons with original tab styling --}}
         <ul class="flex bg-[#F1F5F9] px-1.5 py-1.5 gap-2 rounded-lg">
             <li class="w-full text-center">
-                <a :class="tab !== '#virtual' ? '' : 'bg-white'"
-                    class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
-                    x-on:click.prevent="tab='#virtual'"> Virtual Class </a>
+                <label :class="classType !== 'virtual' ? '' : 'bg-white'"
+                    class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out">
+                    <input type="radio" wire:model.defer='class_type' id="virtual" name="virtual" x-model="classType" value="virtual" class="hidden" />
+                    Virtual Class
+                </label>
             </li>
             <li class="w-full text-center">
-                <a :class="tab !== '#physical' ? '' : 'bg-white'"
-                    class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out"
-                    x-on:click.prevent="tab='#physical'"> Physical Class </a>
+                <label :class="classType !== 'physical' ? '' : 'bg-white'"
+                    class="inline-flex w-full cursor-pointer justify-center gap-3 rounded-md px-2 py-1.5 text-sm font-semibold transition-all ease-in-out">
+                    <input type="radio" wire:model.defer='class_type' id="physical" name="physical" x-model="classType" value="physical" class="hidden" />
+                    Physical Class
+                </label>
             </li>
         </ul>
 
+        {{-- Conditional inputs --}}
         <div>
-            <div x-show="tab == '#physical'" x-cloak>
-                <div class="max-w-xl">
-                    <x-wui-input wire:model='class_location' label="Class Venue"
-                        placeholder='Enter desired class venue' shadowless />
+            <div x-show="classType === 'physical'" x-cloak>
+                <div class="w-full">
+                    <x-wui-input
+                        wire:model='class_location'
+                        label="Class Venue"
+                        placeholder='Enter class venue'
+                        shadowless
+                        x-init="$watch('classType', value => {
+                            if (value === 'virtual') {
+                                $wire.set('class_location', null);
+                            }
+                        })"/>
                 </div>
             </div>
         </div>

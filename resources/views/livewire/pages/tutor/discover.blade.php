@@ -26,6 +26,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             <div>
                 {{-- Upcoming Schedules --}}
+                <livewire:pages.tutee.components.upcoming_sched>
             </div>
         </div>
     </div>
