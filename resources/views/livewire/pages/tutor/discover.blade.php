@@ -11,12 +11,22 @@ new #[Layout('layouts.app')] class extends Component {
     <x-slot name="header">
     </x-slot>
 
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 p-6">
-        <p>Discover page</p>
-    </div>
+    <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
+        <div class="lg:grid lg:grid-cols-3 items-start gap-5">
+            <div class="lg:col-span-2 space-y-3">
+                <p class="capitalize font-semibold text-xl mb-9">interests</p>
 
-    {{-- Posts created by Tutees --}}
-    <div>
-        <livewire:pages.tutee.post_components.post_list>
+                <div class="flex items-center space-x-3 w-full pb-5">
+                    Search and Filter
+                </div>
+
+                {{-- Posts created by Tutees--}}
+                <livewire:pages.tutee.post_components.post_list>
+            </div>
+
+            <div>
+                {{-- Upcoming Schedules --}}
+            </div>
+        </div>
     </div>
 </section>
