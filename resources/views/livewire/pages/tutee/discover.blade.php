@@ -113,11 +113,6 @@ new #[Layout('layouts.app')] class extends Component {
 
     <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
         <div class="lg:grid lg:grid-cols-3 items-start gap-5">
-            <div class="hidden lg:block space-y-3 sticky top-[5rem] overflow-y-auto max-h-[85vh] soft-scrollbar px-2 pb-3">
-                <livewire:pages.tutee.components.top-tutors>
-                <hr class="h-px my-2 bg-gray-200 border-0">
-                <livewire:pages.tutee.components.upcoming_sched>
-            </div>
             <div class="lg:col-span-2 space-y-3">
                 <p class="capitalize font-semibold text-xl mb-9">interests</p>
 
@@ -136,6 +131,11 @@ new #[Layout('layouts.app')] class extends Component {
 
                 {{-- tabs for (discover and post list) --}}
                 @include('livewire.pages.tutee.post_components.partials.tabs')
+            </div>
+            <div class="hidden lg:block space-y-3 sticky top-[5rem] overflow-y-auto max-h-[85vh] soft-scrollbar px-2 pb-3">
+                <livewire:pages.tutee.components.top-tutors>
+                <hr class="h-px my-2 bg-gray-200 border-0">
+                <livewire:pages.tutee.components.upcoming_sched>
             </div>
         </div>
 
