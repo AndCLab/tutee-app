@@ -16,14 +16,13 @@ return new class extends Migration
             $table->foreignId('tutee_id')->constrained('tutee')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('post_desc');
+            $table->text('post_desc');
             $table->json('class_fields');
             $table->date('class_date');
             $table->decimal('class_fee')->default(0);
             $table->enum('class_category', ['individual', 'group']);
             $table->enum('class_type', ['virtual', 'physical']);
             $table->string('class_location');
-            $table->boolean('post_created')->default(1);
             $table->timestamps();
         });
     }

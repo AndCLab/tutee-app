@@ -20,7 +20,6 @@ class Post extends Model
         'class_category',
         'class_type',
         'class_location',
-        'post_created'
     ];
 
     public function tutees()

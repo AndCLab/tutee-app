@@ -294,20 +294,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Top Tutors --}}
             <div class="hidden lg:block space-y-3 sticky top-[5rem] overflow-y-auto max-h-[85vh] soft-scrollbar px-2 pb-3">
-
-                {{-- Header --}}
-                <p class="capitalize font-semibold text-xl mb-9">top tutors</p>
-
-                @forelse ($allTutors as $index => $tutor)
-                    <div class="flex flex-col">
-                       @include('livewire.pages.tutee.schedule.top-tutors')
-                       @break($index === 2)
-                    </div>
-                @empty
-                    <div>
-                        No tutor
-                    </div>
-                @endforelse
+                <livewire:pages.tutee.components.top-tutors>
             </div>
         </div>
     </div>

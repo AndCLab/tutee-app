@@ -57,6 +57,21 @@ new #[Layout('layouts.app')] class extends Component {
             'class_location' => ['string', 'max:255', 'nullable'],
         ];
 
+        if (!$this->class_location) {
+            $this->class_type = 'virtual';
+        }elseif ($this->class_location) {
+            $this->class_type = 'physical';
+        } else {
+            $this->notification([
+                'title'       => 'Error',
+                'description' => 'Either virtual or physical class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+
+            return;
+        }
+
         $this->validate($rules);
 
         $this->post->post_desc = $this->post_desc;
@@ -85,11 +100,11 @@ new #[Layout('layouts.app')] class extends Component {
     <x-slot name="header">
     </x-slot>
 
-    <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
+    <div class="max-w-3xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
         <form wire:submit='editPost'>
             <div class="inline-flex mb-4 justify-end items-center w-full">
                 <div class="inline-flex gap-2 items-center">
-                    <x-primary-button type='submit' wireTarget='editPost'>
+                    <x-primary-button class="text-xs" type='submit' wireTarget='editPost'>
                         Edit Post
                     </x-primary-button>
                 </div>
@@ -97,13 +112,10 @@ new #[Layout('layouts.app')] class extends Component {
 
                 {{-- post desc --}}
                 <div class="mb-4">
-                    <x-wui-input
-                        wire:model="post_desc"
-                        placeholder="Edit post description"
-                        shadowless />
+                    <x-wui-textarea label='Post Description' autofocus wire:model="post_desc" placeholder="Enter post description" shadowless/>
                 </div>
 
-                <div class="flex space-x-4 mb-4">
+                <div class="flex space-x-3 mb-4">
                     {{-- class fields --}}
                         <x-wui-select
                             wire:model="class_fields"
@@ -133,7 +145,7 @@ new #[Layout('layouts.app')] class extends Component {
                         />
                 </div>
 
-                <div class="flex space-x-4 mb-4">
+                <div class="flex space-x-3 mb-4">
                     {{-- Class Fee --}}
                     <x-wui-inputs.currency
                         wire:model.live.debounce.250ms='class_fee'
@@ -155,9 +167,11 @@ new #[Layout('layouts.app')] class extends Component {
 
                 </div>
 
-                Class Type
+                <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-400 mr-2">
+                    Class Type
+                </label>
                 {{-- Virtual or Physical Class --}}
-                <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#virtual' }">
+                <div class="flex flex-col gap-4" x-data="{ tab: window.location.hash ? window.location.hash : '#{{ $class_type }}' }">
                     <ul class="flex bg-[#F1F5F9] px-1.5 py-1.5 gap-2 rounded-lg">
                         <li class="w-full text-center">
                             <a :class="tab !== '#virtual' ? '' : 'bg-white'"
@@ -173,7 +187,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                     <div>
                         <div x-show="tab == '#physical'" x-cloak>
-                            <div class="max-w-xl">
+                            <div class="w-full">
                                 <x-wui-input
                                     wire:model='class_location'
                                     label="Class Venue"

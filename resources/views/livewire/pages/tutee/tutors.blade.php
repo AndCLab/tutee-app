@@ -8,17 +8,18 @@ use App\Models\Tutor;
 use App\Models\User;
 use App\Models\Tutee;
 use App\Models\Classes;
+use App\Models\Review;
 use App\Models\Fields;
 
 new #[Layout('layouts.app')] class extends Component {
     public $title = 'Tutors | Tutee';
 
-    public $tutors;
     public $pages = 5;
 
     public $mobileViewTutor;
     public $selectedTutor;
     public $selectedClass;
+    public $selectedReview;
     public $ST_INDIClasses;
     public $ST_GRClasses;
 
@@ -52,16 +53,12 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->where('active_in', Auth::user()->user_type)
                                 ->get(['field_name'])
                                 ->toArray();
-        $this->tutors = Tutor::take($this->pages)->get();
         $this->selectedTutor = null;
     }
 
     public function loadMore()
     {
         $this->pages += 5;
-        if (!$this->updated()) {
-            $this->tutors = Tutor::take($this->pages)->get();
-        }
     }
 
     public function selectTutor($tutor_id)
@@ -73,11 +70,15 @@ new #[Layout('layouts.app')] class extends Component {
         $this->ST_GRClasses = Classes::where('tutor_id', $tutor_id)->where('class_category', 'group')->count();
 
         $this->selectedClass = Classes::where('tutor_id', $tutor_id)->get();
+
+        $this->selectedReview = Review::whereHas('classes', function ($query) {
+                                $query->where('tutor_id', $this->selectedTutor->id);
+                            })->get();
     }
 
-    public function updated()
+    public function with(): array
     {
-        $this->tutors = Tutor::when($this->search, function ($q) {
+        $tutors = Tutor::when($this->search, function ($q) {
                                 $q->whereHas('user', function ($query) {
                                     $query->where('fname', 'like', "%{$this->search}%")
                                         ->orWhere('lname', 'like', "%{$this->search}%");
@@ -105,7 +106,9 @@ new #[Layout('layouts.app')] class extends Component {
                             ->take($this->pages)
                             ->get();
 
-        return true;
+        return [
+            'tutors' => $tutors,
+        ];
     }
 
 }; ?>
@@ -227,7 +230,12 @@ new #[Layout('layouts.app')] class extends Component {
                                 </div>
                                 <div class="inline-flex items-center gap-1">
                                     <x-wui-icon name='academic-cap' class="size-4 text-[#64748B]" solid />
-                                    <span class="text-xs text-[#64748B]">BS Information Technology</span>
+                                    <span class="text-xs text-[#64748B]">
+                                        @php
+                                            $degrees = json_decode($tutor->degree, true);
+                                        @endphp
+                                        {{ is_array($degrees) ? implode(', ', $degrees) : $tutor->degree }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
