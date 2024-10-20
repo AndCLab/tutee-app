@@ -55,7 +55,7 @@
                 <p>
                     <strong>Class Type:</strong> {{ ucfirst($post->class_type) }}
                 </p>
-                @if ($post->class_location)
+                @if ($post->class_location && $post->class_type == 'physical')
                     <p>
                     <strong>Class Location:</strong> {{ $post->class_location }}
                     </p>
