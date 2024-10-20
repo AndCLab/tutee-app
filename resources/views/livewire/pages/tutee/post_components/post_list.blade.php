@@ -71,35 +71,43 @@ new #[Layout('layouts.app')] class extends Component {
     public function with(): array
     {
         $getFields = Fields::where('user_id', Auth::id())
-                                ->where('active_in', Auth::user()->user_type)
-                                ->get(['field_name'])
-                                ->toArray();
+                            ->where('active_in', Auth::user()->user_type)
+                            ->pluck('field_name')
+                            ->toArray();
 
         $tutee_id = Tutee::where('user_id', Auth::id())->pluck('id')->first();
 
-        $posts = Post::whereHas('tutees', function ($query) use ($tutee_id, $getFields) {
+        // initialize an empty collection for filtered posts
+        $filteredPosts = collect();
 
-                        // if tutee account exists then will only display its posts
-                        if ($tutee_id) {
-                            $query->where('tutee_id', $tutee_id)
-                                ->whereHas('user.fields', function ($subQuery) use ($getFields) {
-                                    $subQuery->whereIn('field_name', $getFields);
-                                });
-                        } else {
+        $posts = Post::all();
 
-                            // otherwise, will display of all the posts (tutor side)
-                            $query->whereNotNull('tutee_id')
-                                ->whereHas('user.fields', function ($subQuery) use ($getFields) {
-                                    $subQuery->whereIn('field_name', $getFields);
-                                });
-                        }
-                    })
-                    ->orderBy('created_at', $this->sort_by)
-                    ->take($this->pages)
-                    ->get();
+        foreach ($posts as $post) {
+            // decode the class_fields json
+            $classFields = json_decode($post->class_fields, true);
+
+            if (Auth::user()->user_type == 'tutee') {
+
+                // include tutee posts based on tutee ID
+                if ($post->tutee_id == $tutee_id) {
+                    $filteredPosts->push($post);
+                }
+
+            } elseif (Auth::user()->user_type == 'tutor') {
+
+                // check if any of the fields matched from the tutor
+                if (!empty(array_intersect($classFields, $getFields))) {
+                    $filteredPosts->push($post);
+                }
+
+            }
+        }
+
+        // sort the filtered posts by creation date and take the specified number of pages
+        $filteredPosts = $filteredPosts->sortByDesc('created_at')->take($this->pages);
 
         return [
-            'posts' => $posts,
+            'posts' => $filteredPosts,
         ];
     }
 

@@ -48,46 +48,54 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
+{{--
+    date > now = future
+    date < now = past
+--}}
+
 <section>
     <x-slot name="header">
     </x-slot>
 
+    <p class="capitalize font-semibold text-xl mb-3">upcoming schedule</p>
     @forelse ($distinct_dates as $index => $date)
-        @foreach ($first_dates as $item)
-            @if ($item['first_date'] === $date)
-                <p class="capitalize font-semibold text-xl mb-3">upcoming schedule</p>
+        @if ($date > Carbon::now()->format('Y-m-d'))
+            <div class="space-y-2">
+                @foreach ($first_dates as $item)
+                    @if ($item['first_date'] === $date)
+                        <div class="flex justify-between items-start gap-4">
+                            <x-wui-icon name='calendar' class="size-6 text-[#0C3B2E]" solid />
+                            <div class="space-y-1 w-full">
+                                {{-- class name and category --}}
+                                <div class="lg:inline-flex items-center gap-2">
+                                    <p class="text-[#8F8F8F] font-medium truncate w-[10rem]">
+                                        {{ $item['class_details']->class_name }}
+                                    </p>
+                                    @if ($item['class_details']->class_category == 'group')
+                                        <x-wui-badge flat warning label="{{ $item['class_details']->class_category }}" />
+                                    @else
+                                        <x-wui-badge flat purple label="{{ $item['class_details']->class_category }}" />
+                                    @endif
+                                </div>
 
-                <div class="flex justify-between items-start gap-4">
-                    <x-wui-icon name='calendar' class="size-6 text-[#0C3B2E]" solid />
-                    <div class="space-y-1 w-full">
-                        {{-- class name and category --}}
-                        <div class="lg:inline-flex items-center gap-2">
-                            <p class="text-[#8F8F8F] font-medium">
-                                {{ $item['class_details']->class_name }}
-                            </p>
-                            @if ($item['class_details']->class_category == 'group')
-                                <x-wui-badge flat warning label="{{ $item['class_details']->class_category }}" />
-                            @else
-                                <x-wui-badge flat purple label="{{ $item['class_details']->class_category }}" />
-                            @endif
-                        </div>
-
-                        {{-- time --}}
-                        <div class="flex flex-col gap-2 w-full">
-                            <div class="text-[#64748B] flex flex-col gap-1 items-start font-light text-sm line-clamp-1">
-                                <span> Date: {{ Carbon::parse($item['first_date'])->format('F d, Y') }}
-                                </span>
-                                <span> Time:
-                                    {{ Carbon::parse($item['start_time'])->format('g:i A') }} -
-                                    {{ Carbon::parse($item['end_time'])->format('g:i A') }}
-                                </span>
+                                {{-- time --}}
+                                <div class="flex flex-col gap-2 w-full">
+                                    <div class="text-[#64748B] flex flex-col gap-1 items-start font-light text-sm line-clamp-1">
+                                        <span> Date: {{ Carbon::parse($item['first_date'])->format('F d, Y') }}
+                                        </span>
+                                        <span> Time:
+                                            {{ Carbon::parse($item['start_time'])->format('g:i A') }} -
+                                            {{ Carbon::parse($item['end_time'])->format('g:i A') }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            @endif
+                    @endif
+                @endforeach
+            </div>
             @break
-        @endforeach
+        @endif
     @empty
         <div class="flex flex-col gap-2 justify-center items-center w-full" wire:loading.remove>
             <img class="size-1/2" src="{{ asset('images/empty_schedule.svg') }}" alt="">
