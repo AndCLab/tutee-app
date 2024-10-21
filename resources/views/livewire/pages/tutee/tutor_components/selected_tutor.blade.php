@@ -142,7 +142,7 @@
                                 <!-- ... -->
                                 <div>
                                     <x-secondary-button class="w-full lg:w-fit text-nowrap"
-                                    wire:click="$dispatchTo('notifications', 'classJoined', { classId: {{ $class->id }}, tutorName: '{{ $selectedTutor->user->fname }}' })">
+                                    wire:click="$dispatchTo('notifications', 'classJoined', { classId: {{ $class->id }}, tutorId: '{{ $selectedTutor->user->id }}' })">
                                     Join Class
                                     </x-secondary-button>
                                 </div>

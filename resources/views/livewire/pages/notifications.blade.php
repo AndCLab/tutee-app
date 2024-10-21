@@ -33,7 +33,14 @@
                         @foreach($dateGroup as $notif)
                             <li class="mb-2 border-b border-gray-200 pb-2 cursor-pointer hover:bg-gray-100 transition-colors duration-200 ease-in-out"
                                 wire:click="markAsRead({{ $notif['id'] }})" wire:key="notif-{{ $notif['id'] }}">
-                                <a href="{{ route('tutee.schedule') }}">
+
+                                @php
+                                    $user = Auth::user();
+                                    $userType = $user->user_type;
+                                    $route = $userType === 'tutor' ? route('classes') : route('tutee.schedule');
+                                @endphp
+
+                                <a href="{{ $route }}">
                                     <div class="flex items-center">
                                         <div class="flex items-center">
                                             <!-- Notification Icon (SVG) -->
@@ -56,8 +63,8 @@
                                                     <!-- Assignment SVG -->
                                                     <g fill="#0C3B2E">
                                                         <path fill="currentColor" d="M17 3H7C5.346 3 4 4.346 4 6v12c0 1.654 1.346 3 3 3h10c1.654 0 3-1.346 3-3V6c0-1.654-1.346-3-3-3zM9 5h6v1c0 .551-.449 1-1 1h-4c-.551 0-1-.449-1-1V5zm9 13c0 .551-.449 1-1 1H7c-.551 0-1-.449-1-1V6c0-.551.449-1 1-1h1v1c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V5h1c.551 0 1 .449 1 1v12zm-2-1H8a.5.5 0 0 1 0-1h8a.5.5 0 0 1 0 1zm0-3H8a.5.5 0 0 1 0-1h8a.5.5 0 0 1 0 1zm0-3H8a.5.5 0 0 1 0-1h8a.5.5 0 0 1 0 1z"/>
-                                                </g>
-                                            </svg>
+                                                    </g>
+                                                </svg>
                                             @else
                                                 <svg class="mr-3 w-6 h-6" style="color:#0C3B2E" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
                                                     <!-- Default SVG for other types -->

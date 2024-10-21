@@ -87,6 +87,7 @@ class Notifications extends Component
             }
         }
 
+        $this->dispatch('notification-clicked', ['className' => $notification->content]);
         $this->updateUnreadCount();
     }
 
@@ -118,7 +119,7 @@ class Notifications extends Component
 
 
     #[On('classJoined')]
-    public function classJoined($classId, $tutorName)
+    public function classJoined($classId, $tutorId)
     {
         // Fetch the class and schedule information
         $class = \App\Models\Classes::findOrFail($classId);
@@ -127,22 +128,53 @@ class Notifications extends Component
         $startDate = Carbon::create($schedule->start_date);
         $formattedDate = $startDate->format('l jS \\of F Y g:i A');
 
-        $content = "You have joined the class '{$class->class_name}' handled by {$tutorName}. The class is scheduled to start on {$formattedDate}.";
+        // $tutorName = $tutorId->fname;
+        $tutor = \App\Models\User::findOrFail($tutorId);
+
+        $tuteeContent = "You have joined the class '{$class->class_name}' handled by {$tutor->fname}. The class is scheduled to start on {$formattedDate}.";
 
         TuteeNotification::create([
             'user_id' => Auth::id(),
             'title' => 'Class Joined', // Provide a title for the notification
-            'content' => $content,
+            'content' => $tuteeContent,
             'type' => 'venue',
             'created_at' => now(), // Set created_at field
             'updated_at' => now(), // Set updated_at field
         ]);
 
+        // session()->flash('success', 'You have successfully joined the class!');
         // Flash a success message
-        session()->flash('success', 'You have successfully joined the class!');
+
+        $tutorContent = "Someone joined your class '{$class->class_name}'";
+
+        TutorNotification::create([
+            'user_id' => $tutor->id,
+            'title' => 'Class Joined', // Provide a title for the notification
+            'content' => $tutorContent,
+            'type' => 'venue',
+            'created_at' => now(), // Set created_at field
+            'updated_at' => now(), // Set updated_at field
+        ]);
 
         $this->loadNotifications();
     }
+
+    public function redirectToSearch($notificationId)
+    {
+        // First, mark the notification as read
+        $this->markAsRead($notificationId);
+        // Retrieve the authenticated user
+        $user = Auth::user();
+        $userType = $user->user_type; // Get user type from the authenticated user
+
+        // Check user role and redirect accordingly
+        if ($userType === 'tutor') {
+            return redirect()->route('classes');
+        } else {
+            return redirect()->route('tutee.schedule');
+        }
+    }
+
 
 
     public function render()
