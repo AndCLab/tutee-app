@@ -115,6 +115,8 @@ class Notifications extends Component
     }
 
 
+
+
     #[On('classJoined')]
     public function classJoined($classId, $tutorName)
     {

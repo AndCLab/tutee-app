@@ -55,7 +55,7 @@ class Bookmarks extends Component
                                           ->where('user_id', Auth::id())
                                           ->get();
     }
-    
+
     public function loadMore()
     {
         $this->pages += 5;
@@ -89,7 +89,7 @@ class Bookmarks extends Component
                                      ->orderBy('created_at', 'desc')
                                      ->take($pages)
                                      ->get();
-    
+
         $this->bookmarkedTutors = $bookmarkedTutors;
     }
 
@@ -98,6 +98,15 @@ class Bookmarks extends Component
         // Dispatch a browser event in Livewire 3
         $this->dispatch('tutor-selected', tutorId: $tutorId);
     }
+
+    // Bookmark component (BookmarkedTutors.php)
+
+    public function redirectToSearch($tutorName)
+    {
+        // Redirect to the tutors page with the tutor's name as a search parameter
+        return redirect()->route('tutors', ['search_tutor' => $tutorName]);
+    }
+
 
     public function render()
     {

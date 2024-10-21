@@ -15,14 +15,14 @@
                                             </div>
                                         </div>
     @else
-        <div wire:ignore class="mb-4 max-h-124 overflow-y-auto soft-scrollbar"
+        <div class="mb-4 max-h-124 overflow-y-auto soft-scrollbar"
              x-data="{ page: 1, isLoading: false }"
              @scroll="if ($el.scrollTop + $el.clientHeight >= $el.scrollHeight - 10 && !isLoading) {
                 isLoading = true;
                 page++;
                 $wire.loadMore().then(() => isLoading = false);
              }">
-            <ul class="max-h-[400px] overflow-y-auto">
+            <ul wire:ignore.self class="max-h-[400px] overflow-y-auto">
                 @foreach($conversations as $conversation)
                     <li class="mb-4">
                         <div class="flex items-center space-x-3">
@@ -62,5 +62,5 @@
         </div>
     @endif
 
-        
+
 </div>
