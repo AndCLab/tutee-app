@@ -17,12 +17,28 @@ new #[Layout('layouts.app')] class extends Component {
     public $sort_by = 'desc';
 
     public $getPost;
+    public $availableFields = [];
+
+    // filters
+    public $pricing;
+    public $class_category;
+    public $class_fields = [];
+    public $time_avail;
 
     // states
     public $showDeletePostModal;
     public $showTuteePost;
     public $deletePostId;
     public $pages = 5;
+
+    public function mount()
+    {
+        $this->availableFields = Fields::where('user_id', Auth::id())
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
+    }
+
 
     public function deletePost()
     {
@@ -77,45 +93,95 @@ new #[Layout('layouts.app')] class extends Component {
 
         $tutee_id = Tutee::where('user_id', Auth::id())->pluck('id')->first();
 
-        // initialize an empty collection for filtered posts
-        $filteredPosts = collect();
-
-        $posts = Post::all();
-
-        foreach ($posts as $post) {
-            // decode the class_fields json
+        // Retrieve all posts and filter them into a collection
+        $filteredPosts = Post::all()->filter(function ($post) use ($tutee_id, $getFields) {
+            // Decode the class_fields JSON
             $classFields = json_decode($post->class_fields, true);
 
             if (Auth::user()->user_type == 'tutee') {
-
-                // include tutee posts based on tutee ID
-                if ($post->tutee_id == $tutee_id) {
-                    $filteredPosts->push($post);
-                }
-
+                // Include tutee posts based on tutee ID
+                return $post->tutee_id == $tutee_id;
             } elseif (Auth::user()->user_type == 'tutor') {
-
-                // check if any of the fields matched from the tutor
-                if (!empty(array_intersect($classFields, $getFields))) {
-                    $filteredPosts->push($post);
-                }
-
+                // Check if any of the fields matched from the tutor
+                return !empty(array_intersect($classFields, $getFields));
             }
-        }
 
-        // sort the filtered posts by creation date and take the specified number of pages
-        $filteredPosts = $filteredPosts->sortByDesc('created_at')->take($this->pages);
+            return false; // In case user_type is neither tutee nor tutor
+        });
+
+        // Apply additional filtering based on other conditions
+        $filteredPosts = $filteredPosts->when($this->class_fields, function ($query) {
+                return $query->filter(function ($post) {
+                    return !empty(array_intersect(json_decode($post->class_fields, true), $this->class_fields));
+                });
+            })
+            ->when($this->pricing, function ($query) {
+                return $query->where('class_fee', '<=', $this->pricing);
+            })
+            ->when($this->class_category, function ($query) {
+                return $query->where('class_category', $this->class_category);
+            })
+            ->when($this->time_avail, function ($query) {
+                return $query->where('class_date', '=', $this->time_avail);
+            })
+            ->sortByDesc('created_at')
+            ->take($this->pages);
 
         return [
             'posts' => $filteredPosts,
         ];
     }
 
+
 }; ?>
 
 <section>
     <x-slot name="header">
     </x-slot>
+
+    @if (Auth::user()->user_type == 'tutor')
+        <div class="md:flex items-center space-x-3 w-full pb-5">
+            <div class="space-y-2 col-span-1 w-full md:col-span-5">
+                {{-- interests --}}
+                <div class="w-full">
+                    <x-wui-select wire:model.live="class_fields" placeholder="Class Fields" multiselect shadowless>
+                        @foreach ($availableFields as $field)
+                            <x-wui-select.option label="{{ $field['field_name'] }}"
+                                value="{{ $field['field_name'] }}" />
+                        @endforeach
+                    </x-wui-select>
+                </div>
+
+                <div class="md:inline-flex space-y-2 w-full md:space-y-0 gap-2">
+                    {{-- pricing --}}
+                    <div class="w-full md:w-[40%]">
+                        <x-wui-inputs.currency wire:model.live.debounce.250ms='pricing' icon="cash" placeholder="Pricing" shadowless />
+                    </div>
+
+                    {{-- sort by --}}
+                    <div class="w-full md:w-[60%]">
+                        <x-wui-select wire:model.live='class_category' placeholder="Sort by Class Type" shadowless>
+                            <x-wui-select.option label="Group Class" value="group" />
+                            <x-wui-select.option label="Individual Class" value="individual" />
+                        </x-wui-select>
+                    </div>
+
+                    {{-- time avail --}}
+                    <div class="w-full">
+                        <x-wui-datetime-picker
+                            placeholder="Availability"
+                            wire:model.live="time_avail"
+                            parse-format="YYYY-MM-DD"
+                            display-format='dddd, MMMM D, YYYY'
+                            :min="now()"
+                            without-time
+                            shadowless
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Post List: Post Cards --}}
     <div class="space-y-6">

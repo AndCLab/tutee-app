@@ -16,10 +16,6 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="lg:col-span-2 space-y-3">
                 <p class="capitalize font-semibold text-xl mb-9">interests</p>
 
-                <div class="flex items-center space-x-3 w-full pb-5">
-                    Search and Filter
-                </div>
-
                 {{-- Posts created by Tutees--}}
                 <livewire:pages.tutee.post_components.post_list>
             </div>
