@@ -83,7 +83,9 @@
                     </svg>
                     <p>Posted on {{ $getPost->created_at->format('l, F d Y g:i A') }}</p>
                 </div>
-                <x-wui-button label="Report Content" flat xs icon="exclamation" />
+                @if (!($getPost->tutees->user->id == Auth::id()))
+                    <x-wui-button wire:click='reportPostModal({{ $getPost->id }})' spinner='reportPostModal({{ $getPost->id }})' label="Report Content" flat xs icon="exclamation" />
+                @endif
             </div>
         </x-slot>
     </x-wui-modal.card>
