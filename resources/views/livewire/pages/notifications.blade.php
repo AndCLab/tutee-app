@@ -40,7 +40,7 @@
                                     $route = $userType === 'tutor' ? route('classes') : route('tutee.schedule');
                                 @endphp
 
-                                <a href="{{ $route }}">
+                                {{-- <a href="{{ $route }}"> --}}
                                     <div class="flex items-center">
                                         <div class="flex items-center">
                                             <!-- Notification Icon (SVG) -->
@@ -76,7 +76,7 @@
                                             </p>
                                         </div>
                                     </div>
-                                </a>
+                                {{-- </a> --}}
                             </li>
                         @endforeach
                     </div>

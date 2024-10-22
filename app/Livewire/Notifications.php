@@ -52,11 +52,13 @@ class Notifications extends Component
             })
             ->toArray();
 
+
         $this->updateUnreadCount();
     }
 
     public function markAsRead($notificationId)
     {
+        \Log::error('Marking as read');
         $user = Auth::user();
         $userType = $user->user_type;
 
@@ -85,9 +87,12 @@ class Notifications extends Component
                     }
                 }
             }
+
+            // Call the route function to determine where to redirect the user
+            return $this->routeToPageBasedOnRole($userType);
         }
 
-        $this->dispatch('notification-clicked', ['className' => $notification->content]);
+        $this->dispatch('notificationNum-updated');
         $this->updateUnreadCount();
     }
 
@@ -156,22 +161,22 @@ class Notifications extends Component
             'updated_at' => now(), // Set updated_at field
         ]);
 
+        $this->dispatch('notificationNum-updated');
         $this->loadNotifications();
     }
 
-    public function redirectToSearch($notificationId)
+// Determine the route based on the user's role
+    public function routeToPageBasedOnRole($userType)
     {
-        // First, mark the notification as read
-        $this->markAsRead($notificationId);
-        // Retrieve the authenticated user
-        $user = Auth::user();
-        $userType = $user->user_type; // Get user type from the authenticated user
-
-        // Check user role and redirect accordingly
         if ($userType === 'tutor') {
+            // If user is a tutor, route them to the classes page
             return redirect()->route('classes');
-        } else {
+        } elseif ($userType === 'tutee') {
+            // If user is a tutee, route them to the schedule page
             return redirect()->route('tutee.schedule');
+        } else {
+            // Handle other roles or show a default page if the user has no role
+            return redirect()->route('dashboard');
         }
     }
 

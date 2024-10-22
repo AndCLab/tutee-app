@@ -1,4 +1,4 @@
-<div wire:ignore>
+<div wire:ignore.self>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
         fill="#292D32" class="icon icon-tabler icons-tabler-filled icon-tabler-bell">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -12,6 +12,9 @@
         <span class="absolute top-[-0.5rem] right-0 inline-block text-center leading-none text-white bg-red-600 rounded-full py-1 px-1 text-xs">
             {{ $unreadCount }}
         </span>
+
+        {{-- red dot display only --}}
+        {{-- <span class="absolute top-[-0.25rem] right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span> --}}
     @endif
 
 

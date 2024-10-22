@@ -2,7 +2,7 @@
     {{-- Icons --}}
 
     {{-- Bookmark Dropdown --}}
-    <x-wui-dropdown wire:ignore >
+    <x-wui-dropdown >
         <x-slot name="trigger">
             <livewire:bookmark-icon />
         </x-slot>
@@ -12,7 +12,7 @@
     </x-wui-dropdown>
 
 
-    <x-wui-dropdown wire:ignore >
+    <x-wui-dropdown >
 
         <x-slot name="trigger">
             <livewire:message-icon />
@@ -23,7 +23,7 @@
 
 
     {{-- Notification Dropdown --}}
-    <x-wui-dropdown wire:ignore >
+    <x-wui-dropdown >
         <x-slot name="trigger">
             <livewire:notification-icon />
         </x-slot>
