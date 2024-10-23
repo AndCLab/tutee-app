@@ -12,7 +12,7 @@ class ReportContent extends Model
     protected $table = 'report_contents';
 
     protected $fillable = [
-        'user_id',
+        'reporter',
         'class_id',
         'post_id',
         'report_option',
@@ -30,9 +30,9 @@ class ReportContent extends Model
         'date_reported' => 'datetime',
     ];
 
-    public function user()
+    public function reporter()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'reporter');
     }
 
     public function class()

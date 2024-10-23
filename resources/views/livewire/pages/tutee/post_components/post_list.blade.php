@@ -9,6 +9,7 @@ use Livewire\Attributes\On;
 use App\Models\Fields;
 use App\Models\Post;
 use App\Models\Tutee;
+use App\Models\Blacklist;
 use App\Models\ReportContent;
 
 new #[Layout('layouts.app')] class extends Component {
@@ -112,7 +113,9 @@ new #[Layout('layouts.app')] class extends Component {
             'selectedOption.required' => 'Please choose a report type.',
         ]);
 
-        $isReported = ReportContent::where('post_id', $this->report_post->id)->exists();
+        $isReported = ReportContent::where('reporter', Auth::id())
+                                    ->where('post_id', $this->report_class->id)
+                                    ->exists();
 
         if ($isReported) {
             $this->notification([
@@ -126,10 +129,26 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         $reported = ReportContent::create([
-            'user_id' => Auth::id(),
+            'reporter' => Auth::id(),
             'post_id' => $this->report_post->id,
             'report_option' => $this->selectedOption,
         ]);
+
+        $reported_user = $reported->tutees->user_id;
+
+        // chgeck if found in blacklist
+        $blacklist = Blacklist::where('reported_user', $reported_user)->first();
+
+        if ($blacklist) {
+            // increment if found
+            $blacklist->increment('report_count');
+        } else {
+            // create a new entry with report_count = 1
+            Blacklist::create([
+                'reported_user' => $reported_user,
+                'report_count' => 1,
+            ]);
+        }
 
         if ($this->comment) {
             $reported->comment = $this->comment;

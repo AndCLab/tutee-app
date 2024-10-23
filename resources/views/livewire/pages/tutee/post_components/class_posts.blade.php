@@ -7,6 +7,7 @@ use WireUi\Traits\Actions;
 use App\Models\Classes;
 use App\Models\ClassRoster;
 use App\Models\ReportContent;
+use App\Models\Blacklist;
 use App\Models\Fields;
 use App\Models\Tutee;
 
@@ -91,6 +92,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 $subQuery->whereIn('field_name', $getFields);
                             });
                     })
+                    ->where('class_students', '>' , 0)
                     ->take($this->pages)
                     ->orderBy('created_at', 'desc')
                     ->get();
@@ -118,7 +120,9 @@ new #[Layout('layouts.app')] class extends Component {
             'selectedOption.required' => 'Please choose a report type.',
         ]);
 
-        $isReported = ReportContent::where('class_id', $this->report_class->id)->exists();
+        $isReported = ReportContent::where('reporter', Auth::id())
+                                    ->where('class_id', $this->report_class->id)
+                                    ->exists();
 
         if ($isReported) {
             $this->notification([
@@ -132,10 +136,26 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         $reported = ReportContent::create([
-            'user_id' => Auth::id(),
+            'reporter' => Auth::id(),
             'class_id' => $this->report_class->id,
             'report_option' => $this->selectedOption,
         ]);
+
+        $reported_user = $reported->class->tutor->user_id;
+
+        // chgeck if found in blacklist
+        $blacklist = Blacklist::where('reported_user', $reported_user)->first();
+
+        if ($blacklist) {
+            // increment if found
+            $blacklist->increment('report_count');
+        } else {
+            // create a new entry with report_count = 1
+            Blacklist::create([
+                'reported_user' => $reported_user,
+                'report_count' => 1,
+            ]);
+        }
 
         if ($this->comment) {
             $reported->comment = $this->comment;
