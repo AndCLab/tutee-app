@@ -17,12 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.is_stepper' => \App\Http\Middleware\CheckStepper::class,
             'checkUserType' => \App\Http\Middleware\CheckUserType::class,
             'checkIsApplied' => \App\Http\Middleware\CheckIsApplied::class,
+            'blocked' => \App\Http\Middleware\BlockedUser::class,
         ]);
     })->withExceptions(function (Exceptions $exceptions) {
         //
     })
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('class:close-expired')->daily();
+        $schedule->command('block:reported-users')->daily();
     })
     ->create();
 

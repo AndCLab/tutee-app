@@ -69,4 +69,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Fields::class);
     }
+
+    public function blacklist()
+    {
+        return $this->hasMany(Blacklist::class, 'reported_user');
+    }
 }

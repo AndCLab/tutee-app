@@ -6,6 +6,8 @@ use Livewire\Attributes\Layout;
 use WireUi\Traits\Actions;
 use App\Models\Classes;
 use App\Models\ClassRoster;
+use App\Models\ReportContent;
+use App\Models\Blacklist;
 use App\Models\Fields;
 use App\Models\Tutee;
 
@@ -14,9 +16,18 @@ new #[Layout('layouts.app')] class extends Component {
 
     // properties
     public $getClass;
+    public $selectedOption;
+    public $comment;
+
+    // models
+    public $report_class;
+    public $report_post;
 
     // states
+    public $showReportClassModal;
+    public $showReportPostModal;
     public $showClassModal;
+    public $showPostModal;
     public $pages = 5;
 
     public function joinClass()
@@ -81,6 +92,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 $subQuery->whereIn('field_name', $getFields);
                             });
                     })
+                    ->where('class_students', '>' , 0)
                     ->take($this->pages)
                     ->orderBy('created_at', 'desc')
                     ->get();
@@ -88,6 +100,78 @@ new #[Layout('layouts.app')] class extends Component {
         return [
             'classes' => $classes
         ];
+    }
+
+    // report class content
+    public function reportClassModal($reportClassId)
+    {
+        $this->showReportClassModal = true;
+        $this->report_class = Classes::findOrFail($reportClassId);
+    }
+
+    public function submitClassReport()
+    {
+        $rule = $this->validate([
+            'comment' => ['nullable', 'max:255', 'string'],
+            'selectedOption' => ['required']
+        ], [
+            'comment.max' => 'The comment may not be greater than 255 characters.',
+            'comment.string' => 'The comment must be a valid string.',
+            'selectedOption.required' => 'Please choose a report type.',
+        ]);
+
+        $isReported = ReportContent::where('reporter', Auth::id())
+                                    ->where('class_id', $this->report_class->id)
+                                    ->exists();
+
+        if ($isReported) {
+            $this->notification([
+                'title' => 'Already Reported',
+                'description' => 'We\'re still reviewing your feedback.',
+                'icon' => 'error',
+                'timeout' => 2500,
+            ]);
+
+            return;
+        }
+
+        $reported = ReportContent::create([
+            'reporter' => Auth::id(),
+            'class_id' => $this->report_class->id,
+            'report_option' => $this->selectedOption,
+        ]);
+
+        $reported_user = $reported->class->tutor->user_id;
+
+        // chgeck if found in blacklist
+        $blacklist = Blacklist::where('reported_user', $reported_user)->first();
+
+        if ($blacklist) {
+            // increment if found
+            $blacklist->increment('report_count');
+        } else {
+            // create a new entry with report_count = 1
+            Blacklist::create([
+                'reported_user' => $reported_user,
+                'report_count' => 1,
+            ]);
+        }
+
+        if ($this->comment) {
+            $reported->comment = $this->comment;
+            $reported->save();
+        }
+
+        $this->notification([
+            'title' => 'Content reported',
+            'description' => 'Thank you! We\'ll review your feedback.',
+            'icon' => 'success',
+            'timeout' => 2500,
+        ]);
+
+        $this->showReportClassModal = false;
+
+        $this->reset('comment');
     }
 
 }; ?>
@@ -193,6 +277,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     <!-- Class View Modal -->
     @include('livewire.pages.tutee.post_components.modals.class_view_modal')
+
+    {{-- report content --}}
+    @include('livewire.pages.report_contents.report_class')
 
     <x-wui-notifications position="bottom-right" />
 

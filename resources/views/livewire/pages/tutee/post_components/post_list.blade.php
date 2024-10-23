@@ -9,6 +9,8 @@ use Livewire\Attributes\On;
 use App\Models\Fields;
 use App\Models\Post;
 use App\Models\Tutee;
+use App\Models\Blacklist;
+use App\Models\ReportContent;
 
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
@@ -18,6 +20,13 @@ new #[Layout('layouts.app')] class extends Component {
 
     public $getPost;
     public $availableFields = [];
+    public $report_post;
+
+    // properties
+    public $selectedOption;
+    public $comment;
+
+    // models
 
     // filters
     public $pricing;
@@ -30,6 +39,9 @@ new #[Layout('layouts.app')] class extends Component {
     public $showTuteePost;
     public $deletePostId;
     public $pages = 5;
+
+    public $showReportPostModal;
+    public $showPostModal;
 
     public function mount()
     {
@@ -81,6 +93,78 @@ new #[Layout('layouts.app')] class extends Component {
     public function loadMore()
     {
         $this->pages += 5;
+    }
+
+    // report post content
+    public function reportPostModal($reportPostId)
+    {
+        $this->showReportPostModal = true;
+        $this->report_post = Post::findOrFail($reportPostId);
+    }
+
+    public function submitPostReport()
+    {
+        $rule = $this->validate([
+            'comment' => ['nullable', 'max:255', 'string'],
+            'selectedOption' => ['required']
+        ], [
+            'comment.max' => 'The comment may not be greater than 255 characters.',
+            'comment.string' => 'The comment must be a valid string.',
+            'selectedOption.required' => 'Please choose a report type.',
+        ]);
+
+        $isReported = ReportContent::where('reporter', Auth::id())
+                                    ->where('post_id', $this->report_class->id)
+                                    ->exists();
+
+        if ($isReported) {
+            $this->notification([
+                'title' => 'Already Reported',
+                'description' => 'We\'re still reviewing your feedback.',
+                'icon' => 'error',
+                'timeout' => 2500,
+            ]);
+
+            return;
+        }
+
+        $reported = ReportContent::create([
+            'reporter' => Auth::id(),
+            'post_id' => $this->report_post->id,
+            'report_option' => $this->selectedOption,
+        ]);
+
+        $reported_user = $reported->tutees->user_id;
+
+        // chgeck if found in blacklist
+        $blacklist = Blacklist::where('reported_user', $reported_user)->first();
+
+        if ($blacklist) {
+            // increment if found
+            $blacklist->increment('report_count');
+        } else {
+            // create a new entry with report_count = 1
+            Blacklist::create([
+                'reported_user' => $reported_user,
+                'report_count' => 1,
+            ]);
+        }
+
+        if ($this->comment) {
+            $reported->comment = $this->comment;
+            $reported->save();
+        }
+
+        $this->notification([
+            'title' => 'Content reported',
+            'description' => 'Thank you! We\'ll review your feedback.',
+            'icon' => 'success',
+            'timeout' => 2500,
+        ]);
+
+        $this->showReportPostModal = false;
+
+        $this->reset('comment');
     }
 
     #[On('post-created')]
@@ -304,5 +388,12 @@ new #[Layout('layouts.app')] class extends Component {
         </x-wui-card>
     </x-wui-modal>
 
+    {{-- view tutee post --}}
     @include('livewire.pages.tutee.post_components.modals.view_tutee_post')
+
+    {{-- report content --}}
+    @include('livewire.pages.report_contents.report_post')
+
+    <x-wui-notifications position="bottom-right" />
+
 </section>

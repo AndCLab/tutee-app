@@ -82,14 +82,14 @@ new #[Layout('layouts.app')] class extends Component {
                                 $q->whereHas('user', function ($query) {
                                     $query->where('fname', 'like', "%{$this->search}%")
                                         ->orWhere('lname', 'like', "%{$this->search}%");
-                                });
+                            });
                             })
                             ->when($this->sort_by, function ($q) {
                                 $q->orderBy('created_at', $this->sort_by);
                             })
                             ->when($this->time_avail, function ($q) {
-                                $q->whereHas('classes.schedule', function ($query) {
-                                    $query->where('start_date', 'like', "%{$this->time_avail}%");
+                                $q->whereHas('classes.schedule.recurring_schedule', function ($query) {
+                                    $query->where('dates', '=', $this->time_avail);
                                 });
                             })
                             ->when($this->class_fields, function ($q) {
@@ -183,7 +183,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <x-wui-datetime-picker
                             placeholder="Availability"
                             wire:model.live="time_avail"
-                            parse-format="YYYY-MM-DD HH:mm"
+                            parse-format="YYYY-MM-DD"
                             display-format='dddd, MMMM D, YYYY'
                             :min="now()"
                             without-time

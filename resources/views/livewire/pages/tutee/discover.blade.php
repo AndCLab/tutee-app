@@ -17,7 +17,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $class_date;
     public $class_fee = 0;
     public string $class_category = '';
-    public string $class_type = '';
+    public string $class_type = 'virtual';
     public string $class_location = '';
     public $post_created;
 

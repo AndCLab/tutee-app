@@ -38,7 +38,7 @@
             <div class="flex gap-2 items-center">
                 About the Class
                 <div>
-                    @if ($class->class_category == 'group')
+                    @if ( $getClass->class_category == 'group')
                         <x-wui-badge flat warning label="{{ $getClass->class_category }}" />
                     @else
                         <x-wui-badge flat purple label="{{ $getClass->class_category }}" />
@@ -127,7 +127,7 @@
                     </svg>
                     <p>Posted on {{ $getClass->created_at->format('l, F d Y g:i A') }}</p>
                 </div>
-                <x-wui-button label="Report Content" flat xs icon="exclamation" />
+                <x-wui-button wire:click='reportClassModal({{ $getClass->id }})' spinner='reportClassModal({{ $getClass->id }})' label="Report Content" flat xs icon="exclamation" />
             </div>
         </x-slot>
     </x-wui-modal.card>
