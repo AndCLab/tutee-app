@@ -44,4 +44,13 @@ class ReportContent extends Model
     {
         return $this->belongsTo(Post::class, 'post_id');
     }
+
+    public function scopeSearch($query, $term)
+    {
+        return $query->whereHas('reporter', function ($q) use ($term) {
+            $q->where('fname', 'like', "%{$term}%")
+            ->orWhere('lname', 'like', "%{$term}%")
+            ->orWhere('email', 'like', "%{$term}%");
+        });
+    }
 }
