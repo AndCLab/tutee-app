@@ -12,10 +12,10 @@ Route::view('profile', 'profile')
     ->middleware(['auth', 'check.is_stepper'])
     ->name('profile');
 
-// In web.php or routes file
-Route::get('/blocked', function () {
-    return view('blocked'); // Ensure you have a blocked.blade.php view
-})->name('blocked');
+// // In web.php or routes file
+// Route::get('/blocked', function () {
+//     return view('blocked'); // Ensure you have a blocked.blade.php view
+// })->name('blocked');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
