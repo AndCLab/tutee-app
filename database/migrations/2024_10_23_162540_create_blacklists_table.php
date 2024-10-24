@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('blacklists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reported_user')->constrained('users')
+            $table->foreignId('reported_user_id')->constrained('users')
                 ->onDelete('cascade');
             $table->timestamp('blocked_at')->nullable();
             $table->unsignedInteger('report_count')->default(0);
