@@ -114,7 +114,7 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         $isReported = ReportContent::where('reporter_id', Auth::id())
-                                    ->where('post_id', $this->report_class->id)
+                                    ->where('post_id', $this->report_post->id)
                                     ->exists();
 
         if ($isReported) {
@@ -134,7 +134,7 @@ new #[Layout('layouts.app')] class extends Component {
             'report_option' => $this->selectedOption,
         ]);
 
-        $reported_user_id = $reported->tutees->user_id;
+        $reported_user_id = $reported->post->tutees->user_id;
 
         // chgeck if found in blacklist
         $blacklist = Blacklist::where('reported_user_id', $reported_user_id)->first();
