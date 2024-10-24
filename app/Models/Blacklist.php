@@ -12,14 +12,14 @@ class Blacklist extends Model
     protected $table = 'blacklists';
 
     protected $fillable = [
-        'reported_user',
+        'reported_user_id',
         'blocked_at',
         'report_count',
     ];
 
     public function reportedUser()
     {
-        return $this->belongsTo(User::class, 'reported_user');
+        return $this->belongsTo(User::class, 'reported_user_id');
     }
 
     // scopes

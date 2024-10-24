@@ -113,8 +113,8 @@ new #[Layout('layouts.app')] class extends Component {
             'selectedOption.required' => 'Please choose a report type.',
         ]);
 
-        $isReported = ReportContent::where('reporter', Auth::id())
-                                    ->where('post_id', $this->report_class->id)
+        $isReported = ReportContent::where('reporter_id', Auth::id())
+                                    ->where('post_id', $this->report_post->id)
                                     ->exists();
 
         if ($isReported) {
@@ -129,15 +129,15 @@ new #[Layout('layouts.app')] class extends Component {
         }
 
         $reported = ReportContent::create([
-            'reporter' => Auth::id(),
+            'reporter_id' => Auth::id(),
             'post_id' => $this->report_post->id,
             'report_option' => $this->selectedOption,
         ]);
 
-        $reported_user = $reported->tutees->user_id;
+        $reported_user_id = $reported->post->tutees->user_id;
 
         // chgeck if found in blacklist
-        $blacklist = Blacklist::where('reported_user', $reported_user)->first();
+        $blacklist = Blacklist::where('reported_user_id', $reported_user_id)->first();
 
         if ($blacklist) {
             // increment if found
@@ -145,7 +145,7 @@ new #[Layout('layouts.app')] class extends Component {
         } else {
             // create a new entry with report_count = 1
             Blacklist::create([
-                'reported_user' => $reported_user,
+                'reported_user_id' => $reported_user_id,
                 'report_count' => 1,
             ]);
         }
