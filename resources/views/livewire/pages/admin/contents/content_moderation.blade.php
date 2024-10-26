@@ -37,7 +37,7 @@ new #[Layout('layouts.admin')] class extends Component {
 
     public function reportContentStatus($value)
     {
-        $report_contents = ReportContent::whereIn('reporter_id', $this->selected)->get();
+        $report_contents = ReportContent::whereIn('id', $this->selected)->get();
 
         foreach ($report_contents as $report_content) {
             if(!($report_content->status === $value)) {
@@ -117,9 +117,10 @@ new #[Layout('layouts.admin')] class extends Component {
                     <div class="mt-2 sm:mt-0">
                         <x-wui-dropdown class="w-full">
                             <x-slot name="trigger">
-                                <x-wui-button label="Update Status" flat green sm icon='clipboard-check'/>
+                                <x-wui-button label="Select Content" flat green sm icon='clipboard-check'/>
                             </x-slot>
 
+                            <x-wui-dropdown.item label="View Content" wire:click="openContentModal"/>
                             <x-wui-dropdown.item label="Approved" wire:click="reportContentStatus('Approved')"/>
                             <x-wui-dropdown.item label="Not Approved" wire:click="reportContentStatus('Not Approved')"/>
                         </x-wui-dropdown>
@@ -172,7 +173,7 @@ new #[Layout('layouts.admin')] class extends Component {
                         @forelse($report_contents as $report)
                             <tr>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    <x-wui-checkbox id="selected" value="{{ $report->reporter_id }}" wire:model.live="selected"/>
+                                    <x-wui-checkbox id="selected" value="{{ $report->id }}" wire:model.live="selected"/>
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
