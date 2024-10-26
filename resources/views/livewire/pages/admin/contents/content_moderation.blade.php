@@ -127,7 +127,7 @@ new #[Layout('layouts.admin')] class extends Component {
                             ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'report_options',
+                                'name' => 'report_option',
                                 'displayName' => 'Report Option'
                             ])
 
