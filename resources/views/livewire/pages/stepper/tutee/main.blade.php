@@ -81,7 +81,7 @@ new #[Layout('layouts.app')] class extends Component {
             'specific' => 'required'
         ]);
 
-        if (!in_array($this->specific, $this->selected)) {
+        if (!in_array(strtolower($this->specific), array_map('strtolower', $this->selected))) {
             $this->selected[$this->i++] = $this->specific;
         }
 

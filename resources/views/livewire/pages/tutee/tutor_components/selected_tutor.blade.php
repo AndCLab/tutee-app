@@ -55,7 +55,7 @@
         <h2 class="text-lg font-semibold">{{ $selectedTutor->user->fname }}'s Fields</h2>
 
         @foreach ($fields = Fields::where('user_id', $selectedTutor->user->id)->get() as $index => $item)
-            @if (in_array($item->field_name, $class_fields))
+            @if (in_array(strtolower($item->field_name), array_map('strtolower', $class_fields)))
                 <x-wui-badge flat rose label="{{ $item->field_name }}" />
             @else
                 <x-wui-badge flat slate label="{{ $item->field_name }}" />

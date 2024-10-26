@@ -46,12 +46,16 @@ new #[Layout('layouts.app')] class extends Component {
             <img class="w-[40%] h-auto py-1" src="{{ asset('images/blacklist.svg') }}" alt="">
             <div class="md:-translate-y-8 gap-2 flex flex-col justify-center items-center">
                 <p class="text-center text-lg text-gray-900">Your account has been blocked due to multiple reports.</p>
-                <x-wui-button
-                    wire:click="requestForUnblock"
-                    spinner="requestForUnblock"
-                    positive solid icon='refresh'
-                    :disabled="$blockedUser->request == 'Pending'"
-                    label="{{ $blockedUser->request == 'Pending' ? 'Requested' : 'Request for unblock'}}" />
+                @if ($blockedUser->report_count <= 10)
+                    <x-wui-button
+                        wire:click="requestForUnblock"
+                        spinner="requestForUnblock"
+                        positive solid icon='refresh'
+                        :disabled="$blockedUser->request == 'Pending'"
+                        label="{{ $blockedUser->request == 'Pending' ? 'Requested' : 'Request for unblock'}}" />
+                @else
+                    <x-wui-badge md red icon="exclamation" label='You cannot request for unblocking at this moment.'/>
+                @endif
             </div>
         </div>
     </div>

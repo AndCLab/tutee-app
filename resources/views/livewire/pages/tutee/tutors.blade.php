@@ -93,10 +93,13 @@ new #[Layout('layouts.app')] class extends Component {
                                 });
                             })
                             ->when($this->class_fields, function ($q) {
-                                $q->whereHas('user.fields', function ($query) {
-                                    $query->whereIn('field_name', $this->class_fields);
+                                $lowercaseFields = array_map('strtolower', $this->class_fields);
+
+                                $q->whereHas('user.fields', function ($query) use ($lowercaseFields) {
+                                    $query->whereIn('field_name', $lowercaseFields);
                                 });
                             })
+
                             ->when($this->pricing, function ($q) {
                                 $q->whereHas('classes', function ($query) {
                                     $query->where('class_fee', '>=', $this->pricing)
@@ -244,7 +247,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <div class="space-y-2">
                             @foreach ($fields = Fields::where('user_id', $tutor->user->id)->get() as $index => $item)
                                 @break ($index === 3)
-                                @if (in_array($item->field_name, $class_fields))
+                                @if (in_array(strtolower($item->field_name), array_map('strtolower', $class_fields)))
                                     <x-wui-badge flat rose label="{{ $item->field_name }}" />
                                 @else
                                     <x-wui-badge flat slate label="{{ $item->field_name }}" />

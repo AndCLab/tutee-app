@@ -170,17 +170,17 @@ new #[Layout('layouts.app')] class extends Component {
     #[On('post-created')]
     public function with(): array
     {
-        $getFields = Fields::where('user_id', Auth::id())
-                            ->where('active_in', Auth::user()->user_type)
-                            ->pluck('field_name')
-                            ->toArray();
+        $getFields = array_map('strtolower', Fields::where('user_id', Auth::id())
+                           ->where('active_in', Auth::user()->user_type)
+                           ->pluck('field_name')
+                           ->toArray());
 
         $tutee_id = Tutee::where('user_id', Auth::id())->pluck('id')->first();
 
         // Retrieve all posts and filter them into a collection
         $filteredPosts = Post::all()->filter(function ($post) use ($tutee_id, $getFields) {
             // Decode the class_fields JSON
-            $classFields = json_decode($post->class_fields, true);
+            $classFields = array_map('strtolower', json_decode($post->class_fields, true));
 
             if (Auth::user()->user_type == 'tutee') {
                 // Include tutee posts based on tutee ID
@@ -196,7 +196,7 @@ new #[Layout('layouts.app')] class extends Component {
         // Apply additional filtering based on other conditions
         $filteredPosts = $filteredPosts->when($this->class_fields, function ($query) {
                 return $query->filter(function ($post) {
-                    return !empty(array_intersect(json_decode($post->class_fields, true), $this->class_fields));
+                    return !empty(array_intersect(array_map('strtolower', json_decode($post->class_fields, true)), array_map('strtolower', $this->class_fields)));
                 });
             })
             ->when($this->pricing, function ($query) {
