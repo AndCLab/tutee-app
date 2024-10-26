@@ -108,7 +108,7 @@ new #[Layout('layouts.admin')] class extends Component {
                             </th>
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
                                 'name' => 'reporter_id',
-                                'displayName' => 'Reporter ID'
+                                'displayName' => 'User ID'
                             ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [

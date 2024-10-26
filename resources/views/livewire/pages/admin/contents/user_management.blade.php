@@ -12,7 +12,7 @@ new #[Layout('layouts.admin')] class extends Component {
     </x-slot>
 
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 p-6">
-        <p>user management</p>
+        <p class="capitalize font-semibold text-xl">User Management</p>
     </div>
 </section>
 
