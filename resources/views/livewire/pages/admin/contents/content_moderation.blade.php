@@ -35,6 +35,23 @@ new #[Layout('layouts.admin')] class extends Component {
         }
     }
 
+    public function reportContentStatus($value)
+    {
+        $report_contents = ReportContent::whereIn('reporter_id', $this->selected)->get();
+
+        foreach ($report_contents as $report_content) {
+            if(!($report_content->status === $value)) {
+                $newStatus = ($report_content->status === 'Not Approved' || $report_content->status === 'Pending') ? 'Approved' : 'Not Approved';
+
+                $report_content->status = $newStatus;
+                $report_content->save();
+            }
+        }
+
+        $this->selected = [];
+        $this->selectAll = false;
+    }
+
     public function sortBy($field)
     {
         if ($this->sortField === $field) {
@@ -95,6 +112,19 @@ new #[Layout('layouts.admin')] class extends Component {
                         @endforeach
                     </x-wui-select>
                 </div>
+
+                @if ($selected || $selectAll)
+                    <div class="mt-2 sm:mt-0">
+                        <x-wui-dropdown class="w-full">
+                            <x-slot name="trigger">
+                                <x-wui-button label="Update Status" flat green sm icon='clipboard-check'/>
+                            </x-slot>
+
+                            <x-wui-dropdown.item label="Approved" wire:click="reportContentStatus('Approved')"/>
+                            <x-wui-dropdown.item label="Not Approved" wire:click="reportContentStatus('Not Approved')"/>
+                        </x-wui-dropdown>
+                    </div>
+                @endif
 
             </div>
 
