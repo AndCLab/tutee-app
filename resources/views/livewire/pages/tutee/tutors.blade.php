@@ -211,8 +211,12 @@ new #[Layout('layouts.app')] class extends Component {
                         x-on:click="active = {{ $tutor->id }}">
 
                         {{-- new tutor identifier --}}
+                        @php
+                            $week = Carbon::parse($tutor->created_at)->addWeek();
+                        @endphp
+
                         <div class="mb-2">
-                            @if (Carbon::create($tutor->created_at)->greaterThan(Carbon::now()->subWeek()))
+                            @if (Carbon::now()->lessThan($week))
                                 <x-wui-badge flat indigo label="New Tutor" />
                             @endif
                         </div>
