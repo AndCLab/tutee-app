@@ -24,6 +24,25 @@ new #[Layout('layouts.admin')] class extends Component {
         }
     }
 
+    public function updateRequestStatus($value)
+    {
+        $blacklists = Blacklist::whereIn('id', $this->selected)->get();
+
+        foreach ($blacklists as $blacklist) {
+            if(!($blacklist->request_status === $value)) {
+                $blacklist->request_status = $value;
+                if ($value === 'Approved') {
+                    $blacklist->blocked_at = null;
+                }
+                $blacklist->save();
+            }
+        }
+
+
+        $this->selected = [];
+        $this->selectAll = false;
+    }
+
     public function sortBy($field)
     {
         if ($this->sortField === $field) {
@@ -46,6 +65,13 @@ new #[Layout('layouts.admin')] class extends Component {
         return Blacklist::query()
             ->select('blacklists.*')
             ->join('users', 'blacklists.reported_user_id', '=', 'users.id')
+            ->wherenull('blacklists.blocked_at')
+            ->where('blacklists.report_count', '<', 3)
+            ->where(function ($query) {
+                $query->where('blacklists.request_status', 'pending')
+                    ->orwhere('blacklists.request_status', 'not approved')
+                    ->orwherenull('blacklists.request_status');
+            })
             ->search($this->search)
             ->when($this->sortField, function ($query) {
                 $query->orderBy($this->sortField, $this->sortDirection);
@@ -71,6 +97,19 @@ new #[Layout('layouts.admin')] class extends Component {
                 <div class="w-full sm:w-2/6">
                     <x-wui-input placeholder='Search a blacklisted user...' wire:model.live='search' shadowless/>
                 </div>
+
+                @if ($selected || $selectAll)
+                    <div class="mt-2 sm:mt-0">
+                        <x-wui-dropdown class="w-full">
+                            <x-slot name="trigger">
+                                <x-wui-button label="Update Status" flat green sm icon='clipboard-check'/>
+                            </x-slot>
+
+                            <x-wui-dropdown.item label="Approved" wire:click="updateRequestStatus('Approved')"/>
+                            <x-wui-dropdown.item label="Not Approved" wire:click="updateRequestStatus('Not Approved')"/>
+                        </x-wui-dropdown>
+                    </div>
+                @endif
             </div>
 
             {{-- table --}}
@@ -105,6 +144,11 @@ new #[Layout('layouts.admin')] class extends Component {
                                 'name' => 'report_count',
                                 'displayName' => 'Report Count'
                             ])
+
+                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                'name' => 'request_status',
+                                'displayName' => 'Request Status'
+                            ])
                         </tr>
                     </thead>
 
@@ -112,7 +156,7 @@ new #[Layout('layouts.admin')] class extends Component {
                         @forelse($blacklists as $blacklist)
                             <tr>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    <x-wui-checkbox id="selected" value="{{ $blacklist->reported_user_id }}" wire:model.live="selected"/>
+                                    <x-wui-checkbox id="selected" value="{{ $blacklist->id }}" wire:model.live="selected"/>
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
@@ -133,6 +177,10 @@ new #[Layout('layouts.admin')] class extends Component {
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                                     {{ $blacklist->report_count }}
+                                </td>
+
+                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                    {{ $blacklist->request_status }}
                                 </td>
                             </tr>
                         @empty

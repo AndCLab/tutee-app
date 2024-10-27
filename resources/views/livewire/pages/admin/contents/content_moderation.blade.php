@@ -124,7 +124,7 @@ new #[Layout('layouts.admin')] class extends Component {
                     <div class="mt-2 sm:mt-0">
                         <x-wui-dropdown class="w-full">
                             <x-slot name="trigger">
-                                <x-wui-button label="Select Content" flat green sm icon='clipboard-check'/>
+                                <x-wui-button label="Update Status" flat green sm icon='clipboard-check'/>
                             </x-slot>
 
                             <x-wui-dropdown.item label="Approved" wire:click="reportContentStatus('Approved')"/>
