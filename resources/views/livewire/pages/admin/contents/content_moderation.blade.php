@@ -44,9 +44,7 @@ new #[Layout('layouts.admin')] class extends Component {
 
         foreach ($report_contents as $report_content) {
             if(!($report_content->status === $value)) {
-                $newStatus = ($report_content->status === 'Not Approved' || $report_content->status === 'Pending') ? 'Approved' : 'Not Approved';
-
-                $report_content->status = $newStatus;
+                $report_content->status = $value;
                 $report_content->save();
             }
         }

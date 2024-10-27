@@ -17,7 +17,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->timestamp('blocked_at')->nullable();
             $table->unsignedInteger('report_count')->default(0);
-            $table->enum('request', [
+            $table->enum('request_status', [
                 'Pending',
                 'Approved',
                 'Not Approved'
