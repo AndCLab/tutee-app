@@ -14,7 +14,7 @@
             {{ $slot }}
         </p>
         @if ($wireTarget !== null)
-            <div role="status" wire:loading wire:target='{{ $wireTarget }}'>
+            <div role="status" wire:loading wire:target="{{ $wireTarget }}">
                 <svg class="animate-spin size-4 shrink-0"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

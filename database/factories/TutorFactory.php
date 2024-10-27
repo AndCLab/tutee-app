@@ -22,15 +22,9 @@ class TutorFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
-            'bio' => $this->faker->paragraph,
-            'work' => $this->faker->company,
-            'degree' => json_encode([
-                'type' => 'Bachelor',
-                'field' => 'Computer Science',
-                'year' => 2020,
-            ]),
-            'verify_status' => 'not_verified',
+            'user_id' => User::factory(),
+            'bio' => $this->faker->sentences(),
+            'work' => $this->faker->word(),
         ];
     }
 }

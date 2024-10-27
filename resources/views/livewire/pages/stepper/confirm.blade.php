@@ -110,9 +110,31 @@
 
                     <div class="mt-6">
                         <div class="block">
-                            <x-wui-checkbox
-                                :disabled="Auth::user()->apply_status == 'pending'"
-                                wire:model='confirm' class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
+
+                            <div>
+                                <label for="right-label" class="flex items-center ">
+                                    <div class="relative flex items-start">
+
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox"
+                                                class="form-checkbox rounded transition ease-in-out duration-100 border-secondary-300 focus:ring-primary-600 focus:border-primary-400 text-gray-600"
+                                                @disabled(Auth::user()->apply_status == 'pending')
+                                                @checked(Auth::user()->apply_status == 'pending')
+                                                wire:model="confirm"
+                                                x-model="open"
+                                                id="right-label"
+                                                name="confirm">
+                                        </div>
+
+                                        <div class="ml-2 text-sm">
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-400" for="right-label">
+                                                I agree to the terms and condition
+                                            </label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
                         </div>
                     </div>
                 </div>

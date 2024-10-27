@@ -41,5 +41,10 @@ Route::middleware(['auth', 'verified', 'check.is_stepper'])->group(function () {
 });
 
 // Include the default authentication routes provided by Laravel
+// // In web.php or routes file
+// Route::get('/blocked', function () {
+//     return view('blocked'); // Ensure you have a blocked.blade.php view
+// })->name('blocked');
+
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

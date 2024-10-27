@@ -34,11 +34,11 @@
                             <li class="mb-2 border-b border-gray-200 pb-2 cursor-pointer hover:bg-gray-100 transition-colors duration-200 ease-in-out"
                                 wire:click="markAsRead({{ $notif['id'] }})" wire:key="notif-{{ $notif['id'] }}">
 
-                                @php
+                                {{-- @php
                                     $user = Auth::user();
                                     $userType = $user->user_type;
                                     $route = $userType === 'tutor' ? route('classes') : route('tutee.schedule');
-                                @endphp
+                                @endphp --}}
 
                                 {{-- <a href="{{ $route }}"> --}}
                                     <div class="flex items-center">
@@ -82,6 +82,7 @@
                     </div>
                 @endforeach
 
+
                 <!-- Loading indicator -->
                 <div x-show="$el.scrollHeight - $el.scrollTop <= $el.clientHeight" x-intersect='$wire.loadMore()'>
                     <div wire:loading wire:target="loadMore" class="w-full flex flex-col bg-white rounded-xl">
@@ -93,6 +94,12 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+
+                {{-- might be needed to trigger load more --}}
+                <div class="m-2">
+                    {{-- End --}}
                 </div>
             </ul>
         </div>

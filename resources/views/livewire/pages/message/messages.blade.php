@@ -57,8 +57,12 @@
                     </div>
                 </div>
             </div>
-            </ul>
 
+                {{-- might be needed to trigger load more --}}
+                <div class="m-2">
+                    {{-- End --}}
+                </div>
+            </ul>
         </div>
     @endif
 

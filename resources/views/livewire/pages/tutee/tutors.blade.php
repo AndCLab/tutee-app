@@ -1,28 +1,39 @@
 {{-- resources\views\livewire\pages\tutee\tutors.blade.php --}}
 <?php
 
+use Illuminate\Support\Facades\Auth;
+
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
+use WireUi\Traits\Actions;
 use Carbon\Carbon;
 use App\Models\Tutor;
-use App\Models\User;
 use App\Models\Tutee;
+use App\Models\User;
+
 use App\Models\Classes;
+use App\Models\ClassRoster;
+use App\Models\Review;
 use App\Models\Fields;
 use App\Models\Bookmark;
 
 new #[Layout('layouts.app')] class extends Component {
+    use Actions;
+
+    public $showClassModal = false; // Controls the visibility of the modal
+    public $getClass; // Holds the class details
+
     protected $listeners = ['selectTutor'];
 
     public $title = 'Tutors | Tutee';
 
-    public $tutors;
     public $pages = 5;
 
     public $mobileViewTutor;
     public $selectedTutor;
     public $selectedClass;
+    public $selectedReview;
     public $ST_INDIClasses;
     public $ST_GRClasses;
 
@@ -66,16 +77,12 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->where('active_in', Auth::user()->user_type)
                                 ->get(['field_name'])
                                 ->toArray();
-        $this->tutors = Tutor::take($this->pages)->get();
         $this->selectedTutor = null;
     }
 
     public function loadMore()
     {
         $this->pages += 5;
-        if (!$this->updated()) {
-            $this->tutors = Tutor::take($this->pages)->get();
-        }
     }
 
     public function selectTutor($tutor_id)
@@ -88,7 +95,11 @@ new #[Layout('layouts.app')] class extends Component {
 
         $this->selectedClass = Classes::where('tutor_id', $tutor_id)->get();
 
-        $this->tutorIdForBookmark = $tutor_id;
+        $this->selectedReview = Review::whereHas('classes', function ($query) {
+                                $query->where('tutor_id', $this->selectedTutor->id);
+                            })->get();
+                            $this->tutorIdForBookmark = $tutor_id;
+
         $this->isBookmarked = Bookmark::where('tutor_id', $tutor_id)
                             ->where('user_id', Auth::id())
                             ->exists();
@@ -122,27 +133,30 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
 
-    public function updated()
+    public function with(): array
     {
-        $this->tutors = Tutor::when($this->search, function ($q) {
+        $tutors = Tutor::when($this->search, function ($q) {
                                 $q->whereHas('user', function ($query) {
                                     $query->where('fname', 'like', "%{$this->search}%")
                                         ->orWhere('lname', 'like', "%{$this->search}%");
-                                });
+                            });
                             })
                             ->when($this->sort_by, function ($q) {
                                 $q->orderBy('created_at', $this->sort_by);
                             })
                             ->when($this->time_avail, function ($q) {
-                                $q->whereHas('classes.schedule', function ($query) {
-                                    $query->where('start_date', 'like', "%{$this->time_avail}%");
+                                $q->whereHas('classes.schedule.recurring_schedule', function ($query) {
+                                    $query->where('dates', '=', $this->time_avail);
                                 });
                             })
                             ->when($this->class_fields, function ($q) {
-                                $q->whereHas('user.fields', function ($query) {
-                                    $query->whereIn('field_name', $this->class_fields);
+                                $lowercaseFields = array_map('strtolower', $this->class_fields);
+
+                                $q->whereHas('user.fields', function ($query) use ($lowercaseFields) {
+                                    $query->whereIn('field_name', $lowercaseFields);
                                 });
                             })
+
                             ->when($this->pricing, function ($q) {
                                 $q->whereHas('classes', function ($query) {
                                     $query->where('class_fee', '>=', $this->pricing)
@@ -152,8 +166,57 @@ new #[Layout('layouts.app')] class extends Component {
                             ->take($this->pages)
                             ->get();
 
-        return true;
+        return [
+            'tutors' => $tutors,
+        ];
     }
+
+    public function classView($class_id)
+    {
+        $this->showClassModal = true;
+        $this->getClass = Classes::findOrFail($class_id);
+    }
+
+    public function joinClass()
+    {
+        $tutee_id = Tutee::where('user_id', Auth::id())->pluck('id')->first();
+
+        $checkIfAlreadyJoined = ClassRoster::where('class_id', $this->getClass->id)
+                                            ->where('tutee_id', $tutee_id)
+                                            ->exists();
+
+        if (!$checkIfAlreadyJoined) {
+            $roster = ClassRoster::create([
+                'class_id' => $this->getClass->id,
+                'tutee_id' => $tutee_id,
+            ]);
+
+            if ($roster->classes->class_students > 0) {
+                $roster->classes->class_students--;
+                $roster->classes->save();
+            }
+
+
+            $this->notification([
+                'title'       => 'Success',
+                'description' => 'Successfully Joined Class',
+                'icon'        => 'success',
+                'timeout'     => 2500,
+            ]);
+
+        } else {
+            $this->notification([
+                'title'       => 'Schedule Duplication',
+                'description' => 'Already Joined this Class',
+                'icon'        => 'error',
+                'timeout'     => 2500,
+            ]);
+        }
+
+        $this->showClassModal = false;
+    }
+
+
 
 }; ?>
 
@@ -227,7 +290,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <x-wui-datetime-picker
                             placeholder="Availability"
                             wire:model.live="time_avail"
-                            parse-format="YYYY-MM-DD HH:mm"
+                            parse-format="YYYY-MM-DD"
                             display-format='dddd, MMMM D, YYYY'
                             :min="now()"
                             without-time
@@ -252,8 +315,12 @@ new #[Layout('layouts.app')] class extends Component {
                         x-on:click="active = {{ $tutor->id }}">
 
                         {{-- new tutor identifier --}}
+                        @php
+                            $week = Carbon::parse($tutor->created_at)->addWeek();
+                        @endphp
+
                         <div class="mb-2">
-                            @if (Carbon::create($tutor->created_at)->greaterThan(Carbon::now()->subWeek()))
+                            @if (Carbon::now()->lessThan($week))
                                 <x-wui-badge flat indigo label="New Tutor" />
                             @endif
                         </div>
@@ -274,7 +341,12 @@ new #[Layout('layouts.app')] class extends Component {
                                 </div>
                                 <div class="inline-flex items-center gap-1">
                                     <x-wui-icon name='academic-cap' class="size-4 text-[#64748B]" solid />
-                                    <span class="text-xs text-[#64748B]">BS Information Technology</span>
+                                    <span class="text-xs text-[#64748B]">
+                                        @php
+                                            $degrees = json_decode($tutor->degree, true);
+                                        @endphp
+                                        {{ is_array($degrees) ? implode(', ', $degrees) : $tutor->degree }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -283,7 +355,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <div class="space-y-2">
                             @foreach ($fields = Fields::where('user_id', $tutor->user->id)->get() as $index => $item)
                                 @break ($index === 3)
-                                @if (in_array($item->field_name, $class_fields))
+                                @if (in_array(strtolower($item->field_name), array_map('strtolower', $class_fields)))
                                     <x-wui-badge flat rose label="{{ $item->field_name }}" />
                                 @else
                                     <x-wui-badge flat slate label="{{ $item->field_name }}" />
@@ -346,4 +418,5 @@ new #[Layout('layouts.app')] class extends Component {
         }
     </script>
 
+    <x-wui-notifications position="bottom-right" />
 </section>

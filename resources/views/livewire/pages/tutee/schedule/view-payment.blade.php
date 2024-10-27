@@ -1,4 +1,6 @@
-
+@php
+    use Carbon\Carbon;
+@endphp
 
 @if ($class_roster_payment)
     <x-wui-modal.card title="View Payment" align='start' max-width='md' blur wire:model="view_payment_modal">
@@ -9,11 +11,11 @@
         </div>
 
         <x-slot name="footer">
-            <x-wui-button class="w-full" flat label="Cancel" x-on:click="close" />
+            {{-- <x-wui-button class="w-full" flat label="Cancel" x-on:click="close" /> --}}
+            <div class="inline-flex justify-center gap-1 items-center text-[#64748B] w-full">
+                <x-wui-icon name='calendar' class="size-4" />
+                <span class="font-light text-sm">Uploaded on {{ Carbon::parse($class_roster_payment->date_of_upload)->format('F d, Y l h:i A') }}</span>
+            </div>
         </x-slot>
-        <div class="inline-flex justify-center gap-1 items-center mt-2 text-[#64748B] w-full">
-            <x-wui-icon name='calendar' class="size-4" />
-            <span class="font-light text-sm">Uploaded on {{ Carbon::parse($attachment_id->date_of_upload)->format('F d, Y l h:i A') }}</span>
-        </div>
     </x-wui-modal.card>
 @endif

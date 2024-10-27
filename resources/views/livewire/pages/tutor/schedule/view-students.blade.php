@@ -137,15 +137,19 @@ new #[Layout('layouts.app')] class extends Component {
                 Carbon::create($class->schedule->start_time)->format('g:iA') . ' - ' .
                 Carbon::create($class->schedule->end_time)->format('g:iA l')
             }}</p>
-            <p class="capitalize text-md text-[#0F172A]">Total Students: {{ $total_students }}</p>
+            @if ($class->class_category == 'group')
+                <p class="capitalize text-sm text-[#0F172A]">Total Students: {{ $total_students }}</p>
+            @endif
         </div>
 
         <div>
             {{-- search filter --}}
             <div class="sm:inline-flex sm:justify-between sm:items-center mb-4 w-full">
-                <div class="w-full sm:w-2/6">
-                    <x-wui-input placeholder='Search a student...' wire:model.live='search' shadowless/>
-                </div>
+                @if ($class->class_category == 'group')
+                    <div class="w-full sm:w-2/6">
+                        <x-wui-input placeholder='Search a student...' wire:model.live='search' shadowless/>
+                    </div>
+                @endif
                 @if ($selected || $selectAll)
                     <div class="mt-2 sm:mt-0">
                         <x-wui-dropdown class="w-full">
@@ -247,17 +251,19 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- pagination --}}
             <div class="mt-4">
-                <div class="w-full sm:w-[7rem] mb-4 sm:mb-0">
-                    <x-wui-select
-                        placeholder='Per Page'
-                        wire:model.live="perPage"
-                        shadowless
-                    >
-                        <x-wui-select.option label="5" value="5" />
-                        <x-wui-select.option label="10" value="10" />
-                        <x-wui-select.option label="20" value="20" />
-                    </x-wui-select>
-                </div>
+                @if ($total_students >= 5)
+                    <div class="w-full sm:w-[7rem] mb-4 sm:mb-0">
+                        <x-wui-select
+                            placeholder='Per Page'
+                            wire:model.live="perPage"
+                            shadowless
+                        >
+                            <x-wui-select.option label="5" value="5" />
+                            <x-wui-select.option label="10" value="10" />
+                            <x-wui-select.option label="20" value="20" />
+                        </x-wui-select>
+                    </div>
+                @endif
                 {{ $class_roster->links() }}
             </div>
         </div>
@@ -283,15 +289,15 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
 
                 <x-slot name="footer">
-                    <div class="inline-flex gap-2 items-center w-full">
-                        @if ($attachment_id->payment_status === 'Pending')
+                    @if ($attachment_id->payment_status === 'Pending')
+                        <div class="inline-flex gap-2 items-center w-full">
                             <x-wui-button negative label="Disapprove" :disabled="isset($no_upload) && $no_upload" spinner="verifyPayment('Not Approved')" wire:click="verifyPayment('Not Approved')" class="w-full"/>
                             <x-primary-button wire:click="verifyPayment('Approved')" :disabled="isset($no_upload) && $no_upload" wireTarget="verifyPayment('Approved')" class="w-full">Verify Payment</x-primary-button>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                     <div class="inline-flex justify-center gap-1 items-center mt-2 text-[#64748B] w-full">
                         <x-wui-icon name='calendar' class="size-4" />
-                        <span class="font-light text-sm">Uploaded on {{ Carbon::parse($attachment_id->date_of_upload)->format('F d, Y l h:i A') }}</span>
+                        <span class="font-light text-xs">Uploaded on {{ Carbon::parse($attachment_id->date_of_upload)->format('F d, Y l h:i A') }}</span>
                     </div>
                 </x-slot>
             </x-wui-modal.card>

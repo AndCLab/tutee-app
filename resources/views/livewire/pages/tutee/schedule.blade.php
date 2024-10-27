@@ -22,6 +22,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $payment;
     public $rating;
     public $remarks;
+    public $schedule_type;
 
     // collections
     public $review_class;
@@ -35,6 +36,11 @@ new #[Layout('layouts.app')] class extends Component {
     public $leave_class_modal;
     public $review_class_modal;
     public $view_attendees;
+
+    public function mount()
+    {
+        $this->schedule_type = 'future';
+    }
 
     public function openPaymentModal($id)
     {
@@ -64,7 +70,6 @@ new #[Layout('layouts.app')] class extends Component {
                 $this->class_roster_payment->payment_status = 'Pending';
             }
             $this->class_roster_payment->proof_of_payment = $filePath;
-            $this->class_roster_payment->date_of_upload = Carbon::now();
             $this->class_roster_payment->save();
         }
 
@@ -93,6 +98,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function leaveClass()
     {
+        $this->class_roster_leave->classes->class_students++;
+        $this->class_roster_leave->classes->save();
+
         $this->class_roster_leave->delete();
 
         $this->notification([
@@ -151,6 +159,11 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         $this->review_class_modal = false;
+    }
+
+    public function setSchedule($schedule_type)
+    {
+        $this->schedule_type = $schedule_type;
     }
 
 
@@ -228,19 +241,40 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- Schedule --}}
             <div class="lg:col-span-2 space-y-3">
                 {{-- Header --}}
-                <p class="capitalize font-semibold text-xl mb-9">your schedule</p>
+                <div class="w-full inline-flex justify-between items-center mb-5">
+                    <p class="capitalize font-semibold text-xl">your schedule</p>
+                    <x-primary-button class="text-xs" wire:click="setSchedule('{{ $schedule_type == 'future' ? 'past' : 'future' }}')">
+                        {{ $schedule_type == 'future' ? 'View Past Schedules' : 'View Upcoming Schedules' }}
+                    </x-primary-button>
+                </div>
 
                 <ol @class([
-                        'border-s border-gray-200 relative' => $first_dates->isNotEmpty(),
+                        'sm:border-s sm:border-gray-200 sm:relative' => $first_dates->isNotEmpty(),
                     ])>
 
-                    @forelse ($distinct_dates as $date)
+                    @forelse ($distinct_dates as $index => $date)
                         {{-- check if ni labay nga schedule pero wa pa na rate sa studyante --}}
-                        {{-- @if ($date > Carbon::now()->format('Y-m-d')) --}}
-                        @if (!$all_rated_status[$date])
-                            <li class="mb-10 ms-6">
-                                <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
-                                    <x-wui-icon name='calendar' class="size-2.5 text-[#0C3B2E]" solid />
+                        @php
+                            $isFuture = !$all_rated_status[$date] && $schedule_type == 'future';
+                            $isPast = $date < Carbon::now()->format('Y-m-d') && $schedule_type == 'past';
+                        @endphp
+
+                        @if ($isFuture)
+                            <li class="mb-10 sm:ms-6">
+                                <span class="sm:absolute -start-3 sm:flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
+                                    <x-wui-icon name='calendar' class="hidden sm:block size-2.5 text-[#0C3B2E]" solid />
+                                </span>
+                                <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                                    {{ Carbon::parse($date)->format('l, F d, Y') }}
+                                </h3>
+                                <div class="space-y-3">
+                                    @include('livewire.pages.tutee.schedule.schedule-card')
+                                </div>
+                            </li>
+                        @elseif ($isPast)
+                            <li class="mb-10 sm:ms-6">
+                                <span class="sm:absolute -start-3 sm:flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
+                                    <x-wui-icon name='calendar' class="hidden sm:block size-2.5 text-[#0C3B2E]" solid />
                                 </span>
                                 <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
                                     {{ Carbon::parse($date)->format('l, F d, Y') }}
@@ -251,7 +285,7 @@ new #[Layout('layouts.app')] class extends Component {
                             </li>
                         @endif
                     @empty
-                        <div class="flex flex-col gap-2 justify-center items-center w-full" wire:loading.remove>
+                        <div class="flex flex-col gap-2 justify-center items-center w-full">
                             <img class="size-1/2" src="{{ asset('images/empty_schedule.svg') }}" alt="">
                             <p class="font-semibold text-xl">You don't have any schedule set up yet.</p>
                             <span class="font-light">Find classes in the Discover</span>
@@ -262,20 +296,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Top Tutors --}}
             <div class="hidden lg:block space-y-3 sticky top-[5rem] overflow-y-auto max-h-[85vh] soft-scrollbar px-2 pb-3">
-
-                {{-- Header --}}
-                <p class="capitalize font-semibold text-xl mb-9">top tutors</p>
-
-                @forelse ($allTutors as $index => $tutor)
-                    <div class="flex flex-col">
-                       @include('livewire.pages.tutee.schedule.top-tutors')
-                       @break($index === 2)
-                    </div>
-                @empty
-                    <div>
-                        No tutor
-                    </div>
-                @endforelse
+                <livewire:pages.tutee.components.top-tutors>
             </div>
         </div>
     </div>

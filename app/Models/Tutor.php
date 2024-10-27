@@ -16,7 +16,12 @@ class Tutor extends Model
         'bio',
         'work',
         'degree',
-        'average_rating'
+        'verify_status',
+        'average_rating',
+    ];
+
+    protected $casts = [
+        'is_verified' => 'string',
     ];
 
     public function user()

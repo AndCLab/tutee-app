@@ -57,6 +57,12 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '9584638379',
         ]);
 
+        // Fields::factory()->create([
+        //     'user_id' => $user->id,
+        //     'field_name' => fake()->randomElement($fields),
+        //     'active_in' => $user->user_type
+        // ]);
+
         User::factory()->create([
             'fname' => 'Tutee',
             'lname' => 'Example',
@@ -86,11 +92,6 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
         $this->call(ClassesSeeder::class);
-        $this->call(ClassRosterSeeder::class);
-        // $this->call(TutorSeeder::class);
-        // $this->call(TuteeSeeder::class);
-        $this->call(TutorSeeder::class);
-        $this->call(TuteeSeeder::class);
 
         // Adding the Tutor and Tutee Notification seeders
         $this->call(TutorNotificationsSeeder::class);

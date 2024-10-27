@@ -25,7 +25,7 @@ class Review extends Model
 
     public function tutee()
     {
-        return $this->belongsTo(Tutee::class, 'tutee_id');
+        return $this->belongsTo(Tutee::class, 'reviewer');
     }
 
 }

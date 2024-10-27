@@ -88,12 +88,14 @@ class Notifications extends Component
                 }
             }
 
-            // Call the route function to determine where to redirect the user
-            return $this->routeToPageBasedOnRole($userType);
+
         }
 
         $this->dispatch('notificationNum-updated');
         $this->updateUnreadCount();
+
+        // Call the route function to determine where to redirect the user
+        return $this->routeToPageBasedOnRole($userType, $notification);
     }
 
     public function updateUnreadCount()
@@ -166,20 +168,34 @@ class Notifications extends Component
     }
 
 // Determine the route based on the user's role
-    public function routeToPageBasedOnRole($userType)
+    // public function routeToPageBasedOnRole($userType)
+    // {
+    //     if ($userType === 'tutor') {
+    //         // If user is a tutor, route them to the classes page
+    //         return redirect()->route('classes');
+    //     } elseif ($userType === 'tutee') {
+    //         // If user is a tutee, route them to the schedule page
+    //         return redirect()->route('tutee.schedule');
+    //     } else {
+    //         // Handle other roles or show a default page if the user has no role
+    //         return redirect()->route('dashboard');
+    //     }
+    // }
+
+
+    public function routeToPageBasedOnRole($userType, $notification)
     {
+        // Customize based on the notification type
         if ($userType === 'tutor') {
-            // If user is a tutor, route them to the classes page
-            return redirect()->route('classes');
+            $className = $notification->class_name ?? '';  // Assumes class name is stored in notification data
+            return redirect()->route('classes', ['search_class' => $className]);
         } elseif ($userType === 'tutee') {
-            // If user is a tutee, route them to the schedule page
-            return redirect()->route('tutee.schedule');
+            return redirect()->route('tutee.schedule');  // Default route for tutees
         } else {
             // Handle other roles or show a default page if the user has no role
             return redirect()->route('dashboard');
         }
     }
-
 
 
     public function render()
