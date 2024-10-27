@@ -18,7 +18,7 @@ new #[Layout('layouts.admin')] class extends Component {
     public function updatedSelectAll($value)
     {
         if ($value) {
-            $this->selected = $this->getDataQuery()->pluck('reported_user_id')->toArray();
+            $this->selected = $this->getDataQuery()->pluck('id')->toArray();
         } else {
             $this->selected = [];
         }
