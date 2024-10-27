@@ -143,19 +143,15 @@ new #[Layout('layouts.admin')] class extends Component {
                             <th class="text-start whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                                 <x-wui-checkbox id="selectAll" wire:model.live="selectAll" />
                             </th>
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'reporter_id',
-                                'displayName' => 'Reporter User ID'
-                            ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'fname',
-                                'displayName' => 'First Name'
+                                'name' => 'lname',
+                                'displayName' => 'Reporter'
                             ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
                                 'name' => 'lname',
-                                'displayName' => 'Last Name'
+                                'displayName' => 'Reported'
                             ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
@@ -188,15 +184,15 @@ new #[Layout('layouts.admin')] class extends Component {
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    {{ $report->reporter_id }}
+                                      {{ $report->reporter->fname .' '. $report->reporter->lname }}
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                      {{ $report->reporter->fname }}
-                                </td>
-
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                      {{ $report->reporter->lname }}
+                                    @if($report->class)
+                                        {{ $report->class->tutor->user->fname .' '. $report->class->tutor->user->lname }}
+                                    @elseif($report->post)
+                                        {{ $report->post->tutees->user->fname .' '. $report->post->tutees->user->lname }}
+                                    @endif
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">

@@ -51,6 +51,16 @@ class ReportContent extends Model
             $q->where('fname', 'like', "%{$term}%")
             ->orWhere('lname', 'like', "%{$term}%")
             ->orWhere('email', 'like', "%{$term}%");
+        })
+        ->orwhereHas('class.tutor.user', function ($q) use ($term) {
+            $q->where('fname', 'like', "%{$term}%")
+            ->orWhere('lname', 'like', "%{$term}%")
+            ->orWhere('email', 'like', "%{$term}%");
+        })
+        ->orwhereHas('post.tutees.user', function ($q) use ($term) {
+            $q->where('fname', 'like', "%{$term}%")
+            ->orWhere('lname', 'like', "%{$term}%")
+            ->orWhere('email', 'like', "%{$term}%");
         });
     }
 }

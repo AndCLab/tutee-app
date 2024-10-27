@@ -29,7 +29,7 @@ new #[Layout('layouts.admin')] class extends Component {
         $blacklists = Blacklist::whereIn('id', $this->selected)->get();
 
         foreach ($blacklists as $blacklist) {
-            if(!($blacklist->request_status === $value)) {
+            if(!($blacklist->request_status === $value) && $blacklist->request_status != null) {
                 $blacklist->request_status = $value;
                 if ($value === 'Approved') {
                     $blacklist->blocked_at = null;
@@ -126,13 +126,8 @@ new #[Layout('layouts.admin')] class extends Component {
                             ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'fname',
-                                'displayName' => 'First Name'
-                            ])
-
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
                                 'name' => 'lname',
-                                'displayName' => 'Last Name'
+                                'displayName' => 'Blacklisted Name'
                             ])
 
                             @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
@@ -156,7 +151,9 @@ new #[Layout('layouts.admin')] class extends Component {
                         @forelse($blacklists as $blacklist)
                             <tr>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    <x-wui-checkbox id="selected" value="{{ $blacklist->id }}" wire:model.live="selected"/>
+                                    @if($blacklist->request_status != null)
+                                        <x-wui-checkbox id="selected" value="{{ $blacklist->id }}" wire:model.live="selected"/>
+                                    @endif
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
@@ -164,11 +161,7 @@ new #[Layout('layouts.admin')] class extends Component {
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    {{ $blacklist->reportedUser->fname }}
-                                </td>
-
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    {{ $blacklist->reportedUser->lname }}
+                                    {{ $blacklist->reportedUser->fname .' '. $blacklist->reportedUser->lname }}
                                 </td>
 
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
