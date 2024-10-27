@@ -59,9 +59,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         foreach ($students as $stud) {
             if(!($stud->attendance === $value)) {
-                $newAttendance = ($stud->attendance === 'Absent' || $stud->attendance === 'Pending') ? 'Present' : 'Absent';
-
-                $stud->attendance = $newAttendance;
+                $stud->attendance = $value;
                 $stud->save();
             }
         }

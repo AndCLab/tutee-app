@@ -74,7 +74,7 @@ new class extends Component {
     </div>
 
     {{-- collapse button --}}
-    <div class="absolute h-full left-full">
+    {{-- <div class="absolute h-full left-full">
         <div class="sticky top-0 flex h-screen justify-center items-center">
             <button @click='toggleSidenav' class="text-[#0F172A]">
                 <template x-if='!expanded'>
@@ -95,7 +95,7 @@ new class extends Component {
                 </template>
             </button>
         </div>
-    </div>
+    </div> --}}
 
 </div>
 
@@ -105,11 +105,11 @@ new class extends Component {
         return {
             expanded: false,
             initialize() {
-                this.expanded = JSON.parse(localStorage.getItem('sidenavOpen')) ?? false;
+                this.expanded = JSON.parse(localStorage.getItem('sidenavAdminOpen')) ?? false;
             },
             toggleSidenav() {
                 this.expanded = !this.expanded;
-                localStorage.setItem('sidenavOpen', JSON.stringify(this.expanded));
+                localStorage.setItem('sidenavAdminOpen', JSON.stringify(this.expanded));
             }
         }
     }
