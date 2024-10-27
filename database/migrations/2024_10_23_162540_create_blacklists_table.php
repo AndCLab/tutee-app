@@ -17,6 +17,11 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->timestamp('blocked_at')->nullable();
             $table->unsignedInteger('report_count')->default(0);
+            $table->enum('request', [
+                'Pending',
+                'Approved',
+                'Not Approved'
+            ])->nullable();
             $table->timestamps();
         });
     }

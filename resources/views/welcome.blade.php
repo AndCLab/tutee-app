@@ -30,21 +30,15 @@
                         <h1 class="uppercase font-bold text-4xl px-2 font-anton text-[#0C3B2E]">tutee</h1>
                     </div>
                     <div>
-                        @auth('admin')
-                            <p>
-                                Welcome {{ ucfirst(Auth::guard('admin')->user()->username)  }}!
-                            </p>
+                        @guest('web')
+                            @if (Route::has('login'))
+                                <livewire:welcome.navigation />
+                            @endif
                         @else
-                            @guest('web')
-                                @if (Route::has('login'))
-                                    <livewire:welcome.navigation />
-                                @endif
-                            @else
-                                <p>
-                                    Welcome {{ Auth::user()->fname . ' ' . Auth::user()->lname  }}!
-                                </p>
-                            @endguest
-                        @endauth
+                            <p>
+                                Welcome {{ Auth::user()->fname . ' ' . Auth::user()->lname  }}!
+                            </p>
+                        @endguest
                     </div>
                 </div>
             </div>
@@ -61,22 +55,16 @@
                     </div>
                     <span data-aos="fade-right" data-aos-duration="500" class="text-[#64748B] text-center md:text-start md:w-4/5">Enhance Learning and Efficiency with Our All-in-One Tutoring Platform.</span>
 
-                    @auth('admin')
-                        <x-admin-button data-aos="fade-right" data-aos-duration="500" href="{{ route('verify-request.admin') }}" class="sm:w-fit w-full text-center">
-                            Admin Dashboard
-                        </x-admin-button>
+                    @auth('web')
+                        <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ route($route) }}" class="sm:w-fit w-full text-center">
+                            Dashboard
+                        </x-primary-button>
                     @else
-                        @auth('web')
-                            <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ route($route) }}" class="sm:w-fit w-full text-center">
-                                Dashboard
+                        @if (Route::has('register'))
+                            <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ route('register') }}" class="sm:w-fit w-full text-center">
+                                Get Started
                             </x-primary-button>
-                        @else
-                            @if (Route::has('register'))
-                                <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ route('register') }}" class="sm:w-fit w-full text-center">
-                                    Get Started
-                                </x-primary-button>
-                            @endif
-                        @endauth
+                        @endif
                     @endauth
                 </div>
 

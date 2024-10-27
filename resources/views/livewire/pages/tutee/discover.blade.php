@@ -33,27 +33,24 @@ new #[Layout('layouts.app')] class extends Component {
                                 ->toArray();
     }
 
-    public function validation()
+    public function post()
     {
-        $this->validate([
+        $tutee = Tutee::where('user_id', Auth::id())->first();
+
+        $rules = [
             'post_desc' => ['required', 'string', 'max:255'],
             'class_fields' => ['required'],
             'class_date' => ['required', 'date'],
             'class_fee' => ['required', 'numeric'],
             'class_category'=> ['required'],
             'class_type' => ['required'],
-        ]);
-    }
-
-    public function post()
-    {
-        $tutee = Tutee::where('user_id', Auth::id())->first();
+        ];
 
         if ($this->class_type === 'physical') {
             $rules['class_location'] = ['required', 'string', 'max:255'];
         }
 
-        $this->validation();
+        $this->validate($rules);
 
         if ($this->class_type === 'virtual') {
             $this->class_location = '';

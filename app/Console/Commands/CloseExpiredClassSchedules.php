@@ -26,10 +26,13 @@ class CloseExpiredClassSchedules extends Command
 
     protected $description = 'Close class schedules that have passed their end date';
 
-
     /*
         run this command:
         php artisan schedule:work
+
+        or
+
+        php artisan class:close-expired
     */
 
     /**

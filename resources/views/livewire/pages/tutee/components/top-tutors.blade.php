@@ -9,13 +9,13 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function with(): array
     {
-        $getFields = Fields::where('user_id', Auth::id())
-                                ->where('active_in', Auth::user()->user_type)
-                                ->get(['field_name'])
-                                ->toArray();
+        $getFields = array_map('strtolower', Fields::where('user_id', Auth::id())
+                           ->where('active_in', Auth::user()->user_type)
+                           ->pluck('field_name')
+                           ->toArray());
 
         $allTutors = Tutor::whereHas('user.fields', function ($query) use ($getFields){
-                                $query->whereIn('field_name', $getFields);
+                                $query->whereIn(DB::raw('LOWER(field_name)'), $getFields);
                             })
                             ->orderBy('average_rating', 'desc')->get();
 

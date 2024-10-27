@@ -15,6 +15,7 @@ class Blacklist extends Model
         'reported_user_id',
         'blocked_at',
         'report_count',
+        'request',
     ];
 
     public function reportedUser()
