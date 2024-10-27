@@ -12,7 +12,7 @@ new #[Layout('layouts.admin')] class extends Component {
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-xl mx-auto">
+        <div class="max-w-sm mx-auto">
             <livewire:profile.update-password-form />
         </div>
     </div>

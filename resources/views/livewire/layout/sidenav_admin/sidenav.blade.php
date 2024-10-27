@@ -11,7 +11,7 @@ new class extends Component {
     {
         $logout();
 
-        $this->redirect(route('login.admin'), navigate: true);
+        $this->redirect('/admin/login', navigate: true);
     }
 }; ?>
 
@@ -23,7 +23,7 @@ new class extends Component {
 
 --}}
 
-<div class="hidden sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
+<div class="hidden z-50 sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
 
     {{-- sidenav container --}}
     <div class="flex h-screen flex-col sticky top-0 justify-between border-e bg-[#0F172A] w-64">

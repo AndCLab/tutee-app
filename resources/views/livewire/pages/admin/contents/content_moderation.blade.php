@@ -3,6 +3,7 @@
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 use App\Models\ReportContent;
 
 new #[Layout('layouts.admin')] class extends Component {
@@ -96,212 +97,248 @@ new #[Layout('layouts.admin')] class extends Component {
     <x-slot name="header">
     </x-slot>
 
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 p-6">
-        <p class="capitalize font-semibold text-xl">Content Moderation</p>
-    </div>
+    <div class="py-10">
+        <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
 
-    <div class="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-6">
-        <div>
-            {{-- search filter --}}
-            <div class="sm:inline-flex sm:justify-between sm:items-center mb-4 w-full">
-                {{-- Search content... --}}
-                <div class="w-full sm:w-2/6">
-                    <x-wui-input placeholder='Search a report content...' wire:model.live='search' shadowless/>
-                </div>
+            <div>
+                {{-- search filter --}}
+                <div class="md:grid md:grid-row items-start gap-5">
+                    <p class="capitalize font-semibold text-xl">Content Moderation</p>
+                    <div class="sm:inline-flex sm:justify-between sm:items-center mb-4 w-full">
+                        <div class="sm:inline-flex sm:items-center gap-2 space-y-2 sm:space-y-0">
+                            {{-- Search content... --}}
+                            <div class="w-full sm:w-5/6">
+                                <x-wui-input placeholder='Search a report content...' wire:model.live='search' shadowless/>
+                            </div>
 
-                {{-- Report Option --}}
-                <div>
-                    <x-wui-select
-                        wire:model.live="report_options" placeholder="Select Report Option/s" multiselect shadowless>
-                        @foreach ($availableOptions as $option)
-                            <x-wui-select.option label="{{ $option }}"
-                                value="{{ $option }}" />
-                        @endforeach
-                    </x-wui-select>
-                </div>
+                            {{-- Report Option --}}
+                            <div class="w-full sm:w-80">
+                                <x-wui-select
+                                    wire:model.live="report_options" placeholder="Select Report Option/s" multiselect shadowless>
+                                    @foreach ($availableOptions as $option)
+                                        <x-wui-select.option label="{{ $option }}"
+                                            value="{{ $option }}" />
+                                    @endforeach
+                                </x-wui-select>
+                            </div>
+                        </div>
 
-                @if ($selected || $selectAll)
-                    <div class="mt-2 sm:mt-0">
-                        <x-wui-dropdown class="w-full">
-                            <x-slot name="trigger">
-                                <x-wui-button label="Update Status" flat green sm icon='clipboard-check'/>
-                            </x-slot>
+                        @if ($selected || $selectAll)
+                            <div class="mt-2 sm:mt-0">
+                                <x-wui-dropdown class="w-full">
+                                    <x-slot name="trigger">
+                                        <x-wui-button label="Update Status" flat green sm icon='clipboard-check'/>
+                                    </x-slot>
 
-                            <x-wui-dropdown.item label="Approved" wire:click="reportContentStatus('Approved')"/>
-                            <x-wui-dropdown.item label="Not Approved" wire:click="reportContentStatus('Not Approved')"/>
-                        </x-wui-dropdown>
+                                    <x-wui-dropdown.item label="Approved" wire:click="reportContentStatus('Approved')"/>
+                                    <x-wui-dropdown.item label="Not Approved" wire:click="reportContentStatus('Not Approved')"/>
+                                </x-wui-dropdown>
+                            </div>
+                        @endif
                     </div>
-                @endif
 
-            </div>
 
-            {{-- table --}}
-            <div class="overflow-x-auto rounded-lg border border-gray-200 soft-scrollbar">
-                <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm" wire:loading.class='opacity-60'>
-                    <thead>
-                        <tr>
-                            <th class="text-start whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                <x-wui-checkbox id="selectAll" wire:model.live="selectAll" />
-                            </th>
+                </div>
 
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'lname',
-                                'displayName' => 'Reporter'
-                            ])
-
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'lname',
-                                'displayName' => 'Reported'
-                            ])
-
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'date_reported',
-                                'displayName' => 'Reported Date'
-                            ])
-
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'report_option',
-                                'displayName' => 'Report Option'
-                            ])
-
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'status',
-                                'displayName' => 'Status'
-                            ])
-
-                            @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
-                                'name' => 'action',
-                                'displayName' => 'Action'
-                            ])
-                        </tr>
-                    </thead>
-
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse($report_contents as $report)
+                {{-- table --}}
+                <div class="overflow-x-auto rounded-lg border border-gray-200 soft-scrollbar">
+                    <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm" wire:loading.class='opacity-60'>
+                        <thead>
                             <tr>
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    <x-wui-checkbox id="selected" value="{{ $report->id }}" wire:model.live="selected"/>
-                                </td>
+                                <th class="text-start whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                    <x-wui-checkbox id="selectAll" wire:model.live="selectAll" />
+                                </th>
 
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                      {{ $report->reporter->fname .' '. $report->reporter->lname }}
-                                </td>
+                                @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                    'name' => 'lname',
+                                    'displayName' => 'Reporter'
+                                ])
 
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    @if($report->class)
-                                        {{ $report->class->tutor->user->fname .' '. $report->class->tutor->user->lname }}
-                                    @elseif($report->post)
-                                        {{ $report->post->tutees->user->fname .' '. $report->post->tutees->user->lname }}
-                                    @endif
-                                </td>
+                                @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                    'name' => 'lname',
+                                    'displayName' => 'Reported'
+                                ])
 
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    {{ $report->date_reported }}
-                                </td>
+                                @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                    'name' => 'date_reported',
+                                    'displayName' => 'Reported Date'
+                                ])
 
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    {{ $report->report_option }}
-                                </td>
+                                @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                    'name' => 'report_option',
+                                    'displayName' => 'Report Option'
+                                ])
 
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                    {{ $report->status }}
-                                </td>
+                                @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                    'name' => 'status',
+                                    'displayName' => 'Status'
+                                ])
 
-                                <td class="whitespace-nowrap px-4 py-1 text-gray-700">
-                                    <x-wui-button slate xs class="w-full" label="View Content"
-                                    wire:click="openContentModal({{ $report->id }})"/>
-                                </td>
+                                @include('livewire.pages.tutor.schedule.includes.sort-icons-table', [
+                                    'name' => 'action',
+                                    'displayName' => 'Action'
+                                ])
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="whitespace-nowrap px-4 py-2 text-gray-700 text-center">
-                                    <span class="font-semibold text-xl antialiased">
-                                        Empty
-                                    </span>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-200">
+                            @forelse($report_contents as $report)
+                                <tr>
+                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                        <x-wui-checkbox id="selected" value="{{ $report->id }}" wire:model.live="selected"/>
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                          {{ $report->reporter->fname .' '. $report->reporter->lname }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                        @if($report->class)
+                                            {{ $report->class->tutor->user->fname .' '. $report->class->tutor->user->lname }}
+                                        @elseif($report->post)
+                                            {{ $report->post->tutees->user->fname .' '. $report->post->tutees->user->lname }}
+                                        @endif
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                        {{ Carbon::parse($report->date_reported)->format('F d, Y') }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                        {{ $report->report_option }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                        <div @class([
+                                            'text-[#198754]' => $report->status === 'Approved',
+                                            'text-[#871919]' => $report->status === 'Not Approved',
+                                        ])>
+                                            {{ $report->status }}
+                                        </div>
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-4 py-1 text-gray-700">
+                                        <x-wui-button slate xs class="w-full" label="View Content"
+                                        wire:click="openContentModal({{ $report->id }})"
+                                        spinner="openContentModal({{ $report->id }})"/>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="whitespace-nowrap px-4 py-2 text-gray-700 text-center">
+                                        <span class="font-semibold text-xl antialiased">
+                                            Empty
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- pagination --}}
+                <div class="mt-4">
+                    @if ($perPage > 5)
+                        <div class="w-full sm:w-[7rem] mb-4 sm:mb-0">
+                            <x-wui-select
+                                placeholder='Per Page'
+                                wire:model.live="perPage"
+                                shadowless
+                            >
+                                <x-wui-select.option label="5" value="5" />
+                                <x-wui-select.option label="10" value="10" />
+                                <x-wui-select.option label="20" value="20" />
+                            </x-wui-select.option>
+                        </div>
+                    @endif
+                    {{ $report_contents->links() }}
+                </div>
             </div>
         </div>
     </div>
 
     @if ($getContent)
     {{-- View Content Modal --}}
-    <x-wui-modal.card wire:model="viewContentModal" class="space-y-3" align='center' max-width='xl'>
-        <div class="flex gap-2 items-start">
-            <div class="size-16">
-                <img
-                    alt="Reporter Avatar"
-                    src="{{ $getContent->reporter->avatar ? Storage::url($getContent->reporter->avatar) : asset('images/default.jpg') }}"
-                    class="rounded-full object-cover border border-[#F1F5F9] overflow-hidden"
-                />
-            </div>
-            <div class="w-full space-y-2">
-                <p class="flex gap-2 font-semibold">
-                    {{ $getContent->reporter->fname .' '. $getContent->reporter->lname}}
-                </p>
-            </div>
-        </div>
+    <x-wui-modal.card wire:model="viewContentModal" align='center' max-width='xl'>
+        <div class="space-y-2">
+            <div class="flex gap-2 items-start">
+                <div class="size-16">
+                    <img
+                        alt="Reporter Avatar"
+                        src="{{ $getContent->reporter->avatar ? Storage::url($getContent->reporter->avatar) : asset('images/default.jpg') }}"
+                        class="rounded-full object-cover border border-[#F1F5F9] overflow-hidden"
+                    />
+                </div>
+                <div class="w-full space-y-1">
+                    <p class="flex gap-2 font-semibold">
+                        Reported by:
+                        <span class="font-light">
+                            {{ $getContent->reporter->fname .' '. $getContent->reporter->lname}}
+                        </span>
+                    </p>
 
-        {{-- class name --}}
-        <div class="flex flex-col font-semibold">
-            Reason
-            <span class="font-light">
-                {{ $getContent->report_option}}
-            </span>
-        </div>
-
-        {{-- class description --}}
-        <div class="flex flex-col font-semibold">
-            <div class="flex gap-2 items-center">
-                Feedback
+                    {{-- reason --}}
+                    <div class="font-semibold">
+                        Reason:
+                        <span class="font-light">
+                            {{ $getContent->report_option}}
+                        </span>
+                    </div>
+                </div>
             </div>
-            <span class="font-light">
-                {{ $getContent->comment}}
-            </span>
-        </div>
 
-        {{-- collapsable class details --}}
-        <div class="p-3 py-2 rounded-md bg-[#E1E7EC]" x-data="{ expanded: false }">
-            <div class="flex cursor-pointer justify-between items-center" @click="expanded = ! expanded">
-                <span class="font-semibold text-sm">Reported Content Details</span>
-                <template x-if='expanded == false' x-transition>
-                    <x-wui-button xs label='View more' icon='arrow-down'
-                        flat />
-                </template>
-                <template x-if='expanded == true' x-transition>
-                    <x-wui-button xs label='View less' icon='arrow-up'
-                        flat />
-                </template>
-            </div>
-            <div class="text-sm" x-show="expanded" x-collapse x-cloak>
-                @if($getContent->class_id)
-                    <p>
-                        <strong>Class ID: </strong> {{ $getContent->class_id }}
-                    </p>
-                    <p>
-                        <strong>Class Name: </strong> {{ $getContent->class->class_name }}
-                    </p>
-                    <p>
-                        <strong>Class by: </strong> {{ $getContent->class->tutor->user->fname .' '. $getContent->class->tutor->user->lname }}
-                    </p>
-                @elseif ($getContent->post_id)
-                    <p>
-                        <strong>Post ID: </strong> {{ $getContent->post_id }}
-                    </p>
-                    <p>
-                        <strong>Post Description: </strong> {{ $getContent->post->post_desc }}
-                    </p>
-                    <p>
-                        <strong>Posted by: </strong> {{ $getContent->post->tutees->user->fname .' '. $getContent->post->tutees->user->lname}}
-                    </p>
-                @endif
+            {{-- feedback --}}
+            @if ($getContent->comment)
+                <div class="flex flex-col font-semibold">
+                    <div class="flex gap-2 items-center">
+                        Feedback
+                    </div>
+                    <span class="font-light">
+                        {{ $getContent->comment }}
+                    </span>
+                </div>
+            @endif
 
-                <p>
-                    <strong>Report Status: </strong> {{ $getContent->status }}
-                </p>
+            {{-- collapsable class details --}}
+            <div class="p-3 py-2 rounded-md bg-[#E1E7EC]" x-data="{ expanded: true }">
+                <div class="flex cursor-pointer justify-between items-center" @click="expanded = ! expanded">
+                    <span class="font-normal text-lg">Reported Content Details</span>
+                    <template x-if='expanded == false' x-transition>
+                        <x-wui-button xs label='View more' icon='arrow-down'
+                            flat />
+                    </template>
+                    <template x-if='expanded == true' x-transition>
+                        <x-wui-button xs label='View less' icon='arrow-up'
+                            flat />
+                    </template>
+                </div>
+                <div class="text-sm pt-3" x-show="expanded" x-collapse x-cloak>
+                    @if($getContent->class_id)
+                        <p>
+                            <strong>Class ID: </strong> {{ $getContent->class_id }}
+                        </p>
+                        <p>
+                            <strong>Class Name: </strong> {{ $getContent->class->class_name }}
+                        </p>
+                        <p>
+                            <strong>Class by: </strong> {{ $getContent->class->tutor->user->fname .' '. $getContent->class->tutor->user->lname }}
+                        </p>
+                    @elseif ($getContent->post_id)
+                        <p>
+                            <strong>Post ID: </strong> {{ $getContent->post_id }}
+                        </p>
+                        <p>
+                            <strong>Post Description: </strong> {{ $getContent->post->post_desc }}
+                        </p>
+                        <p>
+                            <strong>Posted by: </strong> {{ $getContent->post->tutees->user->fname .' '. $getContent->post->tutees->user->lname}}
+                        </p>
+                    @endif
+
+                    <p>
+                        <strong>Report Status: </strong> {{ $getContent->status }}
+                    </p>
+                </div>
             </div>
         </div>
 
