@@ -92,13 +92,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
         $this->call(ClassesSeeder::class);
-
-        // Adding the Tutor and Tutee Notification seeders
-        $this->call(TutorNotificationsSeeder::class);
-        $this->call(TuteeNotificationsSeeder::class);
-
-        // $this->call(ClassesSeeder::class);
-        // $this->call(ClassRosterSeeder::class);
+        $this->call(NotificationsSeeder::class);
 
         User::factory(10)->create();
 

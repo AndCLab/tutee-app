@@ -50,6 +50,14 @@ new #[Layout('layouts.app')] class extends Component {
             }
 
 
+            $specificDate = $this->getClass->schedule->recurring_schedule->first()->dates ?? null; // Get the first date
+            $this->dispatch('class-joined', [
+                'tutee_id' => $tutee_id,
+                'class_id' => $this->getClass->id,
+                'schedule_id' => $this->getClass->schedule_id,
+                'specific_date' => $specificDate // Pass the specific date
+            ]);
+
             $this->notification([
                 'title'       => 'Success',
                 'description' => 'Successfully Joined Class',

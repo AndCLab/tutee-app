@@ -12,10 +12,13 @@
     </x-wui-dropdown> --}}
 
 
-    <x-wui-dropdown wire:ignore >
+    <x-wui-dropdown >
 
-        <x-slot name="trigger">
-            <livewire:message-icon />
+        <x-slot name="trigger" >
+            <div class="text-black hover:text-gray-600 transform hover:scale-110 hover:shadow-lg transition duration-150 ease-in-out">
+                <livewire:message-icon />
+            </div>
+
         </x-slot>
 
         <livewire:messages />
@@ -23,9 +26,12 @@
 
 
     {{-- Notification Dropdown --}}
-    <x-wui-dropdown wire:ignore >
-        <x-slot name="trigger">
-            <livewire:notification-icon />
+    <x-wui-dropdown >
+        <x-slot name="trigger" >
+            <div class="text-black hover:text-gray-600 transform hover:scale-110 hover:shadow-lg transition duration-150 ease-in-out">
+                <livewire:notification-icon />
+            </div>
+
         </x-slot>
 
         <!-- Display Notifications inside the dropdown -->

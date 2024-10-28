@@ -17,6 +17,7 @@ use App\Models\ClassRoster;
 use App\Models\Review;
 use App\Models\Fields;
 use App\Models\Bookmark;
+use App\Events\ClassJoined;
 
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
@@ -191,10 +192,19 @@ new #[Layout('layouts.app')] class extends Component {
                 'tutee_id' => $tutee_id,
             ]);
 
+            // Update class student count
             if ($roster->classes->class_students > 0) {
                 $roster->classes->class_students--;
                 $roster->classes->save();
             }
+
+            $specificDate = $this->getClass->schedule->recurring_schedule->first()->dates ?? null; // Get the first date
+            $this->dispatch('class-joined', [
+                'tutee_id' => $tutee_id,
+                'class_id' => $this->getClass->id,
+                'schedule_id' => $this->getClass->schedule_id,
+                'specific_date' => $specificDate // Pass the specific date
+            ]);
 
 
             $this->notification([
