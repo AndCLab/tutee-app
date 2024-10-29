@@ -46,7 +46,7 @@ class Notifications extends Component
             })
             ->toArray();
 
-        $this->updateUnreadCount();
+        // $this->updateUnreadCount();
     }
 
     #[On('class-joined')] // Listen for the class-joined event
@@ -201,15 +201,17 @@ class Notifications extends Component
             }
         }
 
-        $this->dispatch('notificationNum-updated');
-        $this->updateUnreadCount();
+        // $this->dispatch('notificationNum-updated'); //no need, as notificationNum is updated when read because it refreshes and mounts
+        // $this->updateUnreadCount();
 
         // Call the route function to determine where to redirect the user
         return $this->routeToPageBasedOnRole(Auth::user()->user_type, $notification);
     }
 
+    #[On('notificationCount-updated')] // Listen for the update count event
     public function updateUnreadCount()
     {
+        \Log::error('notification count updated in notifications component');
         $user = Auth::user();
 
         $this->unreadCount = Notification::where('user_id', $user->id)

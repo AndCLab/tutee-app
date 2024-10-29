@@ -12,7 +12,6 @@
         <span class="absolute top-[-0.5rem] right-0 inline-block text-center leading-none text-white bg-red-600 rounded-full py-1 px-1 text-xs">
             {{ $unreadCountCurrentRole }}
         </span>
-        uNREAD
         {{-- red dot display only --}}
         {{-- <span class="absolute top-[-0.25rem] right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span> --}}
     @endif
