@@ -19,28 +19,35 @@ class NotificationIcon extends Component
     {
         \Log::error('Notif Icon Mounting');
         $user = Auth::user();
-        
+
         // Get the current role
         $this->currentRole = $user->user_type;
         \Log::info('Current Role:', ['current_role' => $this->currentRole]);
 
-
         $this->updateUnreadCount();
+        $this->dispatchUnreadCount();
     }
 
-    #[On('notificationNum-updated')]
+    public function dispatchUnreadCount(){
+        $this->dispatch('notificationCount-updated');
+        \Log::info('Dispatching notificationCount-updated event');
+    }
+
+
+    // #[On('notificationCount-updated')]
+
+
+    #[On('fetch-notifications')]
     public function updateUnreadCount()
     {
-        $this->dispatch('notificationCount-updated');
-        
-        \Log::error('Notif Numbers Updated');
+
         $user = Auth::user();
 
         // Fetch all unread notifications for this user
         $this->totalNotifications = Notification::where('user_id', $user->id)
                 ->where('read', false)
                 ->get();
-    
+
             \Log::info('Total Notifications:', [
                 'count' => $this->totalNotifications->count(),
                 'user_id' => $user->id
@@ -68,8 +75,11 @@ class NotificationIcon extends Component
             'unread_count_other_role' => $this->unreadCountOtherRole,
         ]);
 
-        
+
+        // $this->dispatchUnreadCount();
     }
+
+
 
     public function render()
     {

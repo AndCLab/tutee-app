@@ -1,4 +1,4 @@
-<div class="w-80 p-4 bg-white shadow-lg rounded-lg h-full relative">
+<div wire:poll.5s="dispatchLoading" class="w-80 p-4 bg-white shadow-lg rounded-lg h-full relative">
     <h2 class="text-lg font-semibold mb-4">
         Notifications
         ({{ $unreadCount }})
@@ -96,4 +96,6 @@
             </ul>
         </div>
     @endif
+
+    <x-wui-notifications position="top-right" />
 </div>

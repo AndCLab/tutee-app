@@ -16,9 +16,14 @@ use Illuminate\Support\Facades\DB;
 use App\Events\ClassJoined; // Import the ClassJoined event
 use Carbon\Carbon;
 
+use Livewire\Attributes\Layout;
+use WireUi\Traits\Actions;
+
 
 class Notifications extends Component
 {
+    use Actions;
+
     public $notifications = [];
     public $unreadCount;
     public $pages = 5;
@@ -27,8 +32,15 @@ class Notifications extends Component
     {
         $this->unreadCount = 0 ;
         $this->loadNotifications();
+        $this->updateUnreadCount();
     }
 
+    public function dispatchLoading()
+    {
+        $this->dispatch('fetch-notifications');
+    }
+
+    #[On('fetch-notifications')]
     public function loadNotifications($pages = 5)
     {
         $user = Auth::user();
@@ -46,6 +58,7 @@ class Notifications extends Component
             })
             ->toArray();
 
+            // $this->dispatch('fetch-notifications');
         // $this->updateUnreadCount();
     }
 
@@ -172,10 +185,16 @@ class Notifications extends Component
 
         \Log::info('Tutor Notification Created:', ['notification_id' => $tutorNotification->id]);
 
+        $this->notification([
+            'title'       => 'Success',
+            'description' => 'You have a joined a class',
+            'icon'        => 'success',
+            'timeout'     => 2500,
+        ]);
         // Reload notifications to include the new ones
 
-        $this->dispatch('notificationNum-updated');
-        $this->loadNotifications();
+        // $this->dispatchLoading();
+        // $this->loadNotifications();
     }
 
     public function markAsRead($notificationId)
@@ -201,7 +220,7 @@ class Notifications extends Component
             }
         }
 
-        // $this->dispatch('notificationNum-updated'); //no need, as notificationNum is updated when read because it refreshes and mounts
+        // $this->dispatch('fetch-notifications'); //no need, as notificationNum is updated when read because it refreshes and mounts
         // $this->updateUnreadCount();
 
         // Call the route function to determine where to redirect the user
@@ -211,7 +230,8 @@ class Notifications extends Component
     #[On('notificationCount-updated')] // Listen for the update count event
     public function updateUnreadCount()
     {
-        \Log::error('notification count updated in notifications component');
+        \Log::info('updateUnreadCount method triggered');
+
         $user = Auth::user();
 
         $this->unreadCount = Notification::where('user_id', $user->id)

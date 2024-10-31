@@ -50,6 +50,7 @@ new #[Layout('layouts.app')] class extends Component {
             }
 
 
+            //Add notifications to joined class
             $specificDate = $this->getClass->schedule->recurring_schedule->first()->dates ?? null; // Get the first date
             $this->dispatch('class-joined', [
                 'tutee_id' => $tutee_id,
