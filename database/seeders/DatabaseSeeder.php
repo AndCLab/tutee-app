@@ -69,9 +69,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
-        $this->call(ClassesSeeder::class);
+        // $this->call(ClassesSeeder::class);
         // $this->call(ClassRosterSeeder::class);
-        // $this->call(TutorSeeder::class);
-        // $this->call(TuteeSeeder::class);
     }
 }

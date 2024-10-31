@@ -70,6 +70,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $this->class_roster_payment->payment_status = 'Pending';
             }
             $this->class_roster_payment->proof_of_payment = $filePath;
+            $this->class_roster_payment->date_of_upload = Carbon::now();
             $this->class_roster_payment->save();
         }
 

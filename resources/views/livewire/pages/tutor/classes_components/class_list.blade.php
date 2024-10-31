@@ -190,7 +190,8 @@ new #[Layout('layouts.app')] class extends Component {
     {{-- Class List: Class Cards --}}
     <div class="space-y-3">
         @forelse ($classes as $class)
-            <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4" wire:loading.remove>
+            <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4
+                {{ $class->schedule->initial_start_date < Carbon::now()->format('Y-m-d') ? 'border border-red-300 bg-red-50' : '' }}" wire:loading.remove>
                 <div class="space-y-1">
                     <div class="flex justify-between items-center">
                         <div class="inline-flex items-center gap-2">
@@ -202,6 +203,10 @@ new #[Layout('layouts.app')] class extends Component {
                                 @if ($class->schedule->never_end == 1)
                                     <x-wui-badge flat zinc label="Closing this class is manual" />
                                 @endif
+                            @endif
+
+                            @if ($class->schedule->initial_start_date < Carbon::now()->format('Y-m-d'))
+                                <x-wui-badge flat negative label="This class schedule has passed" />
                             @endif
                         </div>
                         @if ($class->class_status == 1)
@@ -232,7 +237,9 @@ new #[Layout('layouts.app')] class extends Component {
                     {{ $class->class_description }}
                 </p>
                 <div x-data="{ expanded: false }">
-                    <div class="text-sm p-3 rounded-md bg-[#E1E7EC]" x-show="expanded" x-collapse x-cloak>
+                    <div class="text-sm p-3 rounded-md bg-[#E1E7EC]
+                        {{ $class->schedule->initial_start_date < Carbon::now()->format('Y-m-d') ? 'bg-red-100' : '' }}"
+                        x-show="expanded" x-collapse x-cloak>
                         <p>
                             <strong>Class Status:</strong> {{ $class->class_status == 1 ? 'Open' : 'Closed' }}
                         </p>

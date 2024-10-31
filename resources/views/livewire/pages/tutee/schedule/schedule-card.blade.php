@@ -26,9 +26,9 @@
                         <div class="flex w-full items-center justify-between gap-2">
                             <div class="inline-flex gap-2 items-center">
                                 <p class="text-[#8F8F8F] font-medium truncate w-[8rem] md:w-60 lg:w-fit">
-                                    {{ $item['class_details']->schedule->id }}
+                                    {{-- {{ $item['class_details']->schedule->id }}
                                     {{ $item['class_details']->id }}
-                                    {{ $item['class_roster_id'] }}
+                                    {{ $item['class_roster_id'] }} --}}
                                     {{ $item['class_details']->class_name }}
                                 </p>
                                 @if ($item['class_details']->class_category == 'group')

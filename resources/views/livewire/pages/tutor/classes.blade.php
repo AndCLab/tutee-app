@@ -251,6 +251,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         // schedule
         $scheduleData = [
+            'initial_start_date' => $this->sched_initial_date,
             'start_time' => $this->start_time,
             'tutor_id' => $tutor->id,
             'end_time' => $this->end_time,

@@ -3,10 +3,13 @@
 use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use Carbon\Carbon;
 use WireUi\Traits\Actions;
 use App\Models\Classes;
 use App\Models\ClassRoster;
 use App\Models\ReportContent;
+use App\Models\RecurringSchedule;
+use App\Models\Registration;
 use App\Models\Blacklist;
 use App\Models\Fields;
 use App\Models\Tutee;
@@ -16,6 +19,8 @@ new #[Layout('layouts.app')] class extends Component {
 
     // properties
     public $getClass;
+    public $getRecurringDates;
+    public $getRegistration;
     public $selectedOption;
     public $comment;
 
@@ -28,6 +33,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $showReportPostModal;
     public $showClassModal;
     public $showPostModal;
+    public $showRecurringDates;
     public $pages = 5;
 
     public function joinClass()
@@ -74,6 +80,20 @@ new #[Layout('layouts.app')] class extends Component {
         $this->getClass = Classes::findOrFail($class_id);
     }
 
+    public function viewRecurringDates()
+    {
+        $this->showRecurringDates = true;
+        $this->getRecurringDates = RecurringSchedule::where('schedule_id', $this->getClass->schedule->id)
+                                ->orderBy('dates', 'asc')
+                                ->get();
+        if ($this->getClass->class_category == 'group') {
+            $this->getRegistration = Registration::whereHas('classes', function ($query) {
+                                        $query->where('registration_id', $this->getClass->registration_id)
+                                            ->orderBy('start_date', 'asc');
+                                    })->first();
+        }
+    }
+
     public function loadMore()
     {
         $this->pages += 5;
@@ -86,11 +106,23 @@ new #[Layout('layouts.app')] class extends Component {
                            ->pluck('field_name')
                            ->toArray());
 
-        $classes = Classes::whereHas('tutor', function ($query) use ($getFields) {
-                        $query->whereNotNull('tutor_id')
-                            ->whereHas('user.fields', function ($subQuery) use ($getFields) {
-                                $subQuery->whereIn('field_name', $getFields);
-                            });
+        $classes = Classes::where(function($query) use ($getFields) {
+                        foreach ($getFields as $field) {
+                            $query->orWhereRaw('LOWER(class_fields) LIKE ?', "%{$field}%");
+                        }
+                    })
+                    ->whereHas('schedule', function ($query) {
+                        $query->where('initial_start_date', '>=', Carbon::now()->format('Y-m-d'));
+                    })
+                    ->where(function ($query) {
+                        // include classes with registrations
+                        $query->whereHas('registration', function ($query) {
+                            $query->whereNotNull('start_date')
+                                ->whereNotNull('end_date')
+                                ->where('end_date', '>=', Carbon::now());
+                        })
+                        // include classes without registrations
+                        ->orWhereDoesntHave('registration');
                     })
                     ->where('class_students', '>' , 0)
                     ->take($this->pages)
@@ -280,6 +312,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     {{-- report content --}}
     @include('livewire.pages.report_contents.report_class')
+
+    <!-- Class View Modal -->
+    @include('livewire.pages.tutee.post_components.modals.view-recurring-dates')
 
     <x-wui-notifications position="bottom-right" />
 
