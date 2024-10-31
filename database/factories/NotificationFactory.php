@@ -52,7 +52,7 @@ class NotificationFactory extends Factory
             'notifiable_id' => $user ? $user->id : null, // Set notifiable_id to the selected user's ID
             'title' => $this->faker->sentence,
             'content' => $this->faker->paragraph,
-            'type' => $this->faker->randomElement(['venue', 'schedule', 'assignment', 'payment', 'attendance']),
+            'type' => $this->faker->randomElement(['joinClass', 'editClass', 'assignment', 'payment', 'attendance']),
             'role' => $this->faker->randomElement(['tutor', 'tutee']),
         ];
     }

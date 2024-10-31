@@ -1,4 +1,4 @@
-<div wire:poll.5s="dispatchLoading" class="w-80 p-4 bg-white shadow-lg rounded-lg h-full relative">
+<div wire:poll.5s="loadNotifications" class="w-80 p-4 bg-white shadow-lg rounded-lg h-full relative">
     <h2 class="text-lg font-semibold mb-4">
         Notifications
         ({{ $unreadCount }})
@@ -39,14 +39,14 @@
                                 <div class="flex items-center">
                                     <div class="flex items-center">
                                             <!-- Notification Icon (SVG) -->
-                                            @if($notif['type'] === 'venue')
+                                            @if($notif['type'] === 'editClass')
                                             <svg class="mr-3 h-6 w-6" style="color:#0C3B2E" width="256px" height="256px" viewBox="0 0 24 24" fill="#0C3B2E" xmlns="http://www.w3.org/2000/svg">
                                                 <!-- Venue SVG -->
                                                 <g fill="#0C3B2E">
                                                     <path fill="currentColor" d="M17.657 5.304c-3.124-3.073-8.189-3.073-11.313 0a7.78 7.78 0 0 0 0 11.13L12 21.999l5.657-5.565a7.78 7.78 0 0 0 0-11.13zM12 13.499c-.668 0-1.295-.26-1.768-.732a2.503 2.503 0 0 1 0-3.536c.472-.472 1.1-.732 1.768-.732s1.296.26 1.768.732a2.503 2.503 0 0 1 0 3.536c-.472.472-1.1.732-1.768.732z"/>
                                                 </g>
                                             </svg>
-                                            @elseif($notif['type'] === 'schedule')
+                                            @elseif($notif['type'] === 'joinClass')
                                             <svg class="mr-3 h-6 w-6" style="color:#0C3B2E" width="256px" height="256px" viewBox="0 0 24 24" fill="#0C3B2E" xmlns="http://www.w3.org/2000/svg">
                                                 <!-- Schedule SVG -->
                                                 <g fill="#0C3B2E">
@@ -97,5 +97,5 @@
         </div>
     @endif
 
-    <x-wui-notifications position="top-right" />
+    {{-- <x-wui-notifications position="bottom-right" /> --}}
 </div>

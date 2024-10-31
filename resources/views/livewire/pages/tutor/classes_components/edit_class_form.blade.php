@@ -482,6 +482,53 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Notify user of success
         $this->sendNotification('Updated Class!', 'Successfully updated!', 'success');
+
+
+        // Retrieve all tutees associated with this class from the class_rosters table
+        $tutees = ClassRoster::where('class_id', $this->class->id)->pluck('tutee_id');
+
+        // Get the specific date (first date from recurring schedule)
+        $specificDate = $this->class->schedule->recurring_schedule->first()->dates ?? null;
+
+        // Check if there are any tutees
+        if ($tutees->isEmpty()) {
+            // Log that no tutees were found
+            \Log::warning('No tutees found for class ID: ' . $this->class->id);
+
+            // Dispatch the event for the tutor with null tutee_id
+            $this->dispatch('class-edited', [
+                'class_id' => $this->class->id,
+                'schedule_id' => $this->class->schedule_id,
+                'specific_date' => $specificDate, // Pass the specific date
+                'tutee_id' => null, // Explicitly pass null for tutee_id
+            ]);
+
+            // Log the values for the dispatch
+            \Log::info('Dispatching class-edited event for tutor with no tutees:', [
+                'class_id' => $this->class->id,
+                'schedule_id' => $this->class->schedule_id,
+                'specific_date' => $specificDate,
+                'tutee_id' => null,
+            ]);
+        } else {
+            // Loop through each tutee and dispatch the event
+            foreach ($tutees as $tuteeId) {
+                $this->dispatch('class-edited', [
+                    'class_id' => $this->class->id,
+                    'schedule_id' => $this->class->schedule_id,
+                    'specific_date' => $specificDate, // Pass the specific date
+                    'tutee_id' => $tuteeId, // Pass the tutee ID
+                ]);
+
+                // Log the values before dispatching the event
+                \Log::info('Dispatching class-edited event with data:', [
+                    'class_id' => $this->class->id,
+                    'schedule_id' => $this->class->schedule_id,
+                    'specific_date' => $specificDate, // Pass the specific date
+                    'tutee_id' => $tuteeId, // Pass the tutee ID
+                ]);
+            }
+        }
     }
 
 }; ?>

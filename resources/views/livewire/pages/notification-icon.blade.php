@@ -1,4 +1,8 @@
-<div wire:poll.5s="dispatchUnreadCount" >
+
+
+
+
+<div wire:poll.5s="updateUnreadCount" >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
         fill="#292D32" class="icon icon-tabler icons-tabler-filled icon-tabler-bell">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -16,5 +20,7 @@
         {{-- <span class="absolute top-[-0.25rem] right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span> --}}
     @endif
 
+    {{-- <x-wui-notifications position="bottom-right" /> --}}
 
 </div>
+

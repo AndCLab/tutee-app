@@ -8,36 +8,43 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
+use Livewire\Attributes\Layout;
+use WireUi\Traits\Actions;
+
 class NotificationIcon extends Component
 {
+    use Actions;
     public $unreadCountCurrentRole = 0;
     public $unreadCountOtherRole = 0;
     public $currentRole;
     public $totalNotifications;
+    public $shouldNotify = true; // Flag variable
 
     public function mount()
     {
         \Log::error('Notif Icon Mounting');
         $user = Auth::user();
-
         // Get the current role
         $this->currentRole = $user->user_type;
         \Log::info('Current Role:', ['current_role' => $this->currentRole]);
 
+
+
         $this->updateUnreadCount();
-        $this->dispatchUnreadCount();
+        // $this->dispatchUnreadCount();
     }
 
-    public function dispatchUnreadCount(){
-        $this->dispatch('notificationCount-updated');
-        \Log::info('Dispatching notificationCount-updated event');
-    }
+
+    // public function dispatchUnreadCount(){
+    //     $this->dispatch('notificationCount-updated');
+    //     \Log::info('Dispatching notificationCount-updated event');
+    // }
 
 
     // #[On('notificationCount-updated')]
 
 
-    #[On('fetch-notifications')]
+    // #[On('fetch-notifications')]
     public function updateUnreadCount()
     {
 
@@ -75,11 +82,36 @@ class NotificationIcon extends Component
             'unread_count_other_role' => $this->unreadCountOtherRole,
         ]);
 
-
         // $this->dispatchUnreadCount();
+
+        // Only notify if the flag is true
+        // if ($this->shouldNotify) {
+        //     $this->notifyUser ();
+        // }
     }
 
 
+    public function rendered()
+    {
+        if ($this->shouldNotify) {
+            $this->notifyUser ();
+        }
+    }
+
+    public function notifyUser()
+    {
+        \Log::info('User Notified Now');
+
+        $unreadNotifs = "You have {$this->unreadCountCurrentRole} unread notifications";
+        $this->notification([
+            'title'       => 'Notification',
+            'description' => $unreadNotifs,
+            'icon'        => 'success',
+            'timeout'     => 2500,
+        ]);
+
+        $this->shouldNotify = false; // Set the flag to false after notifying
+    }
 
     public function render()
     {
