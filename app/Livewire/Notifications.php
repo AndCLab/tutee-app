@@ -71,6 +71,15 @@ class Notifications extends Component
                     ]);
                 }
 
+                if($user->user_type === 'tutor' && $newNotification->type === 'leaveClass'){
+                    $this->notification([
+                        'title'       => 'Success',
+                        'description' => 'Someone just left your class!',
+                        'icon'        => 'error',
+                        'timeout'     => 2500,
+                    ]);
+                }
+
                 if($user->user_type === 'tutee' && $newNotification->type === 'editClass'){
                     $this->notification([
                         'title'       => 'Success',
@@ -338,6 +347,88 @@ class Notifications extends Component
         \Log::info('Tutor Notification Created:', ['notification_id' => $tutorNotification->id]);
     }
 
+    #[On('class-left')] // Listen for the class-left event
+    public function handleClassLeft($data)
+    {
+        // Get the current authenticated user
+        $user = Auth::user();
+
+        // Check if the user is authenticated
+        if (!$user) {
+            \Log::error('No authenticated user when trying to create notification for class leave.');
+            return; // Handle the case where there is no authenticated user
+        }
+
+        \Log::info('Authenticated User:', ['user_id' => $user->id]);
+
+        // Fetch the class information
+        $class = Classes::findOrFail($data['class_id']); // No eager loading
+
+        // Log the class data for debugging
+        \Log::info('Class Data:', ['class' => $class]);
+
+        // Retrieve the tutor using the tutor_id from the Classes model
+        $tutor = Tutor::where('id', $class->tutor_id)->with('user')->first();
+
+        // Check if the tutor exists
+        if (!$tutor || !$tutor->user) {
+            \Log::error('Tutor not found for class ID: ' . $data['class_id']);
+            return; // Handle the case where the tutor does not exist
+        }
+
+        // Log the tutor data for debugging
+        \Log::info('Tutor Data:', ['tutor_id' => $tutor->id, 'tutor_user' => $tutor->user]);
+
+        // Construct the notification content for the tutor
+        $tuteeName = $user->name ?? 'Unknown Tutee'; // Get the authenticated user's name
+        $contentForTutor = "{$tuteeName} has left your class {$class->class_name}.";
+
+        // Create the notification for the tutor
+        $tutorNotification = Notification::create([
+            'notifiable_id' => $tutor->id, // Make sure this is valid
+            'notifiable_type' => 'App\Models\Tutor',
+            'user_id' => $tutor->user->id, // Ensure this is set correctly
+            'class_id' => $data['class_id'], // Set the class_id
+            'class_roster_id' => null, // Set to null if not applicable
+            'post_id' => null, // Set to null if not applicable
+            'review_id' => null, // Set to null if not applicable
+            'report_content_id' => null, // Set to null if not applicable
+            'blacklist_id' => null, // Set to null if not applicable
+            'recurring_schedule_id' => null, // Set to null if not applicable
+            'title' => 'Tutee Left Class', // Provide a title
+            'content' => $contentForTutor, // Use the constructed content
+            'read' => false,
+            'type' => 'leaveClass', // Set a default type for scheduling
+            'role' => 'tutor', // Set the role based on context
+        ]);
+
+        \Log::info('Tutor Notification Created:', ['notification_id' => $tutorNotification->id]);
+
+        // Construct the notification content for the tutee
+        $contentForTutee = "You have successfully left the class {$class->class_name}.";
+
+        // Create the notification for the tutee
+        $tuteeNotification = Notification::create([
+            'notifiable_id' => $data['tutee_id'], // Make sure this is valid
+            'notifiable_type' => 'App\Models\Tutee',
+            'user_id' => $user->id, // Ensure this is set correctly
+            'class_id' => $data['class_id'], // Set the class_id
+            'class_roster_id' => null, // Set to null if not applicable
+            'post_id' => null, // Set to null if not applicable
+            'review_id' => null, // Set to null if not applicable
+            'report_content_id' => null, // Set to null if not applicable
+            'blacklist_id' => null, // Set to null if not applicable
+            'recurring_schedule_id' => null, // Set to null if not applicable
+            'title' => 'leftClass', // Provide a title
+            'content' => $contentForTutee, // Use the constructed content
+            'read' => false,
+            'type' => 'leaveClass', // Set a default type for scheduling
+            'role' => 'tutee', // Set the role based on context
+        ]);
+
+        \Log::info('Tutee Notification Created:', ['notification_id' => $tuteeNotification->id]);
+    }
+
     public function markAsRead($notificationId)
     {
         $notification = Notification::find($notificationId);
@@ -391,7 +482,13 @@ class Notifications extends Component
 
         // Customize based on the notification type
         if ($userType === 'tutor') {
-            $className = $notification->class_id->class_name ?? '';  // Assumes class name is stored in notification data
+            // Fetch the class using the class_id from the notification
+            $class = Classes::find($notification->class_id); // Get the class by ID
+
+            // Check if the class exists and get the class name
+            $className = $class ? $class->class_name : ''; // Handle case where class might not exist
+
+            // Redirect to the classes route with the class name for searching
             return redirect()->route('classes', ['search_class' => $className]);
         } elseif ($userType === 'tutee') {
             return redirect()->route('tutee.schedule');  // Default route for tutees
@@ -399,6 +496,11 @@ class Notifications extends Component
             // Handle other roles or show a default page if the user has no role
             return redirect()->route('dashboard');
         }
+
+        // if ($userType === 'tutor') {
+        //     $className = $notification->class_id->class_name ?? '';  // Assumes class name is stored in notification data
+        //     return redirect()->route('edit-class', $notification->class_id); // Redirect to edit class
+        // }
     }
 
     public function render()

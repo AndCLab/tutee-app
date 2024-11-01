@@ -110,6 +110,18 @@ new #[Layout('layouts.app')] class extends Component {
             'timeout'     => 2500,
         ]);
 
+        // Get the current authenticated tutee
+        $tutee_id = Tutee::where('user_id', Auth::id())->pluck('id')->first();
+        // Retrieve the class associated with the class roster
+        $class = $this->class_roster_leave->classes;
+
+        // Dispatch the leave class event
+        $this->dispatch('class-left', [
+            'tutee_id' => $tutee_id,
+            'class_id' => $class->id,
+            'tutor_id' => $class->tutor_id, // Pass the tutor ID for notifications
+        ]);
+
         $this->leave_class_modal = false;
     }
 

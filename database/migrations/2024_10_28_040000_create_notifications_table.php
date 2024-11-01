@@ -31,7 +31,7 @@ return new class extends Migration
                 ->onDelete('cascade'); // Reference to the recurring schedules
             $table->string('title');
             $table->text('content');
-            $table->enum('type', ['joinClass', 'editClass', 'assignment', 'payment', 'attendance']);
+            $table->enum('type', ['joinClass', 'editClass', 'leaveClass', 'payment', 'attendance']);
             $table->enum('role', ['tutor', 'tutee']); // To differentiate between tutor and tutee notifications
             $table->string('notifiable_type'); // Add this line
             $table->unsignedBigInteger('notifiable_id'); // Add this line
