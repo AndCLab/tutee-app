@@ -538,7 +538,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                             {{-- class students --}}
                             @if ($this->class_category == "group")
-                                <x-wui-inputs.number wire:model='class_students' min="5" step="5" max="40" label="How many students?" shadowless/>
+                                <x-wui-inputs.number hint="Limitation of 5 to 40 students" wire:model='class_students' min="5" step="5" max="40" label="How many students?" shadowless/>
                             @endif
                         </div>
 

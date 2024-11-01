@@ -200,9 +200,10 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-wui-badge flat warning label="{{ $class->class_category }}" />
                             @else
                                 <x-wui-badge flat purple label="{{ $class->class_category }}" />
-                                @if ($class->schedule->never_end == 1)
-                                    <x-wui-badge flat zinc label="Closing this class is manual" />
-                                @endif
+                            @endif
+
+                            @if ($class->schedule->never_end == 1)
+                                <x-wui-badge flat zinc label="Closing this class is manual" />
                             @endif
 
                             @if ($class->schedule->initial_start_date < Carbon::now()->format('Y-m-d'))
