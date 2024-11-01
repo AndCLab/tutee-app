@@ -18,6 +18,14 @@ return new class extends Migration
             $table->integer('tutor_id')->unsigned();
             $table->time('end_time');
             $table->boolean('never_end')->default(0);
+            $table->enum('repeat_every', [
+                'once',
+                'days',
+                'months',
+                'weeks',
+                'weekdays',
+                'custom'
+            ])->nullable();
             $table->timestamps();
         });
     }

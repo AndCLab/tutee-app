@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('class:close-expired')->daily();
         $schedule->command('block:reported-users')->daily();
         $schedule->command('unblock:reported-users')->hourly();
+        $schedule->command('update:recurring-schedule-dates')->daily();
     })
     ->create();
 

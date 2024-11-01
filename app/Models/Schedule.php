@@ -17,6 +17,7 @@ class Schedule extends Model
         'tutor_id',
         'end_time',
         'never_end',
+        'repeat_every',
     ];
 
     /**

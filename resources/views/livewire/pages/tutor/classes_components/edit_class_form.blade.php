@@ -73,7 +73,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         // $this->start_time = Carbon::parse($this->class->schedule->start_time)->format('H:i');
         // $this->end_time = Carbon::parse($this->class->schedule->end_time)->format('H:i');
-        // $this->sched_initial_date = Carbon::parse($this->class->schedule->end_time)->format('H:i');
+        // $this->sched_initial_date = Carbon::parse($this->class->schedule->initial_start_date)->format('Y-m-d');
 
         if ($this->class->class_students) {
             $this->class_students = $this->class->class_students;
@@ -300,6 +300,7 @@ new #[Layout('layouts.app')] class extends Component {
             'tutor_id' => $tutor->id,
             'end_time' => $this->end_time,
             'never_end' => $neverValue == true ? 1 : 0, // tutor will close this class manually if it sets to 1
+            'repeat_every' => $this->interval_unit,
         ];
 
         $schedule = null;
@@ -382,7 +383,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         // Add conditional validation for group class with registration
         if ($this->class->class_category === 'group' && $this->class->registration) {
-            $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
+            $rules['class_students'] = ['required', 'integer', 'lte:40', 'gte:5'];
             $rules['regi_start_date'] = ['required', 'date'];
             $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
         }
@@ -398,7 +399,11 @@ new #[Layout('layouts.app')] class extends Component {
         $this->class->class_name = $this->class_name;
         $this->class->class_description = $this->class_description;
         $this->class->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
-        $this->class->class_students = $this->class_students;
+
+        if ($this->class->class_category == 'group') {
+            $this->class->class_students = $this->class_students;
+        }
+
         $this->class->class_fee = $this->class_fee;
 
         // Determine class type
@@ -533,7 +538,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                             {{-- class students --}}
                             @if ($this->class_category == "group")
-                                <x-wui-inputs.number wire:model='class_students' label="How many students?" shadowless/>
+                                <x-wui-inputs.number wire:model='class_students' min="5" step="5" max="40" label="How many students?" shadowless/>
                             @endif
                         </div>
 
@@ -661,11 +666,55 @@ new #[Layout('layouts.app')] class extends Component {
                         {{ Carbon::create($class->schedule->start_time)->format('g:i A') }} -
                         {{ Carbon::create($class->schedule->end_time)->format('g:i A') }}
                     </span>
-                    <div class="gap-2 space-y-2">
-                        @foreach ($storedSchedules as $date)
-                            <x-wui-badge flat info label="{{ Carbon::create($date->dates)->format('l, F j, Y') }}" />
-                        @endforeach
-                    </div>
+                    @if ($class->schedule->never_end == 1)
+                        <div class="gap-2 space-y-2">
+                            <x-wui-badge flat info label="{{ Carbon::create($class->schedule->initial_start_date)->format('l, F j, Y') }}" />
+                        </div>
+                        <p class="text-sm">
+                            <span class="font-medium">Next Schedule:</span>
+
+                            @switch($class->schedule->repeat_every)
+                                @case('days')
+                                    <x-wui-badge
+                                        flat
+                                        rose
+                                        label="{{ Carbon::create($class->schedule->initial_start_date)->addDay()->format('l, F j, Y') }}" />
+                                    @break
+                                @case('weeks')
+                                    <x-wui-badge
+                                        flat
+                                        rose
+                                        label="{{ Carbon::create($class->schedule->initial_start_date)->addWeek()->format('l, F j, Y') }}" />
+                                    @break
+                                @case('months')
+                                    <x-wui-badge
+                                        flat
+                                        rose
+                                        label="{{ Carbon::create($class->schedule->initial_start_date)->addMonth()->format('l, F j, Y') }}" />
+                                    @break
+                                @case('weekdays')
+                                    @php
+                                        $newDate = Carbon::create($class->schedule->initial_start_date);
+
+                                        do {
+                                            $newDate->addDay();
+                                        } while ($newDate->isWeekend());
+                                    @endphp
+                                    <x-wui-badge
+                                        flat
+                                        rose
+                                        label="{{ $newDate->format('l, F j, Y') }}" />
+                                    @break
+                                @default
+                            @endswitch
+                        </p>
+                    @else
+                        <div class="gap-2 space-y-2">
+                            @foreach ($storedSchedules as $date)
+                                <x-wui-badge flat info label="{{ Carbon::create($date->dates)->format('l, F j, Y') }}" />
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </form>

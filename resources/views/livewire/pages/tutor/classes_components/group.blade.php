@@ -67,7 +67,7 @@
             </div>
 
             {{-- class students --}}
-            <x-wui-inputs.number wire:model='class_students' label="How many students?" shadowless/>
+            <x-wui-inputs.number wire:model='class_students' min="5" step="5" max="40" label="How many students?" shadowless/>
 
             {{-- class price --}}
             <div x-data="{ open: false }">
