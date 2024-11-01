@@ -236,13 +236,13 @@ class Notifications extends Component
         \Log::info('Authenticated User:', ['user_id' => $user->id]);
 
         // Fetch the class information
-        $class = Classes::findOrFail($data['class_id']); // No eager loading
+        $class = Classes::findOrFail($data['class_id']);
 
         // Log the class data for debugging
         \Log::info('Class Data:', ['class' => $class]);
 
         // Retrieve the schedule for the class using the schedule_id from the dispatched event
-        $schedule = Schedule::find($data['schedule_id']); // Use the schedule_id from the event data
+        $schedule = Schedule::find($data['schedule_id']);
 
         // Check if the schedule exists
         if (!$schedule) {
@@ -251,7 +251,7 @@ class Notifications extends Component
         }
 
         // Retrieve the recurring schedules for the found schedule
-        $recurringSchedules = $schedule->recurring_schedule; // Assuming there's a one-to-many relationship
+        $recurringSchedules = $schedule->recurring_schedule;
 
         // Check if there are any recurring schedules
         if ($recurringSchedules->isEmpty()) {
@@ -260,8 +260,8 @@ class Notifications extends Component
         }
 
         // Find the specific recurring schedule based on the passed date
-        $specificDate = $data['specific_date']; // This should be the date or ID you passed
-        $specificSchedule = $recurringSchedules->firstWhere('dates', $specificDate); // Adjust based on how you pass the date
+        $specificDate = $data['specific_date'];
+        $specificSchedule = $recurringSchedules->firstWhere('dates', $specificDate);
 
         // Check if the specific schedule was found
         if (!$specificSchedule) {
@@ -284,74 +284,55 @@ class Notifications extends Component
         // Log the tutor data for debugging
         \Log::info('Tutor Data:', ['tutor_id' => $tutor->id, 'tutor_user' => $tutor->user]);
 
-        // Construct the notification content for the tutee
-        $className = $class->class_name ?? 'Unknown Class'; // Assuming class_name is the correct field
-        $tuteeId = $data['tutee_id']; // Get the tutee ID from the dispatched data
-        $tutee = Tutee::find($tuteeId); // Retrieve the tutee object
-        $tuteeName = $tutee ? $tutee->name : 'Unknown Tutee'; // Get the tutee's name
+        // Create notifications for each tutee
+        foreach ($data['tutee_ids'] as $tuteeId) {
+            $tutee = Tutee::find($tuteeId);
+            $tuteeName = $tutee ? $tutee->name : 'Unknown Tutee';
 
-        $tutorName = $tutor->user->fname ?? 'Unknown Tutor'; // Access the user's first name
+            $contentForTutee = "{$class->class_name} with {$tutor->user->fname} has been updated. The next session is scheduled for {$formattedDate}.";
 
-        // Log the notification content data for tutee
-        \Log::info('Notification Data for Tutee:', [
-            'class_name' => $className,
-            'tutee_name' => $tuteeName,
-            'scheduled_date' => $formattedDate,
-            'tutee_id' => $tuteeId,
-        ]);
+            // Create the notification for the tutee
+            $tuteeNotification = Notification::create([
+                'notifiable_id' => $tuteeId,
+                'notifiable_type' => 'App\Models\Tutee',
+                'user_id' => $tutee->user->id,
+                'class_id' => $data['class_id'],
+                'class_roster_id' => null,
+                'post_id' => null,
+                'review_id' => null,
+                'report_content_id' => null,
+                'blacklist_id' => null,
+                'recurring_schedule_id' => $specificSchedule->id,
+                'title' => 'Class Updated',
+                'content' => $contentForTutee,
+                'read' => false,
+                'type' => 'editClass',
+                'role' => 'tutee',
+            ]);
 
-        $contentForTutee = "{$className} with {$tutorName} has been updated. The next session is scheduled for {$formattedDate}.";
-
-        // Check if tutee_id is present
-        if ($data['tutee_id'] !== null) {
-        // Create the notification for the tutee
-        $tuteeNotification = Notification::create([
-            'notifiable_id' => $tuteeId, // Use the tutee ID from the dispatched data
-            'notifiable_type' => 'App\Models\Tutee',
-            'user_id' => $tutee->user->id, // Ensure this is set correctly
-            'class_id' => $data['class_id'], // Set the class_id
-            'class_roster_id' => null, // Set to null if not applicable
-            'post_id' => null, // Set to null if not applicable
-            'review_id' => null, // Set to null if not applicable
-            'report_content_id' => null, // Set to null if not applicable
-            'blacklist_id' => null, // Set to null if not applicable
-            'recurring_schedule_id' => $specificSchedule->id, // Link to the recurring schedule
-            'title' => 'Class Updated', // Provide a title
-            'content' => $contentForTutee, // Use the constructed content
-            'read' => false,
-            'type' => 'editClass', // Set a default type for class edit
-            'role' => 'tutee', // Set the role based on context
-        ]);
-
-        \Log::info('Tutee Notification Created:', ['notification_id' => $tuteeNotification->id]);
-        } else {
-            // Logic for when there are no tutees
-            // Optionally log or handle the case where there are no tutees
-            \Log::info('No tutees to notify for class ID: ' . $class->id);
+            \Log::info('Tutee Notification Created:', ['notification_id' => $tuteeNotification->id]);
         }
 
-
-
         // Construct the notification content for the tutor
-        $contentForTutor = "You've updated the {$className} scheduled at {$formattedDate}.";
+        $contentForTutor = "You've updated the {$class->class_name} scheduled at {$formattedDate}.";
 
         // Create the notification for the tutor
         $tutorNotification = Notification::create([
-            'notifiable_id' => $tutor->id, // Make sure this is valid
+            'notifiable_id' => $tutor->id,
             'notifiable_type' => 'App\Models\Tutor',
-            'user_id' => $tutor->user->id, // Ensure this is set correctly
-            'class_id' => $data['class_id'], // Set the class_id
-            'class_roster_id' => null, // Set to null if not applicable
-            'post_id' => null, // Set to null if not applicable
-            'review_id' => null, // Set to null if not applicable
-            'report_content_id' => null, // Set to null if not applicable
-            'blacklist_id' => null, // Set to null if not applicable
-            'recurring_schedule_id' => $specificSchedule->id, // Link to the recurring schedule
-            'title' => 'Class Updated', // Provide a title
-            'content' => $contentForTutor, // Use the constructed content
+            'user_id' => $tutor->user->id,
+            'class_id' => $data['class_id'],
+            'class_roster_id' => null,
+            'post_id' => null,
+            'review_id' => null,
+            'report_content_id' => null,
+            'blacklist_id' => null,
+            'recurring_schedule_id' => $specificSchedule->id,
+            'title' => 'Class Updated',
+            'content' => $contentForTutor,
             'read' => false,
-            'type' => 'editClass', // Set a default type for class edit
-            'role' => 'tutor', // Set the role based on context
+            'type' => 'editClass',
+            'role' => 'tutor',
         ]);
 
         \Log::info('Tutor Notification Created:', ['notification_id' => $tutorNotification->id]);

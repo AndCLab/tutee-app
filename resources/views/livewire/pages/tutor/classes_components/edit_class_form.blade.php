@@ -499,8 +499,8 @@ new #[Layout('layouts.app')] class extends Component {
             $this->dispatch('class-edited', [
                 'class_id' => $this->class->id,
                 'schedule_id' => $this->class->schedule_id,
-                'specific_date' => $specificDate, // Pass the specific date
-                'tutee_id' => null, // Explicitly pass null for tutee_id
+                'specific_date' => $specificDate,
+                'tutee_ids' => [], // Pass an empty array for tutee IDs
             ]);
 
             // Log the values for the dispatch
@@ -508,26 +508,23 @@ new #[Layout('layouts.app')] class extends Component {
                 'class_id' => $this->class->id,
                 'schedule_id' => $this->class->schedule_id,
                 'specific_date' => $specificDate,
-                'tutee_id' => null,
             ]);
         } else {
-            // Loop through each tutee and dispatch the event
-            foreach ($tutees as $tuteeId) {
-                $this->dispatch('class-edited', [
-                    'class_id' => $this->class->id,
-                    'schedule_id' => $this->class->schedule_id,
-                    'specific_date' => $specificDate, // Pass the specific date
-                    'tutee_id' => $tuteeId, // Pass the tutee ID
-                ]);
+            // Dispatch the event for all tutees at once
+            $this->dispatch('class-edited', [
+                'class_id' => $this->class->id,
+                'schedule_id' => $this->class->schedule_id,
+                'specific_date' => $specificDate,
+                'tutee_ids' => $tutees->toArray(), // Pass all tutee IDs as an array
+            ]);
 
-                // Log the values before dispatching the event
-                \Log::info('Dispatching class-edited event with data:', [
-                    'class_id' => $this->class->id,
-                    'schedule_id' => $this->class->schedule_id,
-                    'specific_date' => $specificDate, // Pass the specific date
-                    'tutee_id' => $tuteeId, // Pass the tutee ID
-                ]);
-            }
+            // Log the values before dispatching the event
+            \Log::info('Dispatching class-edited event with data for multiple tutees:', [
+                'class_id' => $this->class->id,
+                'schedule_id' => $this->class->schedule_id,
+                'specific_date' => $specificDate,
+                'tutee_ids' => $tutees->toArray(),
+            ]);
         }
     }
 
