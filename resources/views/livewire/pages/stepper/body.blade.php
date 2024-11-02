@@ -24,9 +24,11 @@
             @includeWhen($count === 4, 'livewire.pages.stepper.confirm')
 
             <div class="flex flex-col-reverse md:flex-row justify-between md:w-3/4 md:mx-auto gap-3 my-5">
-                <x-secondary-button wire:click='prev_step' @class(['w-full', 'hidden' => $count === 1])>
-                    Back
-                </x-secondary-button>
+                @if (Auth::user()->apply_status != 'pending')
+                    <x-secondary-button wire:click='prev_step' @class(['w-full', 'hidden' => $count === 1])>
+                        Back
+                    </x-secondary-button>
+                @endif
                 @if ($count < 4)
                     <x-primary-button wire:click='next_step' class="w-full">
                         Next

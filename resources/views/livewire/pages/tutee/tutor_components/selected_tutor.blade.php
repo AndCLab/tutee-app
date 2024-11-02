@@ -113,53 +113,47 @@
         @forelse ($selectedClass as $count => $class)
             @break($count === 3)
             <div class="flex justify-between items-start gap-4 p-4 rounded border">
-
                 {{-- parent div --}}
-                    <x-wui-icon name='calendar' class="size-6 text-[#0C3B2E]" solid />
-                    <div class="space-y-1 w-full">
-                        {{-- child 1 --}}
-                        <div class="lg:inline-flex items-center gap-2">
-                            <p class="text-[#8F8F8F] font-medium">
-                                {{ $class->class_name }}
+                <x-wui-icon name='calendar' class="size-6 text-[#0C3B2E]" solid />
+                <div class="space-y-1 w-full">
+                    {{-- child 1 --}}
+                    <div class="lg:inline-flex items-center gap-2">
+                        <p class="text-[#8F8F8F] font-medium">
+                            {{ $class->class_name }}
+                        </p>
+                        @if ($class->class_category == 'group')
+                            <x-wui-badge flat warning
+                                label="{{ $class->class_category }}" />
+                        @else
+                            <x-wui-badge flat purple
+                                label="{{ $class->class_category }}" />
+                        @endif
+                    </div>
+
+                    {{-- child 2 --}}
+                    <div class="line-clamp-2">
+                        {{ $class->class_description }}
+                    </div>
+
+                    {{-- child 3 --}}
+                    <div class="lg:flex flex-wrap lg:flex-nowrap lg:justify-between lg:items-center">
+                        <div class="text-[#64748B] inline-flex gap-2 items-center">
+                            <x-wui-icon name='calendar' class="size-5" />
+                            <p class="font-light text-sm line-clamp-1">
+                                {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
                             </p>
-                            @if ($class->class_category == 'group')
-                                <x-wui-badge flat warning
-                                    label="{{ $class->class_category }}" />
-                            @else
-                                <x-wui-badge flat purple
-                                    label="{{ $class->class_category }}" />
-                            @endif
                         </div>
-
-                        {{-- child 2 --}}
-                        <div class="line-clamp-2">
-                            {{ $class->class_description }}
-                        </div>
-
-                        {{-- child 3 --}}
-                        <div class="lg:flex flex-wrap lg:flex-nowrap lg:justify-between lg:items-center">
-                            <div class="text-[#64748B] inline-flex gap-2 items-center">
-                                <x-wui-icon name='calendar' class="size-5" />
-                                <p class="font-light text-sm line-clamp-1">
-                                    {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
-                                </p>
-                            </div>
+                        <div>
+                            <!-- ... -->
                             <div>
-                                <!-- ... -->
-                                <div>
-                                    <x-secondary-button class="w-full lg:w-fit text-nowrap"
-                                    wire:click="classView({{ $class->id }})" wireTarget="classView({{ $class->id }})">
-                                    Join Class
-                                    </x-secondary-button>
-
-                                    <!-- Class View Modal -->
-                                    @include('livewire.pages.tutee.post_components.modals.class_view_modal')
-
-                                </div>
-
+                                <x-secondary-button class="w-full lg:w-fit text-nowrap text-xs"
+                                wire:click="classView({{ $class->id }})" wireTarget="classView({{ $class->id }})">
+                                Inspect Class
+                                </x-secondary-button>
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
         @empty
             <div class="flex justify-between items-end p-4 rounded border">
@@ -232,7 +226,5 @@
             </div>
         @endforelse
     </div>
-
-
 </div>
 

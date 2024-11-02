@@ -31,7 +31,7 @@
             <div class="flex flex-row">
                 <livewire:layout.sidenav_admin.sidenav />
                 <div class="w-full">
-                    {{-- <livewire:layout.navigation /> --}}
+                    <livewire:layout.topnav_admin.navigation />
         @endif
                 <!-- Page Content -->
                     <main>

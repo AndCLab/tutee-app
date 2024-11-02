@@ -24,7 +24,7 @@ new #[Layout('layouts.app')] class extends Component {
     public string $class_type = '';
     public string $class_location = '';
     public string $class_link = '';
-    public $class_students;
+    public $class_students = 5;
     public $class_fee = 0;
     public $class_status;
     public $class_fields = []; //fields setter
@@ -251,10 +251,12 @@ new #[Layout('layouts.app')] class extends Component {
 
         // schedule
         $scheduleData = [
+            'initial_start_date' => $this->sched_initial_date,
             'start_time' => $this->start_time,
             'tutor_id' => $tutor->id,
             'end_time' => $this->end_time,
             'never_end' => $neverValue == true ? 1 : 0, // tutor will close this class manually if it sets to 1
+            'repeat_every' => $this->interval_unit,
         ];
 
         $schedule = null;
@@ -428,10 +430,14 @@ new #[Layout('layouts.app')] class extends Component {
             'class_fields' => ['required'],
             'class_location' => ['string', 'max:255'],
             'class_link' => ['string', 'max:255'],
-            'class_students' => ['required', 'lt:40', 'gt:2'],
+            'class_students' => ['required', 'lte:40', 'gte:5'],
+
+            // registration
+            'regi_start_date' => ['required', 'date'],
+            'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
 
             // schedules
-            'sched_initial_date' => ['required', 'date'],
+            'sched_initial_date' => ['required', 'date', 'after:regi_end_date'],
             'sched_end_date' => ['nullable', 'date', 'after:sched_initial_date'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
@@ -439,10 +445,6 @@ new #[Layout('layouts.app')] class extends Component {
             // recurrence and interval
             'interval_unit' => ['required', 'string', 'in:once,months,weeks,days,weekdays,custom'],
             'stop_repeating' => ['required', 'string', 'in:never,date'],
-
-            // registration
-            'regi_start_date' => ['required', 'date'],
-            'regi_end_date' => ['required', 'date', 'after:regi_start_date'],
         ]);
     }
 

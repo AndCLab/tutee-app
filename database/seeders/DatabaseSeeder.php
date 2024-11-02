@@ -30,6 +30,18 @@ class DatabaseSeeder extends Seeder
 
         //dummy record for stepper testing
         User::factory()->create([
+            'fname' => 'Test',
+            'lname' => 'User',
+            'is_stepper' => 1,
+            'user_type' => null,
+            'email' => 'test@example.com',
+            'address' => 'address',
+            'zip_code' => '6015',
+            'phone_prefix' => '+63',
+            'phone_number' => '9582938479',
+        ]);
+
+        User::factory()->create([
             'fname' => 'John',
             'lname' => 'Doe',
             'name' => 'John Doe',
@@ -56,12 +68,6 @@ class DatabaseSeeder extends Seeder
             'phone_prefix' => '+63',
             'phone_number' => '9584638379',
         ]);
-
-        // Fields::factory()->create([
-        //     'user_id' => $user->id,
-        //     'field_name' => fake()->randomElement($fields),
-        //     'active_in' => $user->user_type
-        // ]);
 
         User::factory()->create([
             'fname' => 'Tutee',
@@ -91,10 +97,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class);
         $this->call(FieldsSeeder::class);
-        $this->call(ClassesSeeder::class);
-        $this->call(NotificationsSeeder::class);
-
-        User::factory(10)->create();
+        // $this->call(ClassesSeeder::class);
+        // $this->call(ClassRosterSeeder::class);
+        // $this->call(NotificationsSeeder::class);
 
         for($i = 0; $i < 8; $i++){
             $group = Group::factory()->create(['owner_id' => 1,]);

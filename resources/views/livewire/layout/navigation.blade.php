@@ -18,7 +18,6 @@ new class extends Component {
         $this->tutor = Tutor::where('user_id', Auth::id())->first();
     }
 
-    // Testing purposes
     public function switchRole(){
         if($this->role == 'tutee'){
             $this->user->user_type = 'tutor';
@@ -71,47 +70,42 @@ new class extends Component {
 {{-- drop-shadow-md --}}
 <nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-border/40 bg-background/95 backdrop-blur">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between min-h-fit py-3">
             <div></div>
             <div class="hidden sm:flex sm:gap-2 sm:items-center sm:ms-6">
                 {{-- Be a Tutee (Tutor and not yet Tutee) --}}
                 @if ($role == 'tutor' && ($user->apply_status == 'not_applied'))
                     @if ($tutor->verify_status === 'not_verified')
-                        <x-wui-button sm wire:click='verifyTutor' flat primary icon='badge-check'
-                        spinner='verifyTutor' label='Verify Tutor Account' />
+                        <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='verifyTutor' flat primary icon='badge-check' spinner='verifyTutor' label='Verify Tutor Account' />
                     @elseif ($tutor->verify_status === 'pending')
                         <p>Verification pending.</p>
                     @else
                         <p>Your Tutor account has been verified.</p>
                     @endif
 
-                    <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical'
-                    spinner='beATutee' label='Be a Tutee' />
+                    <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='beATutee' flat primary icon='switch-vertical' spinner='beATutee' label='Be a Tutee' />
                     @include('livewire.layout.topnav_tutor.menu')
 
-                {{-- TEMP ONLY Pending Be a Tutee (Tutor and not yet Tutee) --}}
+                {{-- Pending Be a Tutee (Tutor and not yet Tutee) --}}
                 @elseif ($role == 'tutor' && ($user->apply_status == 'pending'))
                     @if ($tutor->verify_status === 'not_verified')
-                        <x-wui-button sm wire:click='verifyTutor' flat primary icon='badge-check'
-                        spinner='verifyTutor' label='Verify Tutor Account' />
+                        <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='verifyTutor' flat primary icon='badge-check' spinner='verifyTutor' label='Verify Tutor Account' />
                     @elseif ($tutor->verify_status === 'pending')
                         <p>Verification pending.</p>
                     @else
                         <p>Your Tutor account has been verified.</p>
                     @endif
 
-                    <div>
-                        <livewire:role-icon />
-
-                    <x-wui-button sm wire:click='beATutee' flat primary icon='switch-vertical'
-                    spinner='beATutee' label='Continue Tutee Application' />
-                    @include('livewire.layout.topnav_tutor.menu')
+                    <div class="inline-flex items-center">
+                        <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='beATutee' flat primary icon='switch-vertical' spinner='beATutee' label='Continue Tutee Application' />
+                        @include('livewire.layout.topnav_tutor.menu')
+                    </div>
 
                 {{-- Switch to Tutee (Tutee and applied as Tutor) --}}
                 @elseif ($role == 'tutor' && $user->apply_status == 'applied')
                     @if ($tutor->verify_status === 'not_verified')
-                        <x-wui-button sm wire:click='verifyTutor' flat primary icon='badge-check'
+                        <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='verifyTutor' flat primary icon='badge-check'
                         spinner='verifyTutor' label='Verify Tutor Account' />
                     @elseif ($tutor->verify_status === 'pending')
                         <p>Verification pending.</p>
@@ -119,116 +113,34 @@ new class extends Component {
                         <p>Your Tutor account has been verified.</p>
                     @endif
 
-                    <div>
+                    <div class="inline-flex items-center">
                         <livewire:role-icon />
 
-                        <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
+                        <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='switchRole' flat primary icon='switch-vertical'
                         spinner='switchRole' label='Switch to Tutee' />
                         @include('livewire.layout.topnav_tutor.menu')
                     </div>
 
                 {{-- Apply as Tutor (Tutee and not yet Tutor) --}}
                 @elseif ($role == 'tutee' && ($user->apply_status == 'not_applied'))
-                    <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
-                    spinner='applyAsTutor' label='Apply as Tutor' />
+                    <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='applyAsTutor' flat primary icon='switch-vertical' spinner='applyAsTutor' label='Apply as Tutor' />
                     @include('livewire.layout.topnav_tutee.menu')
-                {{-- TEMP ONLY Pending Apply as Tutor (Tutee and not yet Tutor) --}}
+
+                {{-- Pending Apply as Tutor (Tutee and not yet Tutor) --}}
                 @elseif ($role == 'tutee' && ($user->apply_status == 'pending'))
-                    <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
-                    spinner='applyAsTutor' label='Continue Tutor Application' />
+                    <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='applyAsTutor' flat primary icon='switch-vertical' spinner='applyAsTutor' label='Continue Tutor Application' />
                     @include('livewire.layout.topnav_tutee.menu')
 
                 {{-- Switch to Tutor (Tutor and applied as Tutee) --}}
                 @elseif ($role == 'tutee' && $user->apply_status == 'applied')
-                    <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
-                    spinner='switchRole' label='Switch to Tutor' />
-                    @include('livewire.layout.topnav_tutee.menu')
-                @elseif ($role == 'tutee' && !$user->is_applied)
-
-                    <div>
+                    <div class="inline-flex items-center">
                         <livewire:role-icon />
 
-                        <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
-                        spinner='applyAsTutor' label='Apply as Tutor' />
+                        <x-wui-button :disabled="$user->blacklist()->blocked()->exists()" sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='Switch to Tutor' />
                         @include('livewire.layout.topnav_tutee.menu')
                     </div>
-
-
-                {{-- Switch to Tutor (Tutor and applied as Tutee) --}}
-                @elseif ($role == 'tutee' && $user->is_applied)
-                    <div>
-                        <livewire:role-icon />
-
-                        <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
-                        spinner='switchRole' label='Switch to Tutor' />
-                        @include('livewire.layout.topnav_tutee.menu')
-                    </div>
-
-                @elseif ($role == 'tutee' && ($user->apply_status == 'not_applied'))
-                    <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
-                    spinner='applyAsTutor' label='Apply as Tutor' />
-                    @include('livewire.layout.topnav_tutee.menu')
-                {{-- TEMP ONLY Pending Apply as Tutor (Tutee and not yet Tutor) --}}
-                @elseif ($role == 'tutee' && ($user->apply_status == 'pending'))
-                    <x-wui-button sm wire:click='applyAsTutor' flat primary icon='switch-vertical'
-                    spinner='applyAsTutor' label='Continue Tutor Application' />
-                    @include('livewire.layout.topnav_tutee.menu')
-
-                {{-- Switch to Tutor (Tutor and applied as Tutee) --}}
-                @elseif ($role == 'tutee' && $user->apply_status == 'applied')
-                    <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
-                    spinner='switchRole' label='Switch to Tutor' />
-                    @include('livewire.layout.topnav_tutee.menu')
-                @elseif ($role == 'tutee' && $user->is_applied)
-                    <div>
-                        <livewire:role-icon />
-
-                        <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical'
-                        spinner='switchRole' label='Switch to Tutor' />
-                        @include('livewire.layout.topnav_tutee.menu')
-                    </div>
-
                 @endif
-
-                {{-- Switch role testing purposes
-                <x-wui-button sm wire:click='switchRole' flat primary icon='switch-vertical' spinner='switchRole' label='switch role testing kay kapuy logout :)' />
-                --}}
             </div>
-
-            <!-- Settings Dropdown -->
-            {{-- <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name"
-                                x-on:profile-updated.window="name = $event.detail.name"></div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile')" wire:navigate>
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <button wire:click="logout" class="w-full text-start">
-                            <x-dropdown-link>
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </button>
-                    </x-slot>
-                </x-dropdown>
-            </div> --}}
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">

@@ -203,6 +203,7 @@ new class extends Component
                 autocomplete='address'
                 hint='Update your address'
                 errorless
+                shadowless
             />
         </div>
 
@@ -216,6 +217,7 @@ new class extends Component
                 autocomplete='postal-code'
                 hint='Update your zip code'
                 errorless
+                shadowless
             />
         </div>
 

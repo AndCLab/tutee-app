@@ -4,14 +4,14 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use WireUi\Traits\Actions;
-use App\Models\Classes;
-use App\Models\ClassRoster;
 use App\Models\Fields;
 use App\Models\Post;
 use App\Models\Tutee;
 
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
+
+    public $title = "Discover | Tutee";
 
     public string $post_desc ='';
     public $getFields = [];
@@ -97,6 +97,10 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <section>
     <x-slot name="header">

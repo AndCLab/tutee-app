@@ -36,8 +36,8 @@ class BlockReportedUsers extends Command
      */
     public function handle()
     {
-        // block users with 10+ report_count for 20 years
-        $this->blockUsers(10, now()->addYears(10));
+        // block users with 10+ report_count for 1 month
+        $this->blockUsers(10, now()->addMonth());
 
         // block users with 6+ report_count for 3 days
         $this->blockUsers(6, now()->addDays(3));

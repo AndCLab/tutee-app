@@ -6,6 +6,15 @@
 <x-wui-modal wire:model="showClassSchedule" max-width='lg' persistent>
     <x-wui-card title='Class Schedule' wire:loading.class='opacity-60'>
         <div class="grid grid-cols-1 gap-4">
+            @if ($regi_start_date && $regi_end_date)
+                <div class="text-xs">
+                    <p class="font-medium">Registration Date</p>
+                    <p>
+                        {{ Carbon::parse($regi_end_date)->format('l, F j, Y') }} -
+                        {{ Carbon::parse($regi_end_date)->format('l, F j, Y') }}
+                    </p>
+                </div>
+            @endif
             <x-wui-datetime-picker
                 label="Start Date Time"
                 placeholder="January 1, 2000"

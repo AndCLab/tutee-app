@@ -1,4 +1,4 @@
-<div class="icon-container flex items-center space-x-2">
+<div class="icon-container flex items-center pl-2 space-x-2">
     {{-- Icons --}}
 
     {{-- Bookmark Dropdown | No bookmarks for tutors --}}
@@ -12,7 +12,7 @@
     </x-wui-dropdown> --}}
 
 
-    <x-wui-dropdown >
+    <x-wui-dropdown width="7xl">
 
         <x-slot name="trigger" >
             <div class="text-black hover:text-gray-600 transform hover:scale-110 hover:shadow-lg transition duration-150 ease-in-out">
@@ -26,7 +26,7 @@
 
 
     {{-- Notification Dropdown --}}
-    <x-wui-dropdown >
+    <x-wui-dropdown width="7xl">
         <x-slot name="trigger">
             <div class="text-black hover:text-gray-600 transform hover:scale-110 hover:shadow-lg transition duration-150 ease-in-out">
                 <livewire:notification-icon />

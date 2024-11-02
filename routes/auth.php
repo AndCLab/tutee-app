@@ -57,6 +57,6 @@ Route::middleware('auth', 'check.is_stepper', 'verified', 'blocked')->group(func
 
     Route::view('/forbidden-access', 'forbidden-page');
 
+    Volt::route('blocked', 'pages.blocked')->name('blocked');
 });
 
-Volt::route('blocked', 'pages.blocked')->middleware('auth')->name('blocked');

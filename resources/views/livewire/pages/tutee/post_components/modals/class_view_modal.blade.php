@@ -85,7 +85,7 @@
                 <p>
                     <strong>Class Location:</strong> {{ $getClass->class_location }}
                 </p>
-                <p>
+                {{-- <p>
                     <strong>Upcoming Schedule Date:</strong>
                     @foreach ($getClass->schedule->recurring_schedule as $recurring)
                         @if (Carbon::parse($recurring->dates)->isToday() || Carbon::parse($recurring->dates)->isFuture())
@@ -95,15 +95,15 @@
                             @break
                         @endif
                     @endforeach
-                </p>
-                <p>
-                    <strong>Time:</strong>
-                    {{ Carbon::create($getClass->schedule->start_time)->format('g:i A') }} -
-                    {{ Carbon::create($getClass->schedule->end_time)->format('g:i A') }}
-                </p>
-                <x-primary-button class="w-full mt-5" wire:click='joinClass' wireTarget='joinClass'>
-                    Join Class
-                </x-primary-button>
+                </p> --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
+                    <x-primary-button class="w-full mt-5" wire:click='joinClass' wireTarget='joinClass'>
+                        {{ $getClass->class_category == 'individual' ? 'Join Class' : 'Register' }}
+                    </x-primary-button>
+                    <x-secondary-button class="w-full mt-5" wire:click='viewRecurringDates' wireTarget='viewRecurringDates'>
+                        View Dates
+                    </x-secondary-button>
+                </div>
             </div>
         </div>
 

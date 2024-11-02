@@ -11,7 +11,7 @@ new class extends Component {
     {
         $logout();
 
-        $this->redirect(route('login.admin'), navigate: true);
+        $this->redirect('/admin/login', navigate: true);
     }
 }; ?>
 
@@ -23,7 +23,7 @@ new class extends Component {
 
 --}}
 
-<div class="hidden sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
+<div class="hidden z-50 sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
 
     {{-- sidenav container --}}
     <div class="flex h-screen flex-col sticky top-0 justify-between border-e bg-[#0F172A] w-64">
@@ -74,7 +74,7 @@ new class extends Component {
     </div>
 
     {{-- collapse button --}}
-    <div class="absolute h-full left-full">
+    {{-- <div class="absolute h-full left-full">
         <div class="sticky top-0 flex h-screen justify-center items-center">
             <button @click='toggleSidenav' class="text-[#0F172A]">
                 <template x-if='!expanded'>
@@ -95,7 +95,7 @@ new class extends Component {
                 </template>
             </button>
         </div>
-    </div>
+    </div> --}}
 
 </div>
 
@@ -105,11 +105,11 @@ new class extends Component {
         return {
             expanded: false,
             initialize() {
-                this.expanded = JSON.parse(localStorage.getItem('sidenavOpen')) ?? false;
+                this.expanded = JSON.parse(localStorage.getItem('sidenavAdminOpen')) ?? false;
             },
             toggleSidenav() {
                 this.expanded = !this.expanded;
-                localStorage.setItem('sidenavOpen', JSON.stringify(this.expanded));
+                localStorage.setItem('sidenavAdminOpen', JSON.stringify(this.expanded));
             }
         }
     }

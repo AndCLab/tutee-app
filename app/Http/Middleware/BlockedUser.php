@@ -24,7 +24,15 @@ class BlockedUser
 
             // if the user is blocked, redirect them to the blocked route
             if ($isBlocked) {
-                return redirect()->route('blocked');
+                // Only redirect if the user is not already on the blocked route
+                if (!$request->routeIs('blocked')) {
+                    return redirect()->route('blocked');
+                }
+            } else {
+                if ($request->routeIs('blocked')) {
+                    $targetRoute = $user->user_type === 'tutee' ? 'tutee.discover' : 'tutor.discover';
+                    return redirect()->route($targetRoute);
+                }
             }
         }
 

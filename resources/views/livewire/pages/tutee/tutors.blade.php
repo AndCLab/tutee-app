@@ -14,6 +14,8 @@ use App\Models\User;
 
 use App\Models\Classes;
 use App\Models\ClassRoster;
+use App\Models\RecurringSchedule;
+use App\Models\Registration;
 use App\Models\Review;
 use App\Models\Fields;
 use App\Models\Bookmark;
@@ -21,9 +23,6 @@ use App\Events\ClassJoined;
 
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
-
-    public $showClassModal = false; // Controls the visibility of the modal
-    public $getClass; // Holds the class details
 
     protected $listeners = ['selectTutor'];
 
@@ -38,7 +37,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $ST_INDIClasses;
     public $ST_GRClasses;
 
-    // states
+    // properties
     #[Url(as: 'search_tutor')]
     public $search;
 
@@ -61,6 +60,13 @@ new #[Layout('layouts.app')] class extends Component {
     public $tutor_type;
 
     public $getFields = []; // fields getter
+
+    public $getClass; // Holds the class details
+    public $getRecurringDates;
+
+    // states
+    public $showClassModal = false; // Controls the visibility of the modal
+    public $showRecurringDates;
 
     public $isBookmarked;
     public $tutorIdForBookmark;
@@ -106,6 +112,19 @@ new #[Layout('layouts.app')] class extends Component {
                             ->exists();
     }
 
+    public function viewRecurringDates()
+    {
+        $this->showRecurringDates = true;
+        $this->getRecurringDates = RecurringSchedule::where('schedule_id', $this->getClass->schedule->id)
+                                ->orderBy('dates', 'asc')
+                                ->get();
+        if ($this->getClass->class_category == 'group') {
+            $this->getRegistration = Registration::whereHas('classes', function ($query) {
+                                        $query->where('registration_id', $this->getClass->registration_id)
+                                            ->orderBy('start_date', 'asc');
+                                    })->first();
+        }
+    }
 
     public function toggleBookmark()
     {
@@ -136,36 +155,38 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function with(): array
     {
-        $tutors = Tutor::when($this->search, function ($q) {
-                                $q->whereHas('user', function ($query) {
-                                    $query->where('fname', 'like', "%{$this->search}%")
-                                        ->orWhere('lname', 'like', "%{$this->search}%");
+        $tutors = Tutor::where('user_id', '!=', Auth::id())
+                        ->when($this->search, function ($q) {
+                            $q->whereHas('user', function ($query) {
+                                $query->where('fname', 'like', "%{$this->search}%")
+                                    ->orWhere('lname', 'like', "%{$this->search}%")
+                                    ->orWhere('name', 'like', "%{$this->search}%");
+                        });
+                        })
+                        ->when($this->sort_by, function ($q) {
+                            $q->orderBy('created_at', $this->sort_by);
+                        })
+                        ->when($this->time_avail, function ($q) {
+                            $q->whereHas('classes.schedule.recurring_schedule', function ($query) {
+                                $query->where('dates', '=', $this->time_avail);
                             });
-                            })
-                            ->when($this->sort_by, function ($q) {
-                                $q->orderBy('created_at', $this->sort_by);
-                            })
-                            ->when($this->time_avail, function ($q) {
-                                $q->whereHas('classes.schedule.recurring_schedule', function ($query) {
-                                    $query->where('dates', '=', $this->time_avail);
-                                });
-                            })
-                            ->when($this->class_fields, function ($q) {
-                                $lowercaseFields = array_map('strtolower', $this->class_fields);
+                        })
+                        ->when($this->class_fields, function ($q) {
+                            $lowercaseFields = array_map('strtolower', $this->class_fields);
 
-                                $q->whereHas('user.fields', function ($query) use ($lowercaseFields) {
-                                    $query->whereIn('field_name', $lowercaseFields);
-                                });
-                            })
+                            $q->whereHas('user.fields', function ($query) use ($lowercaseFields) {
+                                $query->whereIn('field_name', $lowercaseFields);
+                            });
+                        })
 
-                            ->when($this->pricing, function ($q) {
-                                $q->whereHas('classes', function ($query) {
-                                    $query->where('class_fee', '>=', $this->pricing)
-                                            ->orderBy('class_fee', $this->sort_by);
-                                });
-                            })
-                            ->take($this->pages)
-                            ->get();
+                        ->when($this->pricing, function ($q) {
+                            $q->whereHas('classes', function ($query) {
+                                $query->where('class_fee', '>=', $this->pricing)
+                                        ->orderBy('class_fee', $this->sort_by);
+                            });
+                        })
+                        ->take($this->pages)
+                        ->get();
 
         return [
             'tutors' => $tutors,
@@ -374,8 +395,9 @@ new #[Layout('layouts.app')] class extends Component {
                         </div>
                     </div>
                 @empty
-                    <div>
-                        Empty
+                    <div class="flex flex-col gap-3 justify-center items-center w-full">
+                        <img class="size-60" src="{{ asset('images/empty-tutors.svg') }}" alt="">
+                        <p class="md:-translate-y-8 font-semibold text-xl text-gray-900">Empty Tutors</p>
                     </div>
                 @endforelse
 
@@ -427,6 +449,12 @@ new #[Layout('layouts.app')] class extends Component {
             @this.selectTutor(tutor_id);
         }
     </script>
+
+    <!-- class view modal -->
+    @include('livewire.pages.tutee.post_components.modals.class_view_modal')
+
+    <!-- view recurring schedules -->
+    @include('livewire.pages.tutee.post_components.modals.view-recurring-dates')
 
     <x-wui-notifications position="bottom-right" />
 </section>

@@ -188,9 +188,10 @@ new #[Layout('layouts.app')] class extends Component {
     </div>
 
     {{-- Class List: Class Cards --}}
-    <div class="space-y-3">
+    <div class="space-y-3 h-full w-full flex flex-col items-center justify-center" wire:loading.remove>
         @forelse ($classes as $class)
-            <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4" wire:loading.remove>
+            <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4
+                {{ $class->schedule->initial_start_date < Carbon::now()->format('Y-m-d') ? 'border border-red-300 bg-red-50' : '' }}">
                 <div class="space-y-1">
                     <div class="flex justify-between items-center">
                         <div class="inline-flex items-center gap-2">
@@ -199,9 +200,10 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-wui-badge flat warning label="{{ $class->class_category }}" />
                             @else
                                 <x-wui-badge flat purple label="{{ $class->class_category }}" />
-                                @if ($class->schedule->never_end == 1)
-                                    <x-wui-badge flat zinc label="Closing this class is manual" />
-                                @endif
+                            @endif
+
+                            @if ($class->schedule->never_end == 1)
+                                <x-wui-badge flat zinc label="Closing this class is manual" />
                             @endif
                         </div>
                         @if ($class->class_status == 1)
@@ -219,20 +221,27 @@ new #[Layout('layouts.app')] class extends Component {
                             </x-wui-dropdown>
                         @endif
                     </div>
-                    <div class="flex gap-2 items-center text-[#64748B] text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p>Created at {{ $class->created_at->format('l jS \\of F Y h:i A') }}</p>
+                    <div class="space-y-2">
+                        <div class="flex gap-2 items-center text-[#64748B] text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p>Created at {{ $class->created_at->format('l jS \\of F Y h:i A') }}</p>
+                        </div>
+                        @if ($class->schedule->initial_start_date < Carbon::now()->format('Y-m-d'))
+                            <x-wui-badge flat negative label="This class schedule has passed" />
+                        @endif
                     </div>
                 </div>
                 <p class="line-clamp-3 antialiased leading-snug">
                     {{ $class->class_description }}
                 </p>
                 <div x-data="{ expanded: false }">
-                    <div class="text-sm p-3 rounded-md bg-[#E1E7EC]" x-show="expanded" x-collapse x-cloak>
+                    <div class="text-sm p-3 rounded-md bg-[#E1E7EC]
+                        {{ $class->schedule->initial_start_date < Carbon::now()->format('Y-m-d') ? 'bg-red-100' : '' }}"
+                        x-show="expanded" x-collapse x-cloak>
                         <p>
                             <strong>Class Status:</strong> {{ $class->class_status == 1 ? 'Open' : 'Closed' }}
                         </p>
@@ -286,9 +295,9 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
             </div>
         @empty
-            <div class="flex flex-col gap-3 justify-center items-center w-full">
+            <div class="flex flex-col gap-3 items-center justify-center">
                 <img class="size-60" src="{{ asset('images/empty_class.svg') }}" alt="">
-                <p class="font-semibold text-xl">No classes</p>
+                <p class="font-semibold text-center text-xl">No classes</p>
             </div>
         @endforelse
     </div>

@@ -55,7 +55,7 @@ new class extends Component {
 
 --}}
 
-<div class="hidden sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
+<div class="hidden z-50 sm:flex min-w-fit transition-all relative" x-data="sidenav" x-init='initialize' x-cloak>
 
     {{-- sidenav container --}}
     <div @class([
@@ -65,14 +65,10 @@ new class extends Component {
     ])>
         <div class="px-4 py-6">
 
-        <!-- TUTEE LOGO and header -->
-        <div class="flex items-center mb-4">
-            <img src="{{ asset('images/tutee-logo.png') }}" alt="Tutee Logo" class="h-10 w-10 mr-2"> <!-- Adjust size as needed -->
-            <h1 @class([
-                'uppercase font-bold text-center text-4xl px-2 font-anton mb-4',
-                'text-[#0F172A]' => $role == 'tutee',
-                'text-[#6D9773]' => $role == 'tutor',
-            ]) x-show='expanded'>t</h1>
+            <!-- TUTEE LOGO and header -->
+            <h1 class="mb-4" x-show='expanded'>
+                <img src="{{ asset('images/tutee-logo.png') }}" alt="Tutee Logo" class="h-10 w-10"> <!-- Adjust size as needed -->
+            </h1>
 
             {{-- tutee header --}}
             <h1 @class([
@@ -80,7 +76,6 @@ new class extends Component {
                 'text-[#0F172A]' => $role == 'tutee',
                 'text-[#6D9773]' => $role == 'tutor',
             ]) x-show='!expanded'>tutee</h1>
-        </div>
 
             <div
                 @class([
@@ -146,7 +141,7 @@ new class extends Component {
             </div>
 
             <!-- Logout -->
-            <div x-data="{ tooltip: false }" class="relative">
+            <div x-data="{ tooltip: false }" class="relative" wire:ignore>
                 <button wire:click='logout' :class="expanded ? 'w-fit' : 'w-full'" @class([
                     'inline-flex gap-3 text-sm font-medium px-2 mb-3 py-2 rounded-md',
                     'text-[#0F172A] hover:bg-[#E4E6E9]' => $role == 'tutee',

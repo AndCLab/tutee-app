@@ -12,10 +12,12 @@ class Schedule extends Model
     protected $table = 'schedules';
 
     protected $fillable = [
+        'initial_start_date',
         'start_time',
         'tutor_id',
         'end_time',
         'never_end',
+        'repeat_every',
     ];
 
     /**

@@ -9,6 +9,8 @@ use App\Models\Blacklist;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    public $title = "Blocked";
+
     public $blockedUser;
 
     public function mount()
@@ -18,7 +20,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function requestForUnblock()
     {
-        $this->blockedUser->update(['request' => 'Pending']);
+        $this->blockedUser->update(['request_status' => 'Pending']);
 
         $this->notification([
             'title'       => 'Requested!',
@@ -29,6 +31,10 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <section>
     <x-slot name="header">
@@ -46,13 +52,13 @@ new #[Layout('layouts.app')] class extends Component {
             <img class="w-[40%] h-auto py-1" src="{{ asset('images/blacklist.svg') }}" alt="">
             <div class="md:-translate-y-8 gap-2 flex flex-col justify-center items-center">
                 <p class="text-center text-lg text-gray-900">Your account has been blocked due to multiple reports.</p>
-                @if ($blockedUser->report_count <= 10)
+                @if ($blockedUser->report_count < 10)
                     <x-wui-button
                         wire:click="requestForUnblock"
                         spinner="requestForUnblock"
                         positive solid icon='refresh'
-                        :disabled="$blockedUser->request == 'Pending'"
-                        label="{{ $blockedUser->request == 'Pending' ? 'Requested' : 'Request for unblock'}}" />
+                        :disabled="$blockedUser->request_status == 'Pending'"
+                        label="{{ $blockedUser->request_status == 'Pending' ? 'Requested' : 'Request for unblock'}}" />
                 @else
                     <x-wui-badge md red icon="exclamation" label='You cannot request for unblocking at this moment.'/>
                 @endif

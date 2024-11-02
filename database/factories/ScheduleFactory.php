@@ -42,7 +42,10 @@ class ScheduleFactory extends Factory
         // Conditionally set 'never_end' based on whether recurring schedules exist
         $hasRecurringSchedule = fake()->boolean(50); // 50% chance to have recurring schedules
 
+        $initial_start_date = now()->subDays(5)->addDays(rand(1, 10))->format('Y-m-d');
+
         return [
+            'initial_start_date' => $initial_start_date,
             'start_time' => $start_time,
             'tutor_id' => $tutor_id,
             'end_time' => $end_time,
@@ -56,8 +59,7 @@ class ScheduleFactory extends Factory
             $dates = collect();
 
             // Generate unique random dates within the next 5 weeks
-            while ($dates->count() < 5) { // Change 5 to the number of unique dates you want
-                // Generate a random date within the next 5 weeks
+            while ($dates->count() < 5) {
                 $randomDate = now()->addDays(rand(1, 35))->format('Y-m-d');
                 $dates->push($randomDate)->unique(); // Ensure uniqueness
             }

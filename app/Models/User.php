@@ -68,14 +68,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tutee::class);
     }
-    
+
 
     // Define the polymorphic relationship
     public function notifications()
     {
         return $this->morphMany(Notification::class, 'notifiable');
     }
-    
+
     public function getNotifications()
     {
         return $this->notifications()->orderBy('created_at', 'desc')->get();
@@ -91,7 +91,7 @@ class User extends Authenticatable
             $this->tuteeNotifications()->createMany($this->notifications()->get());
         }
     }
-    
+
     public function fields()
     {
         return $this->hasMany(Fields::class);
