@@ -5,13 +5,16 @@
     $defaultAttributes = $href ? ['href' => $href] : ['type' => 'submit'];
 @endphp
 
-<{{ $tag }} {{ $attributes->merge(array_merge($defaultAttributes, ['class' => 'rounded border border-transparent bg-[#0C3B2E] px-4 py-2 text-sm text-white transition duration-150 ease-in-out hover:bg-[#0C3B2E]/90 focus:bg-[#0C3B2E]/90 focus:outline-none focus:ring-2 focus:ring-[#0C3B2E]/70 focus:ring-offset-2 active:bg-[#0C3B2E] disabled:bg-[#0C3B2E]/80'])) }}>
+<{{ $tag }} {{ $attributes->merge(array_merge($defaultAttributes, [
+    'wire:loading.attr' => 'disabled',
+    'class' => 'rounded border border-transparent bg-[#0C3B2E] px-4 py-2 text-sm text-white transition duration-150 ease-in-out hover:bg-[#0C3B2E]/90 focus:bg-[#0C3B2E]/90 focus:outline-none focus:ring-2 focus:ring-[#0C3B2E]/70 focus:ring-offset-2 active:bg-[#0C3B2E] disabled:bg-[#0C3B2E]/80'
+])) }}>
     <div class="inline-flex items-center gap-2">
         <p>
             {{ $slot }}
         </p>
         @if ($wireTarget !== null)
-            <div role="status" wire:loading wire:target='{{ $wireTarget }}'>
+            <div role="status" wire:loading wire:target="{{ $wireTarget }}">
                 <svg class="animate-spin size-4 shrink-0"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

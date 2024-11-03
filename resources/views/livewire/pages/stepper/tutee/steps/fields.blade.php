@@ -62,8 +62,11 @@
             <form wire:submit='get_specific_field' class="space-y-2 mt-2">
                 <div class="w-full">
                     <x-wui-input class="py-1.5" label="Specific Field" placeholder="Enter specific field"
-                        wire:model="specific" autofocus autocomplete='off' />
-                </div>
+                        wire:model="specific" autofocus autocomplete='off' shadowless/>
+                        <div class="text-xs text-gray-400 mt-2">
+                            Must be at least 3 fields.
+                        </div>
+                    </div>
                 <div class="grid">
                     <x-white-button type='submit'>Add Field</x-white-button>
                 </div>

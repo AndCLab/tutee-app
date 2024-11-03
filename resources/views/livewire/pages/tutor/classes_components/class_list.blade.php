@@ -16,6 +16,9 @@ use App\Models\Fields;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    // get auth tutor
+    public $tutor;
+
     // class properties
     public string $class_name = '';
     public string $class_description = '';
@@ -26,7 +29,6 @@ new #[Layout('layouts.app')] class extends Component {
     public $class_students;
     public $class_fee = 0;
     public $class_fields = []; //fields setter
-    public $getFields = []; // fields getter
 
     // for class schedule date
     public $sched_start_date;
@@ -36,292 +38,83 @@ new #[Layout('layouts.app')] class extends Component {
     public $regi_start_date;
     public $regi_end_date;
 
-    public $allClasses;
-    public $pendingClasses;
-
-    public $classFilter;
-
     // states
     #[Url(as: 'search_class')]
-    public $searchAll = '';
+    public $search = '';
 
-    #[Url(as: 'search_pending')]
-    public $searchPending = '';
-
-    public $QueryNotFound;
-    public bool $isEmptyAll = false;
-    public bool $isEmptyPending = false;
+    #[Url(as: 'sort_by')]
     public $sort_by;
 
+    #[Url(as: 'class_status')]
+    public $class_status;
+
+    public bool $isEmptyClass = false;
     public $showWithdrawClassModal;
-    public $showEditClassModal;
-    public $editClassId;
+    public $deleteClassId;
 
     public function mount()
     {
         // default value: descending
         $this->sort_by = 'desc';
-
-        $this->pendingClasses = Classes::where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
-
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
-
-        $this->getFields = Fields::where('user_id', Auth::id())
-            ->get(['field_name'])
-            ->toArray();
-
-        // default
-        $this->classFilter = 'pending';
-
-        $this->isEmptyAll = $this->allClasses->isEmpty();
-        $this->isEmptyPending = $this->pendingClasses->isEmpty();
+        $this->class_status = '1';
+        $this->tutor = Tutor::where('user_id', Auth::id())->first();
     }
+
+    public function with(): array
+    {
+        if ($this->tutor) {
+            $classes = Classes::where('tutor_id', $this->tutor->id)
+                            ->when($this->search, function ($q) {
+                                $q->where('class_name', 'like', "%{$this->search}%");
+                            })
+                            ->when($this->sort_by, function ($q) {
+                                $q->orderBy('created_at', $this->sort_by);
+                            })
+                            ->when($this->class_status && $this->class_status !== null, function ($q) {
+                                $q->where('class_status', $this->class_status);
+                            })
+                            ->get();
+        }
+
+        $getFields = Fields::where('user_id', Auth::id())
+                                ->where('active_in', Auth::user()->user_type)
+                                ->get(['field_name'])
+                                ->toArray();
+
+        // boolean for checking if the collection is empty
+        $this->isEmptyClass = $classes->isEmpty();
+
+        return ['classes' => $classes, 'getFields' => $getFields, 'isEmptyClass' => $this->isEmptyClass];
+    }
+
 
     #[On('new-class')]
     public function updateList($isNotEmpty)
     {
-        if ($this->isEmptyPending != $isNotEmpty || $this->isEmptyAll != $isNotEmpty) {
-            $this->isEmptyPending = $isNotEmpty;
-            $this->isEmptyAll = $isNotEmpty;
+        if ($this->isEmptyClass != $isNotEmpty) {
+            $this->isEmptyClass = $isNotEmpty;
         }
 
-        $this->pendingClasses = Classes::where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
-
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
-    }
-
-    public function updatedSortBy()
-    {
-        $sortOrder = in_array($this->sort_by, ['asc', 'desc']) ? $this->sort_by : 'asc';
-
-        if ($this->classFilter === 'all') {
-            $this->allClasses = Classes::orderBy('created_at', $sortOrder)->get();
-        } elseif ($this->classFilter === 'pending') {
-            $this->pendingClasses = Classes::where('class_status', 1)->orderBy('created_at', $sortOrder)->get();
-        }
-    }
-
-    public function viewAll()
-    {
-        $this->classFilter = 'all';
-        $this->allClasses = Classes::orderBy('created_at', $this->sort_by)->get();
-    }
-
-    public function viewPending()
-    {
-        $this->classFilter = 'pending';
-        $this->pendingClasses = Classes::where('class_status', 1)
-            ->orderBy('created_at', $this->sort_by)
-            ->get();
-    }
-
-    public function updatedSearchAll()
-    {
-        $this->searchClasses('all', $this->searchAll);
-    }
-
-    public function updatedSearchPending()
-    {
-        $this->searchClasses('pending', $this->searchPending);
-    }
-
-    protected function searchClasses(string $filter, string $searchTerm)
-    {
-        if (($filter === 'all' && !$this->isEmptyAll) || ($filter === 'pending' && !$this->isEmptyPending)) {
-            $query = Classes::orderBy('created_at', $this->sort_by)->where('class_name', 'like', '%' . $searchTerm . '%');
-
-            if ($filter === 'pending') {
-                $query->where('class_status', 1);
-            }
-
-            $result = $query->get();
-
-            if ($filter === 'all') {
-                $this->allClasses = $result;
-            } elseif ($filter === 'pending') {
-                $this->pendingClasses = $result;
-            }
-
-            $this->QueryNotFound = $result->isEmpty() ? 'No results found for your search.' : '';
-        }
-    }
-
-    public function editClass()
-    {
-        // Fetch the class to be edited
-        $class = Classes::find($this->editClassId);
-
-        // Define validation rules
-        $rules = [
-            'class_name' => ['required', 'string', 'max:255'],
-            'class_description' => ['required', 'string', 'max:255'],
-            'class_fields' => ['required'],
-            'sched_start_date' => ['required', 'date'],
-            'sched_end_date' => ['required', 'date', 'after:sched_start_date'],
-            'class_location' => ['nullable', 'string', 'max:255'],
-            'class_link' => ['nullable', 'string', 'max:255'],
-        ];
-
-        // Add conditional validation rules
-        if ($class->class_category == 'group' && $class->registration) {
-            $rules['class_students'] = ['required', 'integer', 'min:2', 'max:50'];
-            $rules['regi_start_date'] = ['required', 'date'];
-            $rules['regi_end_date'] = ['required', 'date', 'after:regi_start_date'];
-            $rules['sched_start_date'] = ['required', 'date', 'after:regi_end_date'];
-            $rules['sched_end_date'] = ['required', 'date', 'after:sched_start_date'];
-        }
-
-        // Validate inputs
-        $this->validate($rules);
-
-        // Get current fields
-        $currentFields = json_decode($class->class_fields);
-
-        // Update class details
-        $class->class_name = $this->class_name;
-        $class->class_description = $this->class_description;
-        $class->class_fields = is_array($this->class_fields) ? json_encode($this->class_fields) : $this->class_fields;
-        $class->class_students = $this->class_students;
-        $class->class_fee = $this->class_fee;
-
-        // Determine class type
-        if ($this->class_location && $this->class_link) {
-            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
-            return;
-        } elseif ($this->class_link) {
-            $this->class_type = 'virtual';
-            $this->class_location = $this->class_link;
-        } elseif ($this->class_location) {
-            $this->class_type = 'physical';
-        } else {
-            $this->sendNotification('Error', 'Either virtual or physical class', 'error');
-            return;
-        }
-
-        // Update schedule
-        if ($class->schedule) {
-            $class->schedule->start_date = $this->sched_start_date;
-            $class->schedule->end_date = $this->sched_end_date;
-            $class->schedule->save();
-        }
-
-        // Update registration dates if applicable
-        if ($class->class_category == 'group' && $class->registration) {
-            $class->registration->start_date = $this->regi_start_date;
-            $class->registration->end_date = $this->regi_end_date;
-            $class->registration->save();
-        }
-
-        $newFields = json_decode($class->class_fields);
-
-        // Decrement if current fields are not in the new fields
-        foreach ($currentFields as $currentField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $currentField)->get();
-
-            if (!in_array($currentField, $newFields)) {
-                foreach ($fields as $field) {
-                    $field->class_count--;
-                    $field->save();
-                }
-            }
-        }
-
-        // Increment if new fields are not in the current fields
-        foreach ($newFields as $newField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $newField)->get();
-
-            if (!in_array($newField, $currentFields)) {
-                foreach ($fields as $field) {
-                    $field->class_count++;
-                    $field->save();
-                }
-            }
-        }
-
-        // Save the class
-        $class->save();
-
-        // Reset input fields
-        $this->reset(['class_name', 'class_description', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date', 'class_location', 'class_students', 'class_fee', 'class_link']);
-
-        // Notify user of success
-        $this->sendNotification('Updated Class!', 'Successfully updated!', 'success');
-
-        // Close the modal and dispatch event
-        $this->showEditClassModal = false;
-        $this->dispatch('new-class', isNotEmpty: 0);
-    }
-
-    // Helper method for notifications
-    private function sendNotification($title, $description, $icon, $timeout = 2500)
-    {
-        $this->notification([
-            'title' => $title,
-            'description' => $description,
-            'icon' => $icon,
-            'timeout' => $timeout,
-        ]);
-    }
-
-    public function resetModalState()
-    {
-        $this->reset(['showEditClassModal', 'editClassId', 'class_name', 'class_description', 'class_type', 'class_category', 'class_link', 'class_students', 'class_location', 'class_fee', 'class_fields', 'sched_start_date', 'sched_end_date', 'regi_start_date', 'regi_end_date']);
-        $this->resetValidation();
-    }
-
-    public function editClassModal($editClass)
-    {
-        $this->showEditClassModal = true;
-        $this->editClassId = $editClass;
-
-        $class = Classes::find($editClass);
-
-        $this->class_name = $class->class_name;
-        $this->class_description = $class->class_description;
-        $this->class_type = $class->class_type;
-        $this->class_category = $class->class_category;
-
-        if ($class->class_students) {
-            $this->class_students = $class->class_students;
-        }
-
-        if ($class->class_type == 'virtual') {
-            $this->class_link = $class->class_location;
-        } elseif ($class->class_type == 'physical') {
-            $this->class_location = $class->class_location;
-        }
-
-        $this->class_fee = $class->class_fee;
-        $this->class_fields = json_decode($class->class_fields, true); //fields setter
-
-        // for class schedule date
-        if ($class->schedule) {
-            $this->sched_start_date = $class->schedule->start_date;
-            $this->sched_end_date = $class->schedule->end_date;
-        }
-
-        // for registration date
-        if ($class->class_category == 'group' && $class->registration !== null) {
-            $this->regi_start_date = $class->registration->start_date;
-            $this->regi_end_date = $class->registration->end_date;
-        }
+        $this->classes = Classes::where('tutor_id', $this->tutor->id)
+                                ->where('class_status', $this->class_status)
+                                ->orderBy('created_at', $this->sort_by)
+                                ->get();
     }
 
     // delete class
     public function withdrawClass()
     {
-        $class = Classes::find($this->editClassId);
+        $class = Classes::find($this->deleteClassId);
         $sched = $class->schedule;
         $regi = $class->registration;
 
         $currentFields = json_decode($class->class_fields);
 
         foreach ($currentFields as $classField) {
-            $fields = Fields::where('user_id', Auth::id())->where('field_name', $classField)->get();
+            $fields = Fields::where('user_id', Auth::id())
+                            ->where('active_in', Auth::user()->user_type)
+                            ->where('field_name', $classField)
+                            ->get();
 
             foreach ($fields as $field) {
                 $field->class_count = $field->class_count - 1;
@@ -345,19 +138,29 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         $this->showWithdrawClassModal = false;
-        $this->mount();
     }
 
+    // trigger withdraw class modal
     public function withdrawClassModal($classId)
     {
         $this->showWithdrawClassModal = true;
-        $this->editClassId = $classId;
+        $this->deleteClassId = $classId;
     }
-}; ?>
 
-@php
-    $classes = $classFilter == 'all' ? $allClasses : $pendingClasses;
-@endphp
+    public function closeEndlessClass($classId)
+    {
+        return Classes::findOrFail($classId)->update(['class_status' => 0]);
+
+        $this->notification([
+            'title' => 'Class Closed',
+            'description' => 'Successfully closed the class',
+            'icon' => 'success',
+            'timeout' => 2500,
+        ]);
+    }
+
+
+}; ?>
 
 <section>
     <x-slot name="header">
@@ -366,163 +169,145 @@ new #[Layout('layouts.app')] class extends Component {
     <p class="capitalize font-semibold text-xl mb-9">class list</p>
 
     {{-- Class List: Search and Filter --}}
-    <div class="flex gap-2 pb-3">
-        @if ($classFilter == 'all')
-            <div class="w-full">
-                <x-wui-input wire:model.live='searchAll' placeholder='Search class...' icon='search' shadowless />
-            </div>
-        @else
-            <div class="w-full">
-                <x-wui-input wire:model.live='searchPending' placeholder='Search pending class...' icon='search'
-                    shadowless />
-            </div>
-        @endif
-        <div class="w-fit">
+    <div class="flex flex-wrap md:flex-nowrap gap-2 pb-3">
+        <div class="w-full md:w-2/4">
+            <x-wui-input wire:model.live='search' placeholder='Search class...' icon='search' shadowless />
+        </div>
+        <div class="w-full md:w-fit">
             <x-wui-select wire:model.live='sort_by' placeholder="Sort by" shadowless>
                 <x-wui-select.option label="Ascending" value="asc" />
                 <x-wui-select.option label="Descending" value="desc" />
             </x-wui-select>
         </div>
-        <x-wui-dropdown>
-            <x-slot name="trigger">
-                <x-wui-button.circle flat md squared icon='adjustments' />
-            </x-slot>
-
-            <x-wui-dropdown.item wire:click='viewAll' spinner='viewAll' label="View all classes" />
-            <x-wui-dropdown.item wire:click='viewPending' spinner='viewPending' label="View pending classes" />
-        </x-wui-dropdown>
+        <div class="w-full md:w-fit">
+            <x-wui-select wire:model.live='class_status' placeholder="Class Status" shadowless>
+                <x-wui-select.option label="All Classes" value="0" />
+                <x-wui-select.option label="Pending Classes" value="1" />
+            </x-wui-select>
+        </div>
     </div>
 
     {{-- Class List: Class Cards --}}
-    <div class="space-y-3">
-        @if (!$isEmptyAll || !$isEmptyPending)
-            @foreach ($classes as $class)
-                <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4" wire:loading.remove>
-                    <div class="space-y-1">
-                        <div class="flex justify-between items-center">
-                            <div class="inline-flex items-center gap-2">
-                                <p class="font-semibold">{{ $class->class_name }}</p>
-                                @if ($class->class_category == 'group')
-                                    <x-wui-badge flat warning label="{{ $class->class_category }}" />
-                                @else
-                                    <x-wui-badge flat purple label="{{ $class->class_category }}" />
-                                @endif
-                            </div>
+    <div class="space-y-3 h-full w-full flex flex-col items-center justify-center" wire:loading.remove>
+        @forelse ($classes as $class)
+            <div class="w-full bg-[#F1F5F9] p-4 pb-2 rounded-md text-[#0F172A] space-y-4
+                {{ $class->schedule->initial_start_date < Carbon::now()->format('Y-m-d') ? 'border border-red-300 bg-red-50' : '' }}">
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <div class="inline-flex items-center gap-2">
+                            <p class="font-semibold">{{ $class->class_name }}</p>
+                            @if ($class->class_category == 'group')
+                                <x-wui-badge flat warning label="{{ $class->class_category }}" />
+                            @else
+                                <x-wui-badge flat purple label="{{ $class->class_category }}" />
+                            @endif
+
+                            @if ($class->schedule->never_end == 1)
+                                <x-wui-badge flat zinc label="Closing this class is manual" />
+                            @endif
+                        </div>
+                        @if ($class->class_status == 1)
                             <x-wui-dropdown>
                                 <x-wui-dropdown.header class="font-semibold" label="Actions">
-                                    @if ($class->class_status == 1)
-                                        <x-wui-dropdown.item wire:click='editClassModal({{ $class->id }})'
-                                            icon='pencil-alt' label="Edit" />
-                                        <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})'
-                                            icon='trash' label="Withdraw" />
+                                    <x-wui-dropdown.item wire:navigate href="{{ route('edit-class', $class->id) }}"
+                                        icon='pencil-alt' label="Edit" />
+                                    <x-wui-dropdown.item wire:click='withdrawClassModal({{ $class->id }})'
+                                        icon='trash' label="Withdraw" />
+                                    @if ($class->schedule->never_end == 1)
+                                        <x-wui-dropdown.item wire:click='closeEndlessClass({{ $class->id }})'
+                                            icon='lock-closed' label="Close Class" />
                                     @endif
                                 </x-wui-dropdown.header>
                             </x-wui-dropdown>
-                        </div>
+                        @endif
+                    </div>
+                    <div class="space-y-2">
                         <div class="flex gap-2 items-center text-[#64748B] text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <p>Created at {{ Carbon::create($class['created_at'])->format('l jS \\of F Y h:i A') }}</p>
+                            <p>Created at {{ $class->created_at->format('l jS \\of F Y h:i A') }}</p>
                         </div>
-                    </div>
-                    <p class="line-clamp-3 antialiased leading-snug">
-                        {{ $class->class_description }}
-                    </p>
-                    <div x-data="{ expanded: false }">
-                        <div class="text-sm" x-show="expanded" x-collapse x-cloak>
-                            <p>
-                                Class Status:
-                                @if ($class->class_status == 1)
-                                    Open
-                                @else
-                                    Closed
-                                @endif
-                            </p>
-                            <p>
-                                Class Type: {{ ucfirst($class->class_type) }}
-                            </p>
-                            <p>
-                                Class Fee:
-                                @if ($class->class_fee == 0.0)
-                                    Free Class
-                                @else
-                                    {{ number_format($class->class_fee, 2) }}
-                                @endif
-                            </p>
-                            @if ($class->class_students >= 2)
-                                <p>
-                                    There are {{ $class->class_students }} slots available
-                                </p>
-                            @endif
-                            <p>
-                                Class Fields:
-                                @foreach ($fields = json_decode($class->class_fields, true) as $index => $item)
-                                    @if ($index < count($fields) - 1)
-                                        {{ $item . ',' }}
-                                    @else
-                                        {{ $item }}
-                                    @endif
-                                @endforeach
-                            </p>
-                            <p>
-                                Class Location: {{ $class->class_location }}
-                            </p>
-                            <p>
-                                Starts at
-                                {{ Carbon::create($class->schedule->start_date)->format('l jS \\of F Y h:i A') }}
-                            </p>
-                        </div>
-
-                        <div class="flex justify-end">
-                            <template x-if='expanded == false' x-transition>
-                                <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down'
-                                    flat />
-                            </template>
-                            <template x-if='expanded == true' x-transition>
-                                <x-wui-button @click="expanded = ! expanded" xs label='View less' icon='arrow-up'
-                                    flat />
-                            </template>
-                        </div>
+                        @if ($class->schedule->initial_start_date < Carbon::now()->format('Y-m-d'))
+                            <x-wui-badge flat negative label="This class schedule has passed" />
+                        @endif
                     </div>
                 </div>
-            @endforeach
-        @endif
+                <p class="line-clamp-3 antialiased leading-snug">
+                    {{ $class->class_description }}
+                </p>
+                <div x-data="{ expanded: false }">
+                    <div class="text-sm p-3 rounded-md bg-[#E1E7EC]
+                        {{ $class->schedule->initial_start_date < Carbon::now()->format('Y-m-d') ? 'bg-red-100' : '' }}"
+                        x-show="expanded" x-collapse x-cloak>
+                        <p>
+                            <strong>Class Status:</strong> {{ $class->class_status == 1 ? 'Open' : 'Closed' }}
+                        </p>
+                        <p>
+                            <strong>Class Type:</strong> {{ ucfirst($class->class_type) }}
+                        </p>
+                        <p>
+                            <strong>Class Fee:</strong> {{ $class->class_fee == 0.0 ? 'Free Class' : number_format($class->class_fee, 2) }}
+                        </p>
+                        @if ($class->class_students >= 2)
+                            <p>
+                                There are {{ $class->class_students }} slots available
+                            </p>
+                        @endif
+                        <p>
+                            <strong>Class Fields:</strong>
+                            {{ implode(', ', json_decode($class->class_fields, true)) }}
+                        </p>
+                        <p>
+                            <strong>Class Location:</strong> {{ $class->class_location }}
+                        </p>
+                        <p>
+                            <strong>Upcoming Schedule Date:</strong>
+                            @foreach ($class->schedule->recurring_schedule as $recurring)
+                                @if (Carbon::parse($recurring->dates)->isToday() || Carbon::parse($recurring->dates)->isFuture())
+                                    <span>
+                                        {{ Carbon::parse($recurring->dates)->format('l jS \\of F Y') }}
+                                    </span>
+                                    @break
+                                @endif
+                            @endforeach
+                        </p>
+                        <p>
+                            <strong>Time:</strong>
+                            {{ Carbon::create($class->schedule->start_time)->format('g:i A') }} -
+                            {{ Carbon::create($class->schedule->end_time)->format('g:i A') }}
+                        </p>
+                    </div>
 
-        @if ($classFilter == 'pending' && $isEmptyPending)
-            <div class="flex flex-col gap-3 justify-center items-center w-full" wire:loading.remove>
-                <img class="size-60" src="{{ asset('images/empty_class.svg') }}" alt="">
-                <p class="font-semibold text-xl">You don't have any pending classes</p>
+
+                    <div class="flex justify-end">
+                        <template x-if='expanded == false' x-transition>
+                            <x-wui-button @click="expanded = ! expanded" xs label='View more' icon='arrow-down'
+                                flat />
+                        </template>
+                        <template x-if='expanded == true' x-transition>
+                            <x-wui-button @click="expanded = ! expanded" xs label='View less' icon='arrow-up'
+                                flat />
+                        </template>
+                    </div>
+                </div>
             </div>
-        @elseif($classFilter == 'all' && $isEmptyAll)
-            <div class="flex flex-col gap-3 justify-center items-center w-full" wire:loading.remove>
+        @empty
+            <div class="flex flex-col gap-3 items-center justify-center">
                 <img class="size-60" src="{{ asset('images/empty_class.svg') }}" alt="">
-                <p class="font-semibold text-xl">Start by creating your own class</p>
+                <p class="font-semibold text-center text-xl">No classes</p>
             </div>
-        @endif
-
-
-        @if ($QueryNotFound)
-            <h1 wire:loading.class='hidden'>
-                {{ $QueryNotFound }}
-            </h1>
-        @endif
+        @endforelse
     </div>
-
-    <x-wui-modal wire:model.live="showEditClassModal" persistent>
-        <x-wui-card title="Edit Class">
-            @include('livewire.pages.tutor.classes_components.edit_class')
-        </x-wui-card>
-    </x-wui-modal>
 
     <x-wui-modal wire:model="showWithdrawClassModal" persistent align='center' max-width='sm'>
         <x-wui-card title="Delete Class">
             <p class="text-gray-600">
                 Do you wanna remove this class?
                 <span class="font-semibold">
-                    {{ Classes::where('id', $editClassId)->pluck('class_name')->first() }}
+                    {{ Classes::where('id', $deleteClassId)->pluck('class_name')->first() }}
                 </span>
             </p>
 
@@ -535,15 +320,11 @@ new #[Layout('layouts.app')] class extends Component {
         </x-wui-card>
     </x-wui-modal>
 
-    <x-class-skeleton loadClass='searchAll' />
-    <x-class-skeleton loadClass='searchPending' />
+    <x-class-skeleton loadClass='search' />
     <x-class-skeleton loadClass='sort_by' />
-    <x-class-skeleton loadClass='viewAll' />
-    <x-class-skeleton loadClass='viewPending' />
+    <x-class-skeleton loadClass='class_status' />
     <x-class-skeleton loadClass='withdrawClass' />
     <x-class-skeleton loadClass='withdrawClassModal' />
-    <x-class-skeleton loadClass='editClass' />
-    <x-class-skeleton loadClass='editClassModal' />
-    <x-class-skeleton loadClass='resetModalState' />
+    <x-class-skeleton loadClass='closeEndlessClass' />
 
 </section>

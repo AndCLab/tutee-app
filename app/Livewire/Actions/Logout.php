@@ -12,7 +12,13 @@ class Logout
      */
     public function __invoke(): void
     {
-        Auth::guard('web')->logout();
+        if (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+        }
+
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+        }
 
         Session::invalidate();
         Session::regenerateToken();

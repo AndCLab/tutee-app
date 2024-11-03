@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,7 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'check.is_stepper' => \App\Http\Middleware\CheckStepper::class,
             'checkUserType' => \App\Http\Middleware\CheckUserType::class,
+            'checkIsApplied' => \App\Http\Middleware\CheckIsApplied::class,
+            'blocked' => \App\Http\Middleware\BlockedUser::class,
         ]);
     })->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('class:close-expired')->daily();
+        $schedule->command('block:reported-users')->daily();
+        $schedule->command('unblock:reported-users')->hourly();
+        $schedule->command('update:recurring-schedule-dates')->daily();
+    })
+    ->create();
+

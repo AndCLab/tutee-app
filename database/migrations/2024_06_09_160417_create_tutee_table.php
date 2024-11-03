@@ -16,11 +16,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')
                 ->onDelete('cascade');
             $table->enum('grade_level', [
-                'Preschool', 
-                'Kindergarten', 
+                'Preschool',
+                'Kindergarten',
                 'Elementary School',
-                'Middle School', 
-                'Highschool', 
+                'Middle School',
+                'Highschool',
                 'Undergraduate',
                 'College'
             ]);

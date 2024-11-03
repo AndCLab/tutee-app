@@ -30,7 +30,7 @@
                         <h1 class="uppercase font-bold text-4xl px-2 font-anton text-[#0C3B2E]">tutee</h1>
                     </div>
                     <div>
-                        @guest
+                        @guest('web')
                             @if (Route::has('login'))
                                 <livewire:welcome.navigation />
                             @endif
@@ -55,7 +55,7 @@
                     </div>
                     <span data-aos="fade-right" data-aos-duration="500" class="text-[#64748B] text-center md:text-start md:w-4/5">Enhance Learning and Efficiency with Our All-in-One Tutoring Platform.</span>
 
-                    @auth
+                    @auth('web')
                         <x-primary-button data-aos="fade-right" data-aos-duration="500" href="{{ route($route) }}" class="sm:w-fit w-full text-center">
                             Dashboard
                         </x-primary-button>

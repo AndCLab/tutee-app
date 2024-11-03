@@ -3,26 +3,22 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Tutor;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tutor>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Group>
  */
-class TutorFactory extends Factory
+class GroupFactory extends Factory
 {
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-
-    protected $model = Tutor::class;
-
     public function definition(): array
     {
         return [
-            'user_id' => 3,
-            'work' => $this->faker->word(),
+            'name' => $this->faker->company,
+            'description' => $this->faker->sentence,
         ];
     }
 }

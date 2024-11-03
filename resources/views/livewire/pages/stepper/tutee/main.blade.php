@@ -13,6 +13,8 @@ use WireUi\Traits\Actions;
 new #[Layout('layouts.app')] class extends Component {
     use Actions;
 
+    public $title = 'Stepper | Tutee Role';
+
     public $count = 2;
 
     // General
@@ -79,7 +81,7 @@ new #[Layout('layouts.app')] class extends Component {
             'specific' => 'required'
         ]);
 
-        if (!in_array($this->specific, $this->selected)) {
+        if (!in_array(strtolower($this->specific), array_map('strtolower', $this->selected))) {
             $this->selected[$this->i++] = $this->specific;
         }
 
@@ -142,11 +144,15 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function submit()
     {
-        // Update stepper to 0
         $user = User::find(Auth::id());
         $user->user_type = $this->user_type;
         $user->is_stepper = 0;
         $user->save();
+
+        if ($user->apply_status == 'pending'){
+            $user->apply_status = 'applied';
+            $user->save();
+        }
 
         if ($user && $this->user_type === 'tutee') {
             $tutee = Tutee::create([
@@ -167,6 +173,7 @@ new #[Layout('layouts.app')] class extends Component {
                 Fields::create([
                     'user_id' => $user->id,
                     'field_name' => $item,
+                    'active_in' => 'tutee',
                 ]);
             }
 
@@ -181,6 +188,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->redirect('/login', navigate: true);
     }
 }; ?>
+
+@push('title')
+    {{ $title }}
+@endpush
 
 <div>
     @include('livewire.pages.stepper.body')

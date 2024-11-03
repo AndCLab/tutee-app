@@ -13,6 +13,6 @@ class FieldsSeeder extends Seeder
      */
     public function run(): void
     {
-        Fields::factory()->times(20)->create();
+        Fields::factory()->times(500)->create();
     }
 }

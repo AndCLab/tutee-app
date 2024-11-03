@@ -1,6 +1,6 @@
 {{-- Discover --}}
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('tutor.discover') }}" wire:navigate.hover x-on:mouseenter="tooltip = !tooltip"
+    <a href="{{ route('tutor.discover') }}" wire:navigate x-on:mouseenter="tooltip = !tooltip"
         x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
         class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
@@ -24,7 +24,7 @@
 
 {{-- Classes --}}
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('classes') }}" wire:navigate.hover x-on:mouseenter="tooltip = !tooltip"
+    <a href="{{ route('classes') }}" wire:navigate x-on:mouseenter="tooltip = !tooltip"
         x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
         class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
@@ -47,7 +47,7 @@
 </li>
 
 <li x-data="{ tooltip: false }" class="relative">
-    <a href="{{ route('tutor.schedule') }}" wire:navigate.hover x-on:mouseenter="tooltip = !tooltip"
+    <a href="{{ route('tutor.schedule') }}" wire:navigate x-on:mouseenter="tooltip = !tooltip"
         x-on:mouseleave="tooltip = false" :class="expanded ? 'w-fit' : 'w-full'"
         class="inline-flex items-center gap-3 text-sm font-medium hover:bg-[#F2F2F2]/10 py-2 px-2 rounded-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"

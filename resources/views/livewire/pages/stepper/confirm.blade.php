@@ -42,6 +42,32 @@
         </div>
     </div>
 
+{{-- Application confirmation modal Class --}}
+    <x-wui-modal name="applicationModal" align='center' max-width='xl' persistent>
+        <x-wui-card>
+            @if (Auth::user()->user_type == 'tutor')
+                <h2 class="text-lg font-medium text-gray-900">
+                    You are applying as Tutee.
+                </h2>
+            @else
+                <h2 class="text-lg font-medium text-gray-900">
+                    You are applying as Tutor.
+                </h2>
+            @endif
+                <div>
+                    <div class="mt-6 flex justify-end">
+                        <x-secondary-button x-on:click='close'>
+                            {{ __('Cancel') }}
+                        </x-secondary-button>
+
+                        <x-primary-button class="ms-3" wire:click="submit" x-bind:disabled="!open">
+                            {{ __('Continue') }}
+                        </x-primary-button>
+                    </div>
+                </div>
+        </x-wui-card>
+    </x-wui-modal>
+
     <div class="my-2 text-pretty text-sm md:text-center">
         <p>By using this website, you agree to our <span class="underline cursor-pointer"
             onclick="$openModal('cardModal')">Terms and Condition</span></p>
@@ -51,7 +77,6 @@
     <x-wui-modal name="cardModal" align='center' max-width='xl' persistent>
         <x-wui-card>
             <form wire:submit="submit" x-data="{ open: false }">
-
                 <h2 class="text-lg font-medium text-gray-900">
                     TUTEE Platform - Terms and Conditions
                 </h2>
@@ -85,22 +110,46 @@
 
                     <div class="mt-6">
                         <div class="block">
-                            <x-wui-checkbox wire:model='confirm' class="text-gray-600" id="right-label" label="I agree to the terms and condition" x-model="open" />
+
+                            <div>
+                                <label for="right-label" class="flex items-center ">
+                                    <div class="relative flex items-start">
+
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox"
+                                                class="form-checkbox rounded transition ease-in-out duration-100 border-secondary-300 focus:ring-primary-600 focus:border-primary-400 text-gray-600"
+                                                @disabled(Auth::user()->apply_status == 'pending')
+                                                @checked(Auth::user()->apply_status == 'pending')
+                                                wire:model="confirm"
+                                                x-model="open"
+                                                id="right-label"
+                                                name="confirm">
+                                        </div>
+
+                                        <div class="ml-2 text-sm">
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-400" for="right-label">
+                                                I agree to the terms and condition
+                                            </label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
                 <div>
-
                     <div class="mt-6 flex justify-end">
                         <x-secondary-button x-on:click='close'>
-                            {{ __('Cancel') }}
+                            {{ __('Back') }}
                         </x-secondary-button>
-
+                    @if (!(Auth::user()->apply_status == 'pending'))
                         <x-primary-button class="ms-3" x-bind:disabled="!open">
                             {{ __('Submit') }}
                         </x-primary-button>
                     </div>
+                    @endif
                 </div>
             </form>
         </x-wui-card>

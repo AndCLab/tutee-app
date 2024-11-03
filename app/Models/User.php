@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
@@ -17,18 +18,22 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'avatar',
         'fname',
         'lname',
+        'name',
         'email',
+        'email_verified_at',
+        'password',
         'address',
         'zip_code',
         'phone_prefix',
         'phone_number',
-
         'is_stepper',
+        'apply_status',
         'user_type',
-        'avatar',
-        'password',
+        'google_id',
+        'facebook_id',
     ];
 
     /**
@@ -62,5 +67,38 @@ class User extends Authenticatable
     public function tutees()
     {
         return $this->hasMany(Tutee::class);
+    }
+
+
+    // Define the polymorphic relationship
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
+
+    public function getNotifications()
+    {
+        return $this->notifications()->orderBy('created_at', 'desc')->get();
+    }
+
+    public function updateNotifications()
+    {
+        if ($this->user_type == 'tutor') {
+            $this->tuteeNotifications()->delete();
+            $this->tutorNotifications()->createMany($this->notifications()->get());
+        } elseif ($this->user_type == 'tutee') {
+            $this->tutorNotifications()->delete();
+            $this->tuteeNotifications()->createMany($this->notifications()->get());
+        }
+    }
+
+    public function fields()
+    {
+        return $this->hasMany(Fields::class);
+    }
+
+    public function blacklist()
+    {
+        return $this->hasMany(Blacklist::class, 'reported_user_id');
     }
 }

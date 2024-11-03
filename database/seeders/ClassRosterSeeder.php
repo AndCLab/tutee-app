@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Models\ClassRoster;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Tutee;
 
-class TuteeSeeder extends Seeder
+class ClassRosterSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Tutee::factory()->times(1)->create();
+        ClassRoster::factory()->times(250)->create();
     }
 }

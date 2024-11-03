@@ -29,12 +29,11 @@ return new class extends Migration
             $table->boolean('class_status')->default(1);
 
             $table->foreignId('schedule_id')
-                ->nullable()
                 ->constrained('schedules')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
-                $table->foreignId('registration_id')
+            $table->foreignId('registration_id')
                 ->nullable()
                 ->constrained('registrations')
                 ->onUpdate('cascade')

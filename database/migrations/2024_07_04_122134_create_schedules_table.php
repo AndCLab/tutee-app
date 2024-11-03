@@ -13,8 +13,19 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
+            $table->date('initial_start_date')->nullable();
+            $table->time('start_time');
+            $table->integer('tutor_id')->unsigned();
+            $table->time('end_time');
+            $table->boolean('never_end')->default(0);
+            $table->enum('repeat_every', [
+                'once',
+                'days',
+                'months',
+                'weeks',
+                'weekdays',
+                'custom'
+            ])->nullable();
             $table->timestamps();
         });
     }

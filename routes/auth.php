@@ -18,7 +18,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.reset');
 });
 
-Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
+Route::middleware('auth', 'check.is_stepper', 'verified', 'blocked')->group(function () {
     Volt::route('verify-email', 'pages.auth.verify-email')
         ->name('verification.notice');
 
@@ -38,6 +38,7 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
         Volt::route('tutee/discover', 'pages.tutee.discover')->name('tutee.discover');
         Volt::route('tutors', 'pages.tutee.tutors')->name('tutors');
         Volt::route('tutee/schedule', 'pages.tutee.schedule')->name('tutee.schedule');
+        Volt::route('tutee/edit-post/{id}', 'pages.tutee.post_components.edit_post_form')->name('edit-post');
     });
 
     // Add tutor routes here
@@ -45,8 +46,17 @@ Route::middleware('auth', 'check.is_stepper', 'verified')->group(function () {
         Volt::route('tutor/discover', 'pages.tutor.discover')->name('tutor.discover');
         Volt::route('classes', 'pages.tutor.classes')->name('classes');
         Volt::route('tutor/schedule', 'pages.tutor.schedule.schedule')->name('tutor.schedule');
-        Volt::route('view-students', 'pages.tutor.schedule.view-students')->name('view-students');
+        Volt::route('tutor/view-students/{id}', 'pages.tutor.schedule.view-students')->name('view-students');
+        Volt::route('tutor/edit-class/{id}', 'pages.tutor.classes_components.edit_class_form')->name('edit-class');
+    });
+
+    Route::middleware('checkIsApplied')->group(function () {
+        Volt::route('stepper/be-a-tutee', 'pages.stepper.tutee.main')->name('stepper.be-a-tutee');
+        Volt::route('stepper/apply-as-tutor', 'pages.stepper.tutor.main')->name('stepper.apply-as-tutor');
     });
 
     Route::view('/forbidden-access', 'forbidden-page');
+
+    Volt::route('blocked', 'pages.blocked')->name('blocked');
 });
+

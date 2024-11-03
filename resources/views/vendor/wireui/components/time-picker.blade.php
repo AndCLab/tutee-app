@@ -9,6 +9,7 @@
             readonly: @boolean($readonly),
             disabled: @boolean($disabled),
         },
+        
     })"
     {{ $attributes
         ->only('wire:key')

@@ -31,9 +31,18 @@ new class extends Component
             throw $e;
         }
 
-        Auth::user()->update([
-            'password' => Hash::make($validated['password']),
-        ]);
+        if (Auth::guard('admin')->check()) {
+            $admin = Auth::guard('admin')->user();
+            $admin->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+
+        } elseif (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+            $user->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+        }
 
         $this->reset('current_password', 'password', 'password_confirmation');
 
@@ -88,4 +97,5 @@ new class extends Component
             </x-action-message>
         </div>
     </form>
+    <x-wui-notifications position="bottom-right" />
 </section>
